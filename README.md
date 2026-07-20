@@ -6,6 +6,7 @@
   <img alt="Input" src="https://img.shields.io/badge/Input-chart_images_%2B_PDF-6F42A1?style=for-the-badge">
   <img alt="Output" src="https://img.shields.io/badge/Output-CSV_%2B_JSON_%2B_overlay-25A9E0?style=for-the-badge">
   <img alt="Workflow" src="https://img.shields.io/badge/Workflow-local_%2B_auditable-39A96B?style=for-the-badge">
+  <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-FF6699?style=for-the-badge">
 </p>
 
 # THU Digitizer
@@ -183,3 +184,7 @@ THU Digitizer 的研究基线和实现受这些工具与生态启发或支持：
 - [PyMuPDF](https://pymupdf.readthedocs.io/)：PDF 页面与矢量对象检查。
 - [NumPy](https://numpy.org/)、[Pillow](https://python-pillow.org/)、[Matplotlib](https://matplotlib.org/)、[SciPy](https://scipy.org/) 和 [OpenCV](https://opencv.org/)：本地几何处理、统计验证和证据可视化。
 - 画廊中的开放获取论文与作者公开源数据；具体来源、许可和用途记录在各案例及 [`gallery/ATTRIBUTION.md`](gallery/ATTRIBUTION.md) 中。
+
+## 许可证
+
+本项目使用 [MIT License](LICENSE)。
