@@ -1,0 +1,60 @@
+{
+  "schema_version": 1,
+  "status": "needs_chart_type_confirmation",
+  "inspection": {
+    "input_file": "F:\\AI\\thu-digitizer\\gallery\\assets\\cases\\nature-19006-fig2b\\original.png",
+    "input_sha256": "e7c1dbef62958ed5a8ceb035c0ba3020052e6dcd8248ff7af96c2236ecfb05f8",
+    "file_size_bytes": 77462,
+    "media_kind": "raster",
+    "coordinate_space": "pixel",
+    "format": "PNG",
+    "mode": "RGB",
+    "width": 1200,
+    "height": 645,
+    "appearance": {
+      "background_proposal": "light",
+      "border_median_luminance_0_255": 254.99999999999997,
+      "border_colour_span_median_0_255": 0.0,
+      "pixel_count": 774000,
+      "role": "appearance proposal only; not chart classification or numeric evidence"
+    }
+  },
+  "route_selection": {
+    "chart_type": null,
+    "primary": {
+      "route_id": "unknown_refuse",
+      "title": "Unknown chart: refuse numeric extraction",
+      "chart_types": [
+        "unknown"
+      ],
+      "media_kinds": [
+        "raster",
+        "pdf"
+      ],
+      "coordinate_models": [
+        "unknown"
+      ],
+      "mark_grammars": [
+        "unknown"
+      ],
+      "maturity": "refusal",
+      "implementation": null,
+      "required_confirmations": [
+        "chart_type",
+        "coordinate_model",
+        "recoverable_representation"
+      ],
+      "recoverable": "Input metadata and routing diagnostics only.",
+      "non_recoverable": "All numeric values until the chart grammar and coordinate model are verified.",
+      "automated_extraction": false
+    },
+    "fallback": null,
+    "decision": "needs_chart_type_confirmation",
+    "reason": "No chart-type hint was provided; numeric extraction is refused until classification is verified."
+  },
+  "figure_spec_status": "valid_template_not_yet_verified",
+  "safety": {
+    "numeric_extraction_authorized": false,
+    "reason": "Preflight routing never converts proposed chart type, ROI, axes, or series into verified values."
+  }
+}

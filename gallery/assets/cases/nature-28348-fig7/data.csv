@@ -1,0 +1,18 @@
+record_id,kind,set,value,union,total,percent,source_status,intersection,members,count
+1,set_total,AMP Tier I,3797,8786,9961,38.12,official_source_data_mapped,,,
+2,set_total,Diagnosis Match,6219,8786,9961,62.43,official_source_data_mapped,,,
+3,set_total,Direct Match,8786,8786,9961,88.2,official_source_data_mapped,,,
+4,set_total,Non-Synon,8767,8786,9961,88.01,official_source_data_mapped,,,
+5,set_total,Position-Specific,6251,8786,9961,62.75,official_source_data_mapped,,,
+17,intersection,,,,,32.32,official_source_data_mapped,1,AMP Tier I;Diagnosis Match;Direct Match;Non-Synon;Position-Specific,3219
+16,intersection,,,,,19.37,official_source_data_mapped,2,Diagnosis Match;Direct Match;Non-Synon;Position-Specific,1929
+6,intersection,,,,,13.52,official_source_data_mapped,3,Direct Match;Non-Synon,1347
+12,intersection,,,,,8.81,official_source_data_mapped,4,Direct Match;Non-Synon;Position-Specific,878
+10,intersection,,,,,8.21,official_source_data_mapped,5,Diagnosis Match;Direct Match;Non-Synon,818
+13,intersection,,,,,2.5,official_source_data_mapped,6,AMP Tier I;Diagnosis Match;Direct Match;Non-Synon,249
+15,intersection,,,,,2.07,official_source_data_mapped,7,AMP Tier I;Direct Match;Non-Synon;Position-Specific,206
+8,intersection,,,,,1.21,official_source_data_mapped,8,AMP Tier I;Direct Match;Non-Synon,121
+7,intersection,,,,,0.14,official_source_data_mapped,9,Direct Match;Position-Specific,14
+11,intersection,,,,,0.03,official_source_data_mapped,10,Diagnosis Match;Direct Match;Position-Specific,3
+9,intersection,,,,,0.01,official_source_data_mapped,11,AMP Tier I;Direct Match;Position-Specific,1
+14,intersection,,,,,0.01,official_source_data_mapped,12,AMP Tier I;Diagnosis Match;Direct Match;Position-Specific,1

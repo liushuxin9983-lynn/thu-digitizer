@@ -1,0 +1,16 @@
+intersection,combination,count,FunC_1,FunC_2,FunC_3,FunC_4,value_status
+1,FunC-1+FunC-2+FunC-3+FunC-4,1857,1,1,1,1,official_source_mapped
+2,FunC-1,709,1,0,0,0,official_source_mapped
+3,FunC-3,565,0,0,1,0,official_source_mapped
+4,FunC-1+FunC-3+FunC-4,495,1,0,1,1,official_source_mapped
+5,FunC-2,458,0,1,0,0,official_source_mapped
+6,FunC-4,444,0,0,0,1,official_source_mapped
+7,FunC-3+FunC-4,355,0,0,1,1,official_source_mapped
+8,FunC-1+FunC-3,308,1,0,1,0,official_source_mapped
+9,FunC-2+FunC-3+FunC-4,298,0,1,1,1,official_source_mapped
+10,FunC-1+FunC-2+FunC-4,273,1,1,0,1,official_source_mapped
+11,FunC-1+FunC-4,249,1,0,0,1,official_source_mapped
+12,FunC-1+FunC-2,207,1,1,0,0,official_source_mapped
+13,FunC-1+FunC-2+FunC-3,178,1,1,1,0,official_source_mapped
+14,FunC-2+FunC-4,158,0,1,0,1,official_source_mapped
+15,FunC-2+FunC-3,121,0,1,1,0,official_source_mapped

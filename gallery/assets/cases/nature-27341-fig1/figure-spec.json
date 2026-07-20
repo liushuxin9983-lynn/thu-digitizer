@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "status": "needs_chart_type_confirmation",
+  "source": {
+    "input_file": "F:\\AI\\thu-digitizer\\tmp\\nature-27341\\fig1.png",
+    "sha256": "ccf1f6921d907785103298b96fd971083dd6280fdf212318574920952780c313",
+    "media_kind": "raster",
+    "coordinate_space": "pixel",
+    "width": 1999,
+    "height": 1579,
+    "page": null
+  },
+  "panels": [
+    {
+      "panel_id": "panel-1",
+      "bounds": [
+        0.0,
+        0.0,
+        1999,
+        1579
+      ],
+      "bounds_verification": "proposed",
+      "plot_bounds": [
+        0.0,
+        0.0,
+        1999,
+        1579
+      ],
+      "plot_bounds_verification": "proposed",
+      "chart_type": "unknown",
+      "chart_type_verification": "missing",
+      "coordinate_model": "unknown",
+      "coordinate_model_verification": "missing",
+      "axes": [],
+      "series": [],
+      "mark_grammars": [
+        "unknown"
+      ],
+      "route": {
+        "route_id": "unknown_refuse",
+        "maturity": "refusal",
+        "implementation": null,
+        "automated_extraction": false
+      },
+      "required_confirmations": [
+        "chart_type",
+        "coordinate_model",
+        "recoverable_representation"
+      ],
+      "confirmations": {
+        "chart_type": "missing",
+        "coordinate_model": "missing",
+        "recoverable_representation": "missing"
+      },
+      "recoverable": "Input metadata and routing diagnostics only.",
+      "non_recoverable": "All numeric values until the chart grammar and coordinate model are verified."
+    }
+  ],
+  "evidence_contract": {
+    "required": [
+      "input_hash",
+      "panel_and_plot_bounds",
+      "calibration_anchors",
+      "immutable_extraction_csv",
+      "json_report",
+      "overlay_or_recreation",
+      "confidence_and_refusal_reasons"
+    ],
+    "source_data_role": "independent_validation_only"
+  }
+}

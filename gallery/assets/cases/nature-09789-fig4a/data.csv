@@ -1,0 +1,11 @@
+kind,series,category,x,y,value,pixel_x,pixel_y,radius,fill,value_status
+point,model variance,visible point,0.09,0.425,0.425,284,61,14,#000000,visible_marker_candidate
+point,model variance,visible point,0.105,0.27,0.27,308,263,14,#008080,visible_marker_candidate
+point,model variance,visible point,0.11,0.255,0.255,318,277,14,#ffa500,visible_marker_candidate
+point,model variance,visible point,0.12,0.18,0.18,333,361,14,#0000ff,visible_marker_candidate
+point,model variance,visible point,0.14,0.13,0.13,355,416,14,#800080,visible_marker_candidate
+point,model variance,visible point,0.145,0.25,0.25,365,282,14,#008000,visible_marker_candidate
+point,model variance,visible point,0.155,0.23,0.23,396,307,14,#f263a8,visible_marker_candidate
+point,model variance,visible point,0.16,0.11,0.11,412,438,14,#fff000,visible_marker_candidate
+point,model variance,visible point,0.185,0.06,0.06,439,490,14,#ff0000,visible_marker_candidate
+point,model variance,visible point,0,0,0,185,557,12,#bdbdbd,visible_marker_candidate

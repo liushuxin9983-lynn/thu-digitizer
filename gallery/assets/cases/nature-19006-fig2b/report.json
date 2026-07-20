@@ -1,0 +1,12 @@
+{
+  "status": "source_mapped",
+  "route": "official_source_data_mapped",
+  "source_file": "Source Data/fig2b.tsv",
+  "panel_mapping": "Fig. 2b intersection bars are grouped by the four FunC columns; count is unique KO annotation count",
+  "rows": 15,
+  "pixel_extraction": "not_run",
+  "limitations": [
+    "The original panel contains an UpSet matrix and inset; the interactive chart focuses on the intersection counts and membership matrix."
+  ],
+  "schema_version": 1
+}

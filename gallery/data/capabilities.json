@@ -1,0 +1,2192 @@
+{
+  "schemaVersion": 1,
+  "generated": "2026-07-20",
+  "taxonomySource": {
+    "model": "digitization-layered-taxonomy",
+    "primary": {
+      "name": "WebPlotDigitizer axes and calibration types",
+      "url": "https://automeris.io/docs/digitize/"
+    },
+    "secondary": {
+      "name": "The R Graph Gallery chart vocabulary",
+      "url": "https://r-graph-gallery.com/"
+    },
+    "note": "Top-level groups are designed for data recovery: calibration family plus visible mark plus scientific semantics. R Graph Gallery is vocabulary input, not the product hierarchy."
+  },
+  "counts": {
+    "groups": 13,
+    "types": 77,
+    "stableTypes": 6,
+    "wpdCalibrationFamilies": 7,
+    "extensionRoutes": 2,
+    "oaRepresentatives": 51,
+    "validatedDemos": 8,
+    "referenceFigures": 17
+  },
+  "groups": [
+    {
+      "id": "xy-curves",
+      "label": "Cartesian curves",
+      "title": "XY 曲线与轨迹",
+      "route": "xy"
+    },
+    {
+      "id": "xy-points",
+      "label": "Cartesian points",
+      "title": "XY 点、拟合与嵌入",
+      "route": "xy"
+    },
+    {
+      "id": "categorical-bars",
+      "label": "Categorical marks",
+      "title": "分类柱、条与点",
+      "route": "bar"
+    },
+    {
+      "id": "distribution",
+      "label": "Distributions",
+      "title": "分布与样本概括",
+      "route": "xy"
+    },
+    {
+      "id": "intervals",
+      "label": "Intervals",
+      "title": "区间、不确定性与估计",
+      "route": "xy"
+    },
+    {
+      "id": "matrix-fields",
+      "label": "Matrix & fields",
+      "title": "矩阵、等高线与连续场",
+      "route": "xy"
+    },
+    {
+      "id": "polar-radial",
+      "label": "Polar & radial",
+      "title": "极坐标、径向与圆记录图",
+      "route": "polar"
+    },
+    {
+      "id": "ternary",
+      "label": "Ternary",
+      "title": "三元与单纯形",
+      "route": "ternary"
+    },
+    {
+      "id": "map-image",
+      "label": "Map & scaled image",
+      "title": "地图、显微图与标尺图像",
+      "route": "map_scale"
+    },
+    {
+      "id": "composition-hierarchy",
+      "label": "Composition & hierarchy",
+      "title": "组成、嵌套与层级",
+      "route": "structure"
+    },
+    {
+      "id": "flow-network",
+      "label": "Flow & network",
+      "title": "流、网络与树",
+      "route": "structure"
+    },
+    {
+      "id": "scientific-specialty",
+      "label": "Scientific specialty",
+      "title": "科研专用语义图",
+      "route": "semantic_router"
+    },
+    {
+      "id": "composite",
+      "label": "Composite figures",
+      "title": "复合图、多面板与嵌入表",
+      "route": "semantic_router"
+    }
+  ],
+  "calibrationFamilies": [
+    {
+      "id": "xy",
+      "label": "2D XY",
+      "origin": "WebPlotDigitizer",
+      "description": "线性、对数或日期轴；承载曲线、散点、直方图与大多数统计图。"
+    },
+    {
+      "id": "bar",
+      "label": "Bar axis",
+      "origin": "WebPlotDigitizer",
+      "description": "一个分类轴和一个连续轴；与两个连续轴的直方图分开。"
+    },
+    {
+      "id": "polar",
+      "label": "Polar",
+      "origin": "WebPlotDigitizer",
+      "description": "中心、径向标尺和角度方向的专用校准。"
+    },
+    {
+      "id": "ternary",
+      "label": "Ternary",
+      "origin": "WebPlotDigitizer",
+      "description": "三角形三个顶点和方向决定三分量坐标。"
+    },
+    {
+      "id": "map_scale",
+      "label": "Map / scale bar",
+      "origin": "WebPlotDigitizer",
+      "description": "地图、显微图等只有比例尺的图像。"
+    },
+    {
+      "id": "image_pixel",
+      "label": "Image pixels",
+      "origin": "WebPlotDigitizer",
+      "description": "不换算数据轴，直接恢复像素位置、距离、面积或周长。"
+    },
+    {
+      "id": "circular_recorder",
+      "label": "Circular recorder",
+      "origin": "WebPlotDigitizer",
+      "description": "圆形记录纸的时间与径向信号专用校准。"
+    },
+    {
+      "id": "structure",
+      "label": "Structure parser",
+      "origin": "thu-digitizer extension",
+      "description": "节点、边、扇区、层级和流带，不强行套用 XY 坐标。"
+    },
+    {
+      "id": "semantic_router",
+      "label": "Scientific router",
+      "origin": "thu-digitizer extension",
+      "description": "识别科研语义和面板结构，再路由到一个或多个校准/图元提取器。"
+    }
+  ],
+  "capabilities": [
+    {
+      "id": "line-time-series",
+      "group": "xy-curves",
+      "label": "Line / time series",
+      "aliases": [
+        "折线图",
+        "时间序列",
+        "多系列曲线"
+      ],
+      "engineStatus": "stable",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "颜色可分的曲线中心线与校准坐标",
+      "nonRecoverable": "不可见采样点、平滑参数与插值规则",
+      "caseId": "nature-nanopore-scatter",
+      "thumbnailKey": "signal",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-nanopore-scatter/atlas-signal.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-018-07924-1",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "step-curve",
+      "group": "xy-curves",
+      "label": "Step curve",
+      "aliases": [
+        "阶梯图",
+        "分段常数曲线"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "水平段、垂直跃迁和转折坐标",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-hypergraph-roc",
+      "thumbnailKey": "roc",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-hypergraph-roc/atlas-roc.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-57664-2",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "connected-curve",
+      "group": "xy-curves",
+      "label": "Connected trajectory",
+      "aliases": [
+        "连线轨迹",
+        "相位轨迹"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "有序点或连续路径",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-xenopus-polar",
+      "thumbnailKey": "waveform",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-xenopus-polar/atlas-waveform.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-30636-6",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "area-stream",
+      "group": "xy-curves",
+      "label": "Area / stacked area",
+      "aliases": [
+        "面积图",
+        "堆叠面积",
+        "streamgraph"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "基线和每层可见上边界",
+      "nonRecoverable": "被遮挡层边界与原始样本",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "xy",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "dose-model",
+      "group": "xy-curves",
+      "label": "Dose-response / fitted model",
+      "aliases": [
+        "剂量反应",
+        "模型曲线",
+        "拟合线"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "source_mapped",
+      "recoverableRepresentation": "可见模型曲线、拐点与标定轴",
+      "nonRecoverable": "作者未公开的拟合过程与残差",
+      "caseId": "nature-borneo-edge",
+      "thumbnailKey": "scatter",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-borneo-edge/atlas-scatter.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01997-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "waveform",
+      "group": "xy-curves",
+      "label": "Waveform / signal trace",
+      "aliases": [
+        "波形",
+        "示波器",
+        "生理信号"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "时间-幅值轨迹、事件边界与标尺",
+      "nonRecoverable": "隐藏采样率、滤波与触发条件",
+      "caseId": "nature-xenopus-polar",
+      "thumbnailKey": "waveform",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-xenopus-polar/atlas-waveform.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-30636-6",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "scatter",
+      "group": "xy-points",
+      "label": "Scatter",
+      "aliases": [
+        "散点图",
+        "二维点图"
+      ],
+      "engineStatus": "stable",
+      "demoStatus": "source_mapped",
+      "recoverableRepresentation": "点中心、系列与校准坐标",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-borneo-edge",
+      "thumbnailKey": "scatter",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-borneo-edge/atlas-scatter.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01997-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "bubble",
+      "group": "xy-points",
+      "label": "Bubble",
+      "aliases": [
+        "气泡图",
+        "大小编码点"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "点中心；有尺寸图例时估计面积编码",
+      "nonRecoverable": "没有图例时面积对应的绝对值",
+      "caseId": "nature-spatial-treemap",
+      "thumbnailKey": "dot_matrix",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-spatial-treemap/atlas-dot_matrix.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-35288-0",
+      "figure": "Fig. 6"
+    },
+    {
+      "id": "dense-marginal",
+      "group": "xy-points",
+      "label": "Dense scatter / marginal",
+      "aliases": [
+        "密集散点",
+        "边际分布",
+        "joint plot"
+      ],
+      "engineStatus": "restricted",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "可分离点、密度轮廓与边际统计图",
+      "nonRecoverable": "融合点簇中的逐点身份",
+      "caseId": "nature-ribotie-multipanel",
+      "thumbnailKey": "marginal",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-ribotie-multipanel/atlas-marginal.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "connected-scatter",
+      "group": "xy-points",
+      "label": "Connected scatter",
+      "aliases": [
+        "连线散点",
+        "轨迹点"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "点中心、连接顺序与分组",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-nanopore-scatter",
+      "thumbnailKey": "signal",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-nanopore-scatter/atlas-signal.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-018-07924-1",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "regression-scatter",
+      "group": "xy-points",
+      "label": "Regression scatter",
+      "aliases": [
+        "回归散点",
+        "拟合散点"
+      ],
+      "engineStatus": "stable",
+      "demoStatus": "source_mapped",
+      "recoverableRepresentation": "点、拟合线和可见参考线分层恢复",
+      "nonRecoverable": "作者模型的未公开参数与推断过程",
+      "caseId": "nature-borneo-edge",
+      "thumbnailKey": "scatter",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-borneo-edge/atlas-scatter.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01997-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "volcano-manhattan",
+      "group": "xy-points",
+      "label": "Volcano / Manhattan",
+      "aliases": [
+        "火山图",
+        "曼哈顿图",
+        "显著性散点"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "点中心、阈值线、显著点标签和轴变换",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-ribotie-multipanel",
+      "thumbnailKey": "volcano",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-ribotie-multipanel/atlas-volcano.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "embedding",
+      "group": "xy-points",
+      "label": "Embedding / UMAP / t-SNE",
+      "aliases": [
+        "降维嵌入",
+        "UMAP",
+        "t-SNE"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "可见点位置、类别、聚类和局部轨迹",
+      "nonRecoverable": "高维原始特征与真实距离语义",
+      "caseId": "nature-spatial-treemap",
+      "thumbnailKey": "spatial_map",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-spatial-treemap/atlas-spatial_map.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-35288-0",
+      "figure": "Fig. 6"
+    },
+    {
+      "id": "bar",
+      "group": "categorical-bars",
+      "label": "Vertical / horizontal bar",
+      "aliases": [
+        "柱状图",
+        "条形图",
+        "正负柱"
+      ],
+      "engineStatus": "benchmark_only",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "分类、系列、基线与柱端值",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-ribotie-multipanel",
+      "thumbnailKey": "bar",
+      "calibrationFamily": "bar",
+      "thumbnail": "assets/cases/nature-ribotie-multipanel/atlas-bar.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "grouped-bar",
+      "group": "categorical-bars",
+      "label": "Grouped bar",
+      "aliases": [
+        "分组柱",
+        "簇状柱"
+      ],
+      "engineStatus": "benchmark_only",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "组、子系列和各柱端值",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-xenopus-polar",
+      "thumbnailKey": "errorbar",
+      "calibrationFamily": "bar",
+      "thumbnail": "assets/cases/nature-xenopus-polar/atlas-errorbar.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-30636-6",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "stacked-bar",
+      "group": "categorical-bars",
+      "label": "Stacked / 100% bar",
+      "aliases": [
+        "堆叠柱",
+        "百分比堆叠"
+      ],
+      "engineStatus": "benchmark_only",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "每个可见分段边界与合计",
+      "nonRecoverable": "未展示的组内样本",
+      "caseId": "nature-ribotie-multipanel",
+      "thumbnailKey": "bar",
+      "calibrationFamily": "bar",
+      "thumbnail": "assets/cases/nature-ribotie-multipanel/atlas-bar.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "diverging-bar",
+      "group": "categorical-bars",
+      "label": "Diverging bar",
+      "aliases": [
+        "发散柱",
+        "人口金字塔"
+      ],
+      "engineStatus": "benchmark_only",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "零基线两侧的类别和端值",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "bar",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "waterfall",
+      "group": "categorical-bars",
+      "label": "Waterfall",
+      "aliases": [
+        "瀑布图",
+        "桥图"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "起点、增量、累计端点和连接线",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "bar",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "lollipop-dot",
+      "group": "categorical-bars",
+      "label": "Lollipop / dot plot",
+      "aliases": [
+        "棒棒糖图",
+        "克利夫兰点图"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "类别位置、点值与连接线",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "bar",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "histogram",
+      "group": "distribution",
+      "label": "Histogram",
+      "aliases": [
+        "直方图",
+        "频数分布"
+      ],
+      "engineStatus": "stable",
+      "demoStatus": "source_mapped",
+      "recoverableRepresentation": "连续轴下的 bin 边界与高度",
+      "nonRecoverable": "生成直方图的原始样本",
+      "caseId": "nature-borneo-edge",
+      "thumbnailKey": "histogram",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-borneo-edge/atlas-histogram.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01997-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "boxplot",
+      "group": "distribution",
+      "label": "Boxplot",
+      "aliases": [
+        "箱线图",
+        "盒须图",
+        "横向箱线图"
+      ],
+      "engineStatus": "stable",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "五数概括与可见离群点",
+      "nonRecoverable": "原始样本",
+      "caseId": "nature-ribotie-multipanel",
+      "thumbnailKey": "boxplot",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-ribotie-multipanel/atlas-boxplot.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "violin-raincloud",
+      "group": "distribution",
+      "label": "Violin / raincloud",
+      "aliases": [
+        "小提琴图",
+        "雨云图"
+      ],
+      "engineStatus": "restricted",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "可见密度轮廓、内嵌箱线和样本点",
+      "nonRecoverable": "核密度参数与原始样本",
+      "caseId": "nature-violin-heatmap",
+      "thumbnailKey": "violin",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-violin-heatmap/atlas-violin.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-019-09513-2",
+      "figure": "Fig. 5"
+    },
+    {
+      "id": "strip-beeswarm",
+      "group": "distribution",
+      "label": "Strip / beeswarm",
+      "aliases": [
+        "抖动点",
+        "蜂群图"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "可分离点中心、组别和局部堆叠",
+      "nonRecoverable": "融合点簇中的隐藏样本",
+      "caseId": "nature-ribotie-multipanel",
+      "thumbnailKey": "boxplot",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-ribotie-multipanel/atlas-boxplot.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "density-ridgeline",
+      "group": "distribution",
+      "label": "Density / ridgeline",
+      "aliases": [
+        "密度曲线",
+        "山脊图",
+        "joyplot"
+      ],
+      "engineStatus": "restricted",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "每组可见密度轮廓",
+      "nonRecoverable": "生成曲线的原始样本和带宽",
+      "caseId": "nature-violin-heatmap",
+      "thumbnailKey": "violin",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-violin-heatmap/atlas-violin.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-019-09513-2",
+      "figure": "Fig. 5"
+    },
+    {
+      "id": "ecdf",
+      "group": "distribution",
+      "label": "ECDF / cumulative",
+      "aliases": [
+        "经验累积分布",
+        "累积分布"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "阶梯位置与可见累计概率",
+      "nonRecoverable": "重复值中的精确个体身份",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "xy",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "error-point-range",
+      "group": "intervals",
+      "label": "Error bar / point range",
+      "aliases": [
+        "误差棒",
+        "点区间",
+        "均值与误差"
+      ],
+      "engineStatus": "stable",
+      "demoStatus": "partial_visible",
+      "recoverableRepresentation": "点估计、上下端点和帽线，独立于主系列",
+      "nonRecoverable": "未说明的 SD、SEM 或置信区间语义",
+      "caseId": "nature-xenopus-polar",
+      "thumbnailKey": "errorbar",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-xenopus-polar/atlas-errorbar.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-30636-6",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "forest",
+      "group": "intervals",
+      "label": "Forest / coefficient",
+      "aliases": [
+        "森林图",
+        "系数图",
+        "dot-whisker"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "visible_geometry",
+      "recoverableRepresentation": "点估计、区间端点、参考线和行标签",
+      "nonRecoverable": "作者未展示的统计模型",
+      "caseId": "nature-blood-forest",
+      "thumbnailKey": "forest",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-blood-forest/atlas-forest.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-024-53091-x",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "confidence-band",
+      "group": "intervals",
+      "label": "Confidence / ribbon band",
+      "aliases": [
+        "置信带",
+        "预测带",
+        "ribbon"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "上下边界和中心线",
+      "nonRecoverable": "误差带定义与原始拟合样本",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "xy",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "funnel",
+      "group": "intervals",
+      "label": "Funnel plot",
+      "aliases": [
+        "漏斗图",
+        "发表偏倚图"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "研究点、中心线与显著性边界",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "xy",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "candlestick",
+      "group": "intervals",
+      "label": "Candlestick / OHLC",
+      "aliases": [
+        "蜡烛图",
+        "K 线",
+        "OHLC"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "开高低收与时间位置",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "xy",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "heatmap",
+      "group": "matrix-fields",
+      "label": "Heatmap",
+      "aliases": [
+        "热图",
+        "颜色矩阵"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "source_mapped",
+      "recoverableRepresentation": "行列网格、经色条标定的单元值与可见显著性标记",
+      "nonRecoverable": "无色条时的绝对数值，以及色条端点之外被截断的精确幅度",
+      "caseId": "nature-protaide-heatmap",
+      "thumbnailKey": "heatmap",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-protaide-heatmap/atlas-heatmap.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41591-026-04303-y",
+      "figure": "Fig. 4c"
+    },
+    {
+      "id": "correlogram-dotmatrix",
+      "group": "matrix-fields",
+      "label": "Correlogram / dot matrix",
+      "aliases": [
+        "相关矩阵",
+        "点阵矩阵",
+        "气泡矩阵"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "矩阵索引、符号与可标定颜色/面积",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-spatial-treemap",
+      "thumbnailKey": "dot_matrix",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-spatial-treemap/atlas-dot_matrix.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-35288-0",
+      "figure": "Fig. 6"
+    },
+    {
+      "id": "contour",
+      "group": "matrix-fields",
+      "label": "Contour / isoline",
+      "aliases": [
+        "等高线",
+        "等值线",
+        "相图边界"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "等值线几何、标签和标定坐标",
+      "nonRecoverable": "线间未显示的连续场",
+      "caseId": "nature-autospill-flow",
+      "thumbnailKey": "flow_cytometry",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-autospill-flow/atlas-flow_cytometry.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-021-23126-8",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "density-2d",
+      "group": "matrix-fields",
+      "label": "2D density",
+      "aliases": [
+        "二维密度",
+        "核密度场",
+        "hex density"
+      ],
+      "engineStatus": "restricted",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "色条标定的密度场和可见轮廓",
+      "nonRecoverable": "原始二维事件全集",
+      "caseId": "nature-autospill-flow",
+      "thumbnailKey": "flow_cytometry",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-autospill-flow/atlas-flow_cytometry.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-021-23126-8",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "raster-field",
+      "group": "matrix-fields",
+      "label": "Raster / intensity field",
+      "aliases": [
+        "强度场",
+        "伪彩色图",
+        "二维栅格"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "规则像元与经色条标定的强度",
+      "nonRecoverable": "插值前的原始测量点",
+      "caseId": "nature-nagler-polar",
+      "thumbnailKey": "raster_field",
+      "calibrationFamily": "xy",
+      "thumbnail": "assets/cases/nature-nagler-polar/atlas-raster_field.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01748-1",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "surface-mesh",
+      "group": "matrix-fields",
+      "label": "3D surface / mesh",
+      "aliases": [
+        "三维曲面",
+        "网格面",
+        "瀑布谱"
+      ],
+      "engineStatus": "restricted",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "可见投影轮廓和网格交点",
+      "nonRecoverable": "单张透视图遮挡的背面与真实三维网格",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "xy",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "polar-curve",
+      "group": "polar-radial",
+      "label": "Polar curve / scatter",
+      "aliases": [
+        "极坐标曲线",
+        "极坐标散点",
+        "角度响应"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "角度、半径和系列轨迹",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-nagler-polar",
+      "thumbnailKey": "polar",
+      "calibrationFamily": "polar",
+      "thumbnail": "assets/cases/nature-nagler-polar/atlas-polar.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01748-1",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "radar",
+      "group": "polar-radial",
+      "label": "Radar / spider",
+      "aliases": [
+        "雷达图",
+        "蜘蛛图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "逐轴半径值和系列多边形",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "polar",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "rose-wind",
+      "group": "polar-radial",
+      "label": "Rose / wind rose",
+      "aliases": [
+        "玫瑰图",
+        "风向玫瑰",
+        "极坐标直方图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "角度 bin、径向长度和堆叠分段",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "polar",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "circular-bar",
+      "group": "polar-radial",
+      "label": "Circular bar",
+      "aliases": [
+        "环形柱",
+        "径向柱"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "角度类别和径向柱长",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "polar",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "radial-heatmap",
+      "group": "polar-radial",
+      "label": "Radial heatmap",
+      "aliases": [
+        "环形热图",
+        "径向矩阵"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "角度-半径网格与颜色值",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "polar",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "circular-recorder",
+      "group": "polar-radial",
+      "label": "Circular chart recorder",
+      "aliases": [
+        "圆形记录纸",
+        "圆盘记录仪"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "圆周时间和径向信号轨迹",
+      "nonRecoverable": "记录纸转速与起始时间未标注时的绝对时间",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "circular_recorder",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "ternary-scatter",
+      "group": "ternary",
+      "label": "Ternary scatter",
+      "aliases": [
+        "三元散点",
+        "simplex"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "三角坐标内点与三分量比例",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-graphddp-ternary",
+      "thumbnailKey": "ternary",
+      "calibrationFamily": "ternary",
+      "thumbnail": "assets/cases/nature-graphddp-ternary/atlas-ternary.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-018-05988-7",
+      "figure": "Fig. 3"
+    },
+    {
+      "id": "ternary-contour",
+      "group": "ternary",
+      "label": "Ternary contour / heatmap",
+      "aliases": [
+        "三元等高线",
+        "三元热图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "三元网格、等值线与颜色值",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "ternary",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "simplex-trajectory",
+      "group": "ternary",
+      "label": "Simplex trajectory",
+      "aliases": [
+        "三元轨迹",
+        "组成演化"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "三分量点序列和连接方向",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "ternary",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "raster-choropleth-map",
+      "group": "map-image",
+      "label": "Raster / choropleth map",
+      "aliases": [
+        "栅格地图",
+        "分级设色",
+        "连续色标地图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "有地理配准和色条时的像元或区域值",
+      "nonRecoverable": "缺失投影时的精确地理坐标",
+      "caseId": "nature-economic-map",
+      "thumbnailKey": "raster_map",
+      "calibrationFamily": "map_scale",
+      "thumbnail": "assets/cases/nature-economic-map/atlas-raster_map.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-023-42122-8",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "point-bubble-map",
+      "group": "map-image",
+      "label": "Point / bubble map",
+      "aliases": [
+        "点地图",
+        "气泡地图",
+        "空间点图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "点位置、类别与可标定面积",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-sarscov2-phylogeny",
+      "thumbnailKey": "point_map",
+      "calibrationFamily": "map_scale",
+      "thumbnail": "assets/cases/nature-sarscov2-phylogeny/atlas-point_map.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-020-19818-2",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "grid-hexbin-map",
+      "group": "map-image",
+      "label": "Grid / hexbin map",
+      "aliases": [
+        "规则栅格地图",
+        "六边形地图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "网格索引、边界和颜色值",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-economic-map",
+      "thumbnailKey": "grid_map",
+      "calibrationFamily": "map_scale",
+      "thumbnail": "assets/cases/nature-economic-map/atlas-grid_map.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-023-42122-8",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "connection-map",
+      "group": "map-image",
+      "label": "Connection map",
+      "aliases": [
+        "迁徙线",
+        "航线图",
+        "流向地图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "可见端点、路径和方向",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "map_scale",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "cartogram",
+      "group": "map-image",
+      "label": "Cartogram",
+      "aliases": [
+        "变形地图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "变形后的区域、标签和邻接",
+      "nonRecoverable": "未提供底图时的原始地理面积",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "map_scale",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "scale-microscopy",
+      "group": "map-image",
+      "label": "Scale-bar image / microscopy",
+      "aliases": [
+        "显微图",
+        "比例尺图像",
+        "遥感影像"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "比例尺标定后的点、距离、面积和对象轮廓",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-nagler-polar",
+      "thumbnailKey": "microscopy",
+      "calibrationFamily": "map_scale",
+      "thumbnail": "assets/cases/nature-nagler-polar/atlas-microscopy.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01748-1",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "pixel-measurement",
+      "group": "map-image",
+      "label": "Generic pixel measurement",
+      "aliases": [
+        "像素坐标",
+        "长度",
+        "面积",
+        "周长"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "像素位置、轮廓、距离、面积与周长",
+      "nonRecoverable": "没有比例尺时的物理单位",
+      "caseId": "nature-nagler-polar",
+      "thumbnailKey": "microscopy",
+      "calibrationFamily": "image_pixel",
+      "thumbnail": "assets/cases/nature-nagler-polar/atlas-microscopy.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01748-1",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "pie-donut",
+      "group": "composition-hierarchy",
+      "label": "Pie / donut",
+      "aliases": [
+        "饼图",
+        "甜甜圈图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "扇区角度、比例和可读标签",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-ribotie-multipanel",
+      "thumbnailKey": "donut",
+      "calibrationFamily": "structure",
+      "thumbnail": "assets/cases/nature-ribotie-multipanel/atlas-donut.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "treemap-voronoi",
+      "group": "composition-hierarchy",
+      "label": "Treemap / Voronoi treemap",
+      "aliases": [
+        "矩形树图",
+        "Voronoi treemap"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "可见区域面积、标签与显式层级",
+      "nonRecoverable": "未编码或被裁切的隐藏层级",
+      "caseId": "nature-spatial-treemap",
+      "thumbnailKey": "treemap",
+      "calibrationFamily": "structure",
+      "thumbnail": "assets/cases/nature-spatial-treemap/atlas-treemap.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-35288-0",
+      "figure": "Fig. 6"
+    },
+    {
+      "id": "sunburst-packing",
+      "group": "composition-hierarchy",
+      "label": "Sunburst / circle packing",
+      "aliases": [
+        "旭日图",
+        "圆堆积",
+        "径向层级"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "可见嵌套、面积或角度",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "structure",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "dendrogram",
+      "group": "composition-hierarchy",
+      "label": "Dendrogram",
+      "aliases": [
+        "树状图",
+        "聚类树"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "可见叶、分支与合并高度",
+      "nonRecoverable": "生成树的原始距离矩阵",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "structure",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "waffle",
+      "group": "composition-hierarchy",
+      "label": "Waffle / unit grid",
+      "aliases": [
+        "华夫图",
+        "单位方格"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "单位格计数、类别和显式比例",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "structure",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "sankey-alluvial",
+      "group": "flow-network",
+      "label": "Sankey / alluvial",
+      "aliases": [
+        "桑基图",
+        "河流流向图",
+        "alluvial"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "节点、层级、可见流带宽度和标签",
+      "nonRecoverable": "遮挡流与未标定流量",
+      "caseId": "nature-sankey-flow",
+      "thumbnailKey": "sankey",
+      "calibrationFamily": "structure",
+      "thumbnail": "assets/cases/nature-sankey-flow/atlas-sankey.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41598-022-17508-1",
+      "figure": "Fig. 3"
+    },
+    {
+      "id": "network",
+      "group": "flow-network",
+      "label": "Network",
+      "aliases": [
+        "网络图",
+        "力导向图",
+        "超图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "可见节点、边、标签和布局坐标",
+      "nonRecoverable": "遮挡边和隐藏拓扑",
+      "caseId": "nature-graphddp-ternary",
+      "thumbnailKey": "network",
+      "calibrationFamily": "structure",
+      "thumbnail": "assets/cases/nature-graphddp-ternary/atlas-network.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-018-05988-7",
+      "figure": "Fig. 3"
+    },
+    {
+      "id": "chord-circos",
+      "group": "flow-network",
+      "label": "Chord / Circos",
+      "aliases": [
+        "弦图",
+        "Circos",
+        "环形连接图"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "扇区、连接带、方向和环形注释",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "structure",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "arc-bundle",
+      "group": "flow-network",
+      "label": "Arc / edge bundling",
+      "aliases": [
+        "弧图",
+        "边捆绑"
+      ],
+      "engineStatus": "restricted",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "可分离节点和可见路径",
+      "nonRecoverable": "捆绑重叠中的完整边集合",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "structure",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "phylogenetic-tree",
+      "group": "flow-network",
+      "label": "Phylogenetic tree",
+      "aliases": [
+        "系统发育树",
+        "cladogram",
+        "进化树"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "分支拓扑、叶标签、分支长度和旁注轨道",
+      "nonRecoverable": "生成树的序列比对和模型",
+      "caseId": "nature-sarscov2-phylogeny",
+      "thumbnailKey": "phylogeny",
+      "calibrationFamily": "structure",
+      "thumbnail": "assets/cases/nature-sarscov2-phylogeny/atlas-phylogeny.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-020-19818-2",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "kaplan-meier",
+      "group": "scientific-specialty",
+      "label": "Kaplan–Meier + risk table",
+      "aliases": [
+        "生存曲线",
+        "KM 曲线",
+        "风险表"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "阶梯曲线、删失标记、风险表和组别",
+      "nonRecoverable": "个体级生存记录",
+      "caseId": "nature-phf6-survival",
+      "thumbnailKey": "kaplan_meier",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-phf6-survival/atlas-kaplan_meier.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-024-46134-w",
+      "figure": "Fig. 4"
+    },
+    {
+      "id": "roc-pr",
+      "group": "scientific-specialty",
+      "label": "ROC / precision-recall",
+      "aliases": [
+        "ROC",
+        "PR 曲线",
+        "AUC 曲线"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "多系列阶梯曲线、参考线和阈值路径",
+      "nonRecoverable": "逐样本预测分数与精确阈值",
+      "caseId": "nature-hypergraph-roc",
+      "thumbnailKey": "roc",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-hypergraph-roc/atlas-roc.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-57664-2",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "mass-spectrum",
+      "group": "scientific-specialty",
+      "label": "Mass spectrum / stick spectrum",
+      "aliases": [
+        "质谱",
+        "棒状谱",
+        "峰图"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "峰位、相对强度、基线和可读峰标注",
+      "nonRecoverable": "仪器原始谱、峰宽和未显示低强度信号",
+      "caseId": "nature-acth-spectrum",
+      "thumbnailKey": "mass_spectrum",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-acth-spectrum/atlas-mass_spectrum.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-020-14877-x",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "spectrum-chromatogram",
+      "group": "scientific-specialty",
+      "label": "Spectrum / chromatogram",
+      "aliases": [
+        "光谱",
+        "Raman",
+        "色谱",
+        "衍射谱"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "连续曲线、峰位、峰高/面积和标注",
+      "nonRecoverable": "仪器响应函数和原始采样",
+      "caseId": "nature-nagler-polar",
+      "thumbnailKey": "spectrum",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-nagler-polar/atlas-spectrum.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01748-1",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "flow-cytometry",
+      "group": "scientific-specialty",
+      "label": "Flow cytometry gating",
+      "aliases": [
+        "流式细胞术",
+        "门控图",
+        "FACS"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "二维密度场、门控多边形、簇中心和比例标注",
+      "nonRecoverable": "FCS 事件级数据与补偿矩阵",
+      "caseId": "nature-autospill-flow",
+      "thumbnailKey": "flow_cytometry",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-autospill-flow/atlas-flow_cytometry.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-021-23126-8",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "gel-blot",
+      "group": "scientific-specialty",
+      "label": "Gel / blot densitometry",
+      "aliases": [
+        "凝胶",
+        "Western blot",
+        "条带灰度"
+      ],
+      "engineStatus": "restricted",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "泳道、条带轮廓、背景校正后的相对灰度",
+      "nonRecoverable": "饱和像素对应的真实信号",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "semantic_router",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "genome-track",
+      "group": "scientific-specialty",
+      "label": "Genome / sequence tracks",
+      "aliases": [
+        "基因组轨道",
+        "coverage track",
+        "序列浏览图"
+      ],
+      "engineStatus": "restricted",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "共享坐标下的峰、区间、基因模型和标签",
+      "nonRecoverable": "未显示 reads 和碱基级原始数据",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "semantic_router",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "spatial-omics",
+      "group": "scientific-specialty",
+      "label": "Spatial omics / tissue embedding",
+      "aliases": [
+        "空间转录组",
+        "组织点阵",
+        "空间聚类"
+      ],
+      "engineStatus": "coordinate_specific",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "组织坐标、点类别、强度和区域边界",
+      "nonRecoverable": "表达矩阵与原始组织影像配准参数",
+      "caseId": "nature-spatial-treemap",
+      "thumbnailKey": "spatial_map",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-spatial-treemap/atlas-spatial_map.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-35288-0",
+      "figure": "Fig. 6"
+    },
+    {
+      "id": "multipanel",
+      "group": "composite",
+      "label": "Multi-panel routing",
+      "aliases": [
+        "复合图",
+        "多面板",
+        "panel routing"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "partial_visible",
+      "recoverableRepresentation": "面板边界、类型路由和逐面板证据状态",
+      "nonRecoverable": "未处理面板的数值",
+      "caseId": "nature-ribotie-multipanel",
+      "thumbnailKey": "marginal",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-ribotie-multipanel/atlas-marginal.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "small-multiples",
+      "group": "composite",
+      "label": "Small multiples / facet",
+      "aliases": [
+        "小倍图",
+        "facet",
+        "重复面板"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "重复坐标系、面板变量、共享图例与逐面板图元",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-autospill-flow",
+      "thumbnailKey": "small_multiples",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-autospill-flow/atlas-small_multiples.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-021-23126-8",
+      "figure": "Fig. 1"
+    },
+    {
+      "id": "inset",
+      "group": "composite",
+      "label": "Inset / zoom panel",
+      "aliases": [
+        "插图",
+        "局部放大",
+        "嵌入图"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "主图与插图边界、连接框和各自坐标系",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-hypergraph-roc",
+      "thumbnailKey": "network_inset",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-hypergraph-roc/atlas-network_inset.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-57664-2",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "dual-axis",
+      "group": "composite",
+      "label": "Dual-axis / mixed scale",
+      "aliases": [
+        "双 Y 轴",
+        "混合尺度"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "系列到坐标轴的归属和两套校准",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-xenopus-polar",
+      "thumbnailKey": "errorbar",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-xenopus-polar/atlas-errorbar.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-30636-6",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "broken-axis",
+      "group": "composite",
+      "label": "Broken / discontinuous axis",
+      "aliases": [
+        "断轴",
+        "跳轴",
+        "非连续坐标"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "no_case",
+      "recoverableRepresentation": "每个连续区间的独立校准与拼接规则",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": null,
+      "thumbnailKey": null,
+      "calibrationFamily": "semantic_router",
+      "thumbnail": null,
+      "articleUrl": null,
+      "figure": null
+    },
+    {
+      "id": "marginal-plot",
+      "group": "composite",
+      "label": "Marginal plot",
+      "aliases": [
+        "边际直方图",
+        "边际密度",
+        "joint plot"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "中心 XY 图与共享轴边际统计图",
+      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
+      "caseId": "nature-ribotie-multipanel",
+      "thumbnailKey": "marginal",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-ribotie-multipanel/atlas-marginal.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
+      "figure": "Fig. 2"
+    },
+    {
+      "id": "chart-table-overlay",
+      "group": "composite",
+      "label": "Chart + table / mixed overlay",
+      "aliases": [
+        "图表加表格",
+        "风险表",
+        "柱线混合",
+        "图上注释"
+      ],
+      "engineStatus": "candidate",
+      "demoStatus": "oa_reference",
+      "recoverableRepresentation": "图层分解、表格 OCR、共享类别和系列归属",
+      "nonRecoverable": "图例没有说明时的隐式语义",
+      "caseId": "nature-phf6-survival",
+      "thumbnailKey": "risk_table",
+      "calibrationFamily": "semantic_router",
+      "thumbnail": "assets/cases/nature-phf6-survival/atlas-risk_table.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-024-46134-w",
+      "figure": "Fig. 4"
+    }
+  ],
+  "referenceCases": [
+    {
+      "id": "nature-borneo-edge",
+      "title": "森林边缘效应：散点、模型与重叠直方图",
+      "articleTitle": "Long-term carbon sink in Borneo’s forests halted by drought and vulnerable to edge effects",
+      "authors": "Qie et al.",
+      "journal": "Nature Communications",
+      "year": 2017,
+      "figure": "Fig. 2",
+      "doi": "10.1038/s41467-017-01997-0",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01997-0",
+      "figureUrl": "https://www.nature.com/articles/s41467-017-01997-0/figures/2",
+      "original": "assets/cases/nature-borneo-edge/original.jpg",
+      "evidenceStatus": "source_mapped",
+      "coverage": [
+        "scatter",
+        "histogram",
+        "model curve"
+      ],
+      "report": "assets/cases/nature-borneo-edge/report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "ca03b4effd3427cc6adce6f09350029dd6f566357229f4e1b8005777784f34f3",
+      "thumbnails": {
+        "scatter": "assets/cases/nature-borneo-edge/atlas-scatter.jpg",
+        "histogram": "assets/cases/nature-borneo-edge/atlas-histogram.jpg"
+      }
+    },
+    {
+      "id": "nature-blood-forest",
+      "title": "29 项血液指标的 forest plot",
+      "articleTitle": "Genetic architecture of routinely acquired blood tests in a British South Asian cohort",
+      "authors": "Jacobs et al.",
+      "journal": "Nature Communications",
+      "year": 2024,
+      "figure": "Fig. 2",
+      "doi": "10.1038/s41467-024-53091-x",
+      "articleUrl": "https://www.nature.com/articles/s41467-024-53091-x",
+      "figureUrl": "https://www.nature.com/articles/s41467-024-53091-x/figures/2",
+      "original": "assets/cases/nature-blood-forest/original.jpg",
+      "evidenceStatus": "visible_geometry",
+      "coverage": [
+        "forest plot",
+        "confidence interval",
+        "color scale"
+      ],
+      "report": "assets/cases/nature-blood-forest/report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "57d13b2a5d05db6a4db12a8e001acc39c42b391080bc2fc886b32f7d4b54b537",
+      "thumbnails": {
+        "forest": "assets/cases/nature-blood-forest/atlas-forest.jpg"
+      }
+    },
+    {
+      "id": "nature-ribotie-multipanel",
+      "title": "十面板混合科研图",
+      "articleTitle": "Deep learning to decode sites of RNA translation in normal and cancerous tissues",
+      "authors": "Clauwaert et al.",
+      "journal": "Nature Communications",
+      "year": 2025,
+      "figure": "Fig. 2",
+      "doi": "10.1038/s41467-025-56543-0",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
+      "figureUrl": "https://www.nature.com/articles/s41467-025-56543-0/figures/2",
+      "original": "assets/cases/nature-ribotie-multipanel/original.jpg",
+      "evidenceStatus": "partial_visible",
+      "coverage": [
+        "boxplot",
+        "bar",
+        "donut",
+        "scatter",
+        "volcano",
+        "histogram",
+        "marginal plot",
+        "multi-panel"
+      ],
+      "report": "assets/cases/nature-ribotie-multipanel/report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "2168585fc338c07d41addb473a7ec609b697966769f8b6c37e5c6a3d3c1fa818",
+      "thumbnails": {
+        "boxplot": "assets/cases/nature-ribotie-multipanel/atlas-boxplot.jpg",
+        "bar": "assets/cases/nature-ribotie-multipanel/atlas-bar.jpg",
+        "donut": "assets/cases/nature-ribotie-multipanel/atlas-donut.jpg",
+        "scatter": "assets/cases/nature-ribotie-multipanel/atlas-scatter.jpg",
+        "volcano": "assets/cases/nature-ribotie-multipanel/atlas-volcano.jpg",
+        "histogram": "assets/cases/nature-ribotie-multipanel/atlas-histogram.jpg",
+        "marginal": "assets/cases/nature-ribotie-multipanel/atlas-marginal.jpg"
+      }
+    },
+    {
+      "id": "nature-nanopore-scatter",
+      "title": "纳米孔信号：密集散点、边际分布与波形",
+      "articleTitle": "Detecting topological variations of DNA at single-molecule level",
+      "authors": "Bell et al.",
+      "journal": "Nature Communications",
+      "year": 2019,
+      "figure": "Fig. 2",
+      "doi": "10.1038/s41467-018-07924-1",
+      "articleUrl": "https://www.nature.com/articles/s41467-018-07924-1",
+      "figureUrl": "https://www.nature.com/articles/s41467-018-07924-1/figures/2",
+      "original": "assets/cases/nature-nanopore-scatter/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "dense scatter",
+        "histogram",
+        "signal trace",
+        "multi-panel"
+      ],
+      "report": "assets/cases/nature-nanopore-scatter/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "82896b42ec6e478e652ed681a77d49b769984fb12908c274cb169eb38fef3ca7",
+      "thumbnails": {
+        "dense_scatter": "assets/cases/nature-nanopore-scatter/atlas-dense_scatter.jpg",
+        "signal": "assets/cases/nature-nanopore-scatter/atlas-signal.jpg"
+      }
+    },
+    {
+      "id": "nature-violin-heatmap",
+      "title": "分布与矩阵：violin、boxplot 和 heatmap",
+      "articleTitle": "Dynamic control of enhancer activity drives stage-specific gene expression during flower morphogenesis",
+      "authors": "Yan et al.",
+      "journal": "Nature Communications",
+      "year": 2019,
+      "figure": "Fig. 5",
+      "doi": "10.1038/s41467-019-09513-2",
+      "articleUrl": "https://www.nature.com/articles/s41467-019-09513-2",
+      "figureUrl": "https://www.nature.com/articles/s41467-019-09513-2/figures/5",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6461659/",
+      "original": "assets/cases/nature-violin-heatmap/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "violin",
+        "boxplot",
+        "heatmap",
+        "Venn"
+      ],
+      "report": "assets/cases/nature-violin-heatmap/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "645307a96c75082717752eddf36aedbbe7472b99824709f8693e4471809ad323",
+      "thumbnails": {
+        "violin": "assets/cases/nature-violin-heatmap/atlas-violin.jpg",
+        "heatmap": "assets/cases/nature-violin-heatmap/atlas-heatmap.jpg"
+      }
+    },
+    {
+      "id": "nature-protaide-heatmap",
+      "title": "相关矩阵：色条校准与显著性标记",
+      "articleTitle": "A deep joint-learning proteomics model for diagnosis of six conditions associated with dementia",
+      "authors": "An et al.",
+      "journal": "Nature Medicine",
+      "year": 2026,
+      "figure": "Fig. 4c",
+      "doi": "10.1038/s41591-026-04303-y",
+      "articleUrl": "https://www.nature.com/articles/s41591-026-04303-y",
+      "figureUrl": "https://www.nature.com/articles/s41591-026-04303-y/figures/4",
+      "original": "assets/cases/nature-protaide-heatmap/original.png",
+      "evidenceStatus": "source_mapped",
+      "coverage": [
+        "heatmap",
+        "correlation matrix",
+        "colour bar",
+        "significance overlay"
+      ],
+      "report": "assets/cases/nature-protaide-heatmap/report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "76e70242a6c2f9c5fbea0167d21191a8daf566d2328adfbb72c40420166bbbac",
+      "thumbnails": {
+        "heatmap": "assets/cases/nature-protaide-heatmap/atlas-heatmap.jpg"
+      }
+    },
+    {
+      "id": "nature-spatial-treemap",
+      "title": "空间组学：Voronoi treemap、点阵与空间地图",
+      "articleTitle": "Spatial-ID: a cell typing method for spatially resolved transcriptomics via transfer learning and spatial embedding",
+      "authors": "Shen et al.",
+      "journal": "Nature Communications",
+      "year": 2022,
+      "figure": "Fig. 6",
+      "doi": "10.1038/s41467-022-35288-0",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-35288-0",
+      "figureUrl": "https://www.nature.com/articles/s41467-022-35288-0/figures/6",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9741613/",
+      "original": "assets/cases/nature-spatial-treemap/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "Voronoi treemap",
+        "spatial point map",
+        "dot matrix",
+        "bar"
+      ],
+      "report": "assets/cases/nature-spatial-treemap/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "75a4f728368844a709ed3838dbc5432a80cbc42b7735746e5211b1f191ef4297",
+      "thumbnails": {
+        "spatial_map": "assets/cases/nature-spatial-treemap/atlas-spatial_map.jpg",
+        "treemap": "assets/cases/nature-spatial-treemap/atlas-treemap.jpg",
+        "dot_matrix": "assets/cases/nature-spatial-treemap/atlas-dot_matrix.jpg"
+      }
+    },
+    {
+      "id": "nature-graphddp-ternary",
+      "title": "结构数据：网络、ternary 与侧栏 bar",
+      "articleTitle": "GraphDDP: a graph-embedding approach to detect differentiation pathways in single-cell-data using prior class knowledge",
+      "authors": "Costa, Grün & Backofen",
+      "journal": "Nature Communications",
+      "year": 2018,
+      "figure": "Fig. 3",
+      "doi": "10.1038/s41467-018-05988-7",
+      "articleUrl": "https://www.nature.com/articles/s41467-018-05988-7",
+      "figureUrl": "https://www.nature.com/articles/s41467-018-05988-7/figures/3",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC6134144/",
+      "original": "assets/cases/nature-graphddp-ternary/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "network",
+        "ternary",
+        "bar",
+        "annotation"
+      ],
+      "report": "assets/cases/nature-graphddp-ternary/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "3b2a07c1003c1e6464bd6dd7f94ca4a68c18c5dac7662042bd95a9ae3694e45a",
+      "thumbnails": {
+        "network": "assets/cases/nature-graphddp-ternary/atlas-network.jpg",
+        "ternary": "assets/cases/nature-graphddp-ternary/atlas-ternary.jpg",
+        "bar": "assets/cases/nature-graphddp-ternary/atlas-bar.jpg"
+      }
+    },
+    {
+      "id": "nature-economic-map",
+      "title": "地理栅格：连续色标地图与分类地图",
+      "articleTitle": "A human-machine collaborative approach measures economic development using satellite imagery",
+      "authors": "Ahn et al.",
+      "journal": "Nature Communications",
+      "year": 2023,
+      "figure": "Fig. 2",
+      "doi": "10.1038/s41467-023-42122-8",
+      "articleUrl": "https://www.nature.com/articles/s41467-023-42122-8",
+      "figureUrl": "https://www.nature.com/articles/s41467-023-42122-8/figures/2",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10603027/",
+      "original": "assets/cases/nature-economic-map/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "raster map",
+        "choropleth",
+        "categorical map",
+        "grid"
+      ],
+      "report": "assets/cases/nature-economic-map/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "4dc5acf48f30e1a69a98537ff36d45d46320e73769c852e304546d13482fad39",
+      "thumbnails": {
+        "raster_map": "assets/cases/nature-economic-map/atlas-raster_map.jpg",
+        "grid_map": "assets/cases/nature-economic-map/atlas-grid_map.jpg"
+      }
+    },
+    {
+      "id": "nature-sankey-flow",
+      "title": "食物网简化中的 Sankey 信息流",
+      "articleTitle": "A network simplification approach to ease topological studies about the food-web architecture",
+      "authors": "Gini, Re & Facchini",
+      "journal": "Scientific Reports",
+      "year": 2022,
+      "figure": "Fig. 3",
+      "doi": "10.1038/s41598-022-17508-1",
+      "articleUrl": "https://www.nature.com/articles/s41598-022-17508-1",
+      "figureUrl": "https://www.nature.com/articles/s41598-022-17508-1/figures/3",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9385703/",
+      "original": "assets/cases/nature-sankey-flow/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "Sankey",
+        "alluvial",
+        "flow labels"
+      ],
+      "report": "assets/cases/nature-sankey-flow/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "ac2e959dd699051b3b219224bbd3c1431478d7bf71d19be13ea851809a08977b",
+      "thumbnails": {
+        "sankey": "assets/cases/nature-sankey-flow/atlas-sankey.jpg"
+      }
+    },
+    {
+      "id": "nature-nagler-polar",
+      "title": "极坐标、显微图、空间场与光谱的复合图",
+      "articleTitle": "Giant magnetic splitting inducing near-unity valley polarization in van der Waals heterostructures",
+      "authors": "Nagler et al.",
+      "journal": "Nature Communications",
+      "year": 2017,
+      "figure": "Fig. 1",
+      "doi": "10.1038/s41467-017-01748-1",
+      "articleUrl": "https://www.nature.com/articles/s41467-017-01748-1",
+      "figureUrl": "https://www.nature.com/articles/s41467-017-01748-1/figures/1",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC5691051/",
+      "original": "assets/cases/nature-nagler-polar/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "polar plot",
+        "microscopy",
+        "raster field",
+        "spectrum",
+        "multi-panel"
+      ],
+      "report": "assets/cases/nature-nagler-polar/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "0d44b51da79ea3ccf3d7d19ffd544a504e26b8072896dae02566532a40380e7f",
+      "thumbnails": {
+        "microscopy": "assets/cases/nature-nagler-polar/atlas-microscopy.jpg",
+        "polar": "assets/cases/nature-nagler-polar/atlas-polar.jpg",
+        "raster_field": "assets/cases/nature-nagler-polar/atlas-raster_field.jpg",
+        "spectrum": "assets/cases/nature-nagler-polar/atlas-spectrum.jpg"
+      }
+    },
+    {
+      "id": "nature-phf6-survival",
+      "title": "Kaplan–Meier 阶梯曲线、删失标记与风险表",
+      "articleTitle": "Molecular and clinical analyses of PHF6 mutant myeloid neoplasia provide their pathogenesis and therapeutic targeting",
+      "authors": "Kubota et al.",
+      "journal": "Nature Communications",
+      "year": 2024,
+      "figure": "Fig. 4",
+      "doi": "10.1038/s41467-024-46134-w",
+      "articleUrl": "https://www.nature.com/articles/s41467-024-46134-w",
+      "figureUrl": "https://www.nature.com/articles/s41467-024-46134-w/figures/4",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC10901781/",
+      "original": "assets/cases/nature-phf6-survival/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "Kaplan–Meier",
+        "censor marks",
+        "risk table",
+        "multi-panel"
+      ],
+      "report": "assets/cases/nature-phf6-survival/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "69accfc3225e1c15c20ac9d5d7a2d3e46af57a227a6ba2004cabf61f66213937",
+      "thumbnails": {
+        "kaplan_meier": "assets/cases/nature-phf6-survival/atlas-kaplan_meier.jpg",
+        "risk_table": "assets/cases/nature-phf6-survival/atlas-risk_table.jpg"
+      }
+    },
+    {
+      "id": "nature-xenopus-polar",
+      "title": "生理信号复合图：波形、散点、误差棒与极坐标插图",
+      "articleTitle": "Locomotion-induced ocular motor behavior in larval Xenopus is developmentally tuned by visuo-vestibular reflexes",
+      "authors": "Bacqué-Cazenave et al.",
+      "journal": "Nature Communications",
+      "year": 2022,
+      "figure": "Fig. 2",
+      "doi": "10.1038/s41467-022-30636-6",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-30636-6",
+      "figureUrl": "https://www.nature.com/articles/s41467-022-30636-6/figures/2",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC9135768/",
+      "original": "assets/cases/nature-xenopus-polar/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "signal traces",
+        "scatter",
+        "bar",
+        "error bars",
+        "polar inset",
+        "multi-panel"
+      ],
+      "report": "assets/cases/nature-xenopus-polar/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "6fa59f94942df5c101a7507e4878b6aaa3f0ebfeec973d6d283130335aa2ff9e",
+      "thumbnails": {
+        "waveform": "assets/cases/nature-xenopus-polar/atlas-waveform.jpg",
+        "scatter": "assets/cases/nature-xenopus-polar/atlas-scatter.jpg",
+        "errorbar": "assets/cases/nature-xenopus-polar/atlas-errorbar.jpg",
+        "polar_inset": "assets/cases/nature-xenopus-polar/atlas-polar_inset.jpg"
+      }
+    },
+    {
+      "id": "nature-acth-spectrum",
+      "title": "多面板质谱峰图与标注峰",
+      "articleTitle": "Ultrafast enzymatic digestion of proteins by microdroplet mass spectrometry",
+      "authors": "Zhong, Chen & Zare",
+      "journal": "Nature Communications",
+      "year": 2020,
+      "figure": "Fig. 2",
+      "doi": "10.1038/s41467-020-14877-x",
+      "articleUrl": "https://www.nature.com/articles/s41467-020-14877-x",
+      "figureUrl": "https://www.nature.com/articles/s41467-020-14877-x/figures/2",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7044307/",
+      "original": "assets/cases/nature-acth-spectrum/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "mass spectrum",
+        "peak labels",
+        "stacked panels"
+      ],
+      "report": "assets/cases/nature-acth-spectrum/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "6bd3aff2aa85a43a04f4baa01a8c6cd0071f91f223b5e4f58b912a8fae855d36",
+      "thumbnails": {
+        "mass_spectrum": "assets/cases/nature-acth-spectrum/atlas-mass_spectrum.jpg",
+        "peak_panel": "assets/cases/nature-acth-spectrum/atlas-peak_panel.jpg"
+      }
+    },
+    {
+      "id": "nature-autospill-flow",
+      "title": "流式细胞术密度场、门控边界与小倍图",
+      "articleTitle": "AutoSpill is a principled framework that simplifies the analysis of multichromatic flow cytometry data",
+      "authors": "Roca et al.",
+      "journal": "Nature Communications",
+      "year": 2021,
+      "figure": "Fig. 1",
+      "doi": "10.1038/s41467-021-23126-8",
+      "articleUrl": "https://www.nature.com/articles/s41467-021-23126-8",
+      "figureUrl": "https://www.nature.com/articles/s41467-021-23126-8/figures/1",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC8129071/",
+      "original": "assets/cases/nature-autospill-flow/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "flow cytometry",
+        "density field",
+        "gating polygon",
+        "small multiples"
+      ],
+      "report": "assets/cases/nature-autospill-flow/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "3bb8cd1606efb24a140902f98ac0bcb9274b374730b1e6d1222f0967de437a7d",
+      "thumbnails": {
+        "flow_cytometry": "assets/cases/nature-autospill-flow/atlas-flow_cytometry.jpg",
+        "small_multiples": "assets/cases/nature-autospill-flow/atlas-small_multiples.jpg"
+      }
+    },
+    {
+      "id": "nature-sarscov2-phylogeny",
+      "title": "系统发育树、世界地图与分布图的复合图",
+      "articleTitle": "No evidence for increased transmissibility from recurrent mutations in SARS-CoV-2",
+      "authors": "van Dorp et al.",
+      "journal": "Nature Communications",
+      "year": 2020,
+      "figure": "Fig. 1",
+      "doi": "10.1038/s41467-020-19818-2",
+      "articleUrl": "https://www.nature.com/articles/s41467-020-19818-2",
+      "figureUrl": "https://www.nature.com/articles/s41467-020-19818-2/figures/1",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC7688939/",
+      "original": "assets/cases/nature-sarscov2-phylogeny/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "phylogenetic tree",
+        "point map",
+        "violin",
+        "multi-panel"
+      ],
+      "report": "assets/cases/nature-sarscov2-phylogeny/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "ebeda34be600094c733d2319dfa532447070ef639b46ac182729894e290dff73",
+      "thumbnails": {
+        "phylogeny": "assets/cases/nature-sarscov2-phylogeny/atlas-phylogeny.jpg",
+        "point_map": "assets/cases/nature-sarscov2-phylogeny/atlas-point_map.jpg",
+        "violin": "assets/cases/nature-sarscov2-phylogeny/atlas-violin.jpg"
+      }
+    },
+    {
+      "id": "nature-hypergraph-roc",
+      "title": "多系列 ROC 阶梯曲线与网络插图",
+      "articleTitle": "Hypergraph reconstruction from dynamics",
+      "authors": "Delabays et al.",
+      "journal": "Nature Communications",
+      "year": 2025,
+      "figure": "Fig. 2",
+      "doi": "10.1038/s41467-025-57664-2",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-57664-2",
+      "figureUrl": "https://www.nature.com/articles/s41467-025-57664-2/figures/2",
+      "pmcUrl": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11923283/",
+      "original": "assets/cases/nature-hypergraph-roc/original.jpg",
+      "evidenceStatus": "oa_reference",
+      "coverage": [
+        "ROC",
+        "step curves",
+        "network inset",
+        "multi-panel"
+      ],
+      "report": "assets/cases/nature-hypergraph-roc/reference-report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "1ef1d79da581122eddc619c3178a8a455e9002650a12ba2826861776ebc5dbff",
+      "thumbnails": {
+        "roc": "assets/cases/nature-hypergraph-roc/atlas-roc.jpg",
+        "network_inset": "assets/cases/nature-hypergraph-roc/atlas-network_inset.jpg"
+      }
+    }
+  ],
+  "statusDefinitions": {
+    "engine": {
+      "stable": "已有专用稳定提取器与回归测试",
+      "candidate": "已有可执行路线或局部实现，尚未通过完整晋级门槛",
+      "benchmark_only": "仅有确定性基准路线，不是稳定用户功能",
+      "coordinate_specific": "需要该坐标/拓扑专用解析器，不能套用普通 XY 校准",
+      "restricted": "只能恢复明确的可见表示，不能声称还原隐藏原始数据"
+    },
+    "demo": {
+      "source_mapped": "官方源数据已映射",
+      "visible_geometry": "真实图像几何已提取",
+      "partial_visible": "复杂图局部提取",
+      "oa_reference": "真实 OA 案例已定位，等待专用验证",
+      "no_case": "尚未选定代表案例"
+    }
+  }
+}

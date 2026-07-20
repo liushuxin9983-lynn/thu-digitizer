@@ -1,0 +1,340 @@
+kind,series,category,x,value,pixel_x,pixel_y,radius,fill,confidence,value_status,x2,y2,stroke,stroke_width
+point,Spontaneous curvature,visible curve marker,2.5,3.352839,163.204,335.107,7,#fb8177,0.7,calibrated_raster_trace,,,,
+point,Spontaneous curvature,visible curve marker,5.0,3.342646,184.407,342.803,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,2.5,visible path,163.204,335.107,,none,,raster_supported_connection,184.407,342.803,#fb8177,2
+point,Spontaneous curvature,visible curve marker,7.5,3.446262,205.611,264.572,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,5.0,visible path,184.407,342.803,,none,,raster_supported_connection,205.611,264.572,#fb8177,2
+point,Spontaneous curvature,visible curve marker,10.0,3.399307,226.815,300.023,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,7.5,visible path,205.611,264.572,,none,,raster_supported_connection,226.815,300.023,#fb8177,2
+point,Spontaneous curvature,visible curve marker,12.5,3.318006,248.019,361.405,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,10.0,visible path,226.815,300.023,,none,,raster_supported_connection,248.019,361.405,#fb8177,2
+point,Spontaneous curvature,visible curve marker,15.0,3.311793,269.222,366.096,7,#fb8177,0.7244,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,12.5,visible path,248.019,361.405,,none,,raster_supported_connection,269.222,366.096,#fb8177,2
+point,Spontaneous curvature,visible curve marker,17.5,3.310439,290.426,367.119,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,15.0,visible path,269.222,366.096,,none,,raster_supported_connection,290.426,367.119,#fb8177,2
+point,Spontaneous curvature,visible curve marker,20.0,3.307434,311.63,369.387,7,#fb8177,0.7749,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,17.5,visible path,290.426,367.119,,none,,raster_supported_connection,311.63,369.387,#fb8177,2
+point,Spontaneous curvature,visible curve marker,22.5,3.306111,332.833,370.386,7,#fb8177,0.8472,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,20.0,visible path,311.63,369.387,,none,,raster_supported_connection,332.833,370.386,#fb8177,2
+point,Spontaneous curvature,visible curve marker,25.0,3.30497,354.037,371.247,7,#fb8177,0.7848,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,22.5,visible path,332.833,370.386,,none,,raster_supported_connection,354.037,371.247,#fb8177,2
+point,Spontaneous curvature,visible curve marker,27.5,3.303737,375.241,372.179,7,#fb8177,0.7757,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,25.0,visible path,354.037,371.247,,none,,raster_supported_connection,375.241,372.179,#fb8177,2
+point,Spontaneous curvature,visible curve marker,30.0,3.302649,396.444,373.0,7,#fb8177,0.6959,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,27.5,visible path,375.241,372.179,,none,,raster_supported_connection,396.444,373.0,#fb8177,2
+point,Spontaneous curvature,visible curve marker,67.5,3.302649,714.5,373.0,7,#fb8177,0.5202,calibrated_raster_trace,,,,
+point,Spontaneous curvature,visible curve marker,70.0,3.303578,735.704,372.299,7,#fb8177,0.746,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,67.5,visible path,714.5,373.0,,none,,raster_supported_connection,735.704,372.299,#fb8177,2
+point,Spontaneous curvature,visible curve marker,72.5,3.315332,756.907,363.424,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,70.0,visible path,735.704,372.299,,none,,raster_supported_connection,756.907,363.424,#fb8177,2
+point,Spontaneous curvature,visible curve marker,75.0,3.310979,778.111,366.711,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,72.5,visible path,756.907,363.424,,none,,raster_supported_connection,778.111,366.711,#fb8177,2
+point,Spontaneous curvature,visible curve marker,77.5,3.31091,799.315,366.763,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,75.0,visible path,778.111,366.711,,none,,raster_supported_connection,799.315,366.763,#fb8177,2
+point,Spontaneous curvature,visible curve marker,80.0,3.312049,820.519,365.903,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,77.5,visible path,799.315,366.763,,none,,raster_supported_connection,820.519,365.903,#fb8177,2
+point,Spontaneous curvature,visible curve marker,82.5,3.310828,841.722,366.825,7,#fb8177,0.7011,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,80.0,visible path,820.519,365.903,,none,,raster_supported_connection,841.722,366.825,#fb8177,2
+point,Spontaneous curvature,visible curve marker,85.0,3.317214,862.926,362.003,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,82.5,visible path,841.722,366.825,,none,,raster_supported_connection,862.926,362.003,#fb8177,2
+point,Spontaneous curvature,visible curve marker,87.5,3.321168,884.13,359.018,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,85.0,visible path,862.926,362.003,,none,,raster_supported_connection,884.13,359.018,#fb8177,2
+point,Spontaneous curvature,visible curve marker,90.0,3.327356,905.333,354.346,7,#fb8177,0.7003,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,87.5,visible path,884.13,359.018,,none,,raster_supported_connection,905.333,354.346,#fb8177,2
+point,Spontaneous curvature,visible curve marker,92.5,3.335791,926.537,347.978,7,#fb8177,0.7816,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,90.0,visible path,905.333,354.346,,none,,raster_supported_connection,926.537,347.978,#fb8177,2
+point,Spontaneous curvature,visible curve marker,95.0,3.347039,947.741,339.486,7,#fb8177,0.7244,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,92.5,visible path,926.537,347.978,,none,,raster_supported_connection,947.741,339.486,#fb8177,2
+point,Spontaneous curvature,visible curve marker,97.5,3.361561,968.944,328.521,7,#fb8177,0.7749,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,95.0,visible path,947.741,339.486,,none,,raster_supported_connection,968.944,328.521,#fb8177,2
+point,Spontaneous curvature,visible curve marker,100.0,3.378872,990.148,315.452,7,#fb8177,0.7816,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,97.5,visible path,968.944,328.521,,none,,raster_supported_connection,990.148,315.452,#fb8177,2
+point,Spontaneous curvature,visible curve marker,102.5,3.399946,1011.352,299.541,7,#fb8177,0.7029,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,100.0,visible path,990.148,315.452,,none,,raster_supported_connection,1011.352,299.541,#fb8177,2
+point,Spontaneous curvature,visible curve marker,105.0,3.423329,1032.556,281.887,7,#fb8177,0.7567,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,102.5,visible path,1011.352,299.541,,none,,raster_supported_connection,1032.556,281.887,#fb8177,2
+point,Spontaneous curvature,visible curve marker,107.5,3.449407,1053.759,262.198,7,#fb8177,0.7567,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,105.0,visible path,1032.556,281.887,,none,,raster_supported_connection,1053.759,262.198,#fb8177,2
+point,Spontaneous curvature,visible curve marker,110.0,3.47692,1074.963,241.425,7,#fb8177,0.7244,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,107.5,visible path,1053.759,262.198,,none,,raster_supported_connection,1074.963,241.425,#fb8177,2
+point,Spontaneous curvature,visible curve marker,112.5,3.503604,1096.167,221.279,7,#fb8177,0.7318,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,110.0,visible path,1074.963,241.425,,none,,raster_supported_connection,1096.167,221.279,#fb8177,2
+point,Spontaneous curvature,visible curve marker,115.0,3.533735,1117.37,198.53,7,#fb8177,0.728,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,112.5,visible path,1096.167,221.279,,none,,raster_supported_connection,1117.37,198.53,#fb8177,2
+point,Spontaneous curvature,visible curve marker,117.5,3.571124,1138.574,170.301,7,#fb8177,0.7253,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,115.0,visible path,1117.37,198.53,,none,,raster_supported_connection,1138.574,170.301,#fb8177,2
+point,Spontaneous curvature,visible curve marker,120.0,3.607961,1159.778,142.489,7,#fb8177,0.7008,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,117.5,visible path,1138.574,170.301,,none,,raster_supported_connection,1159.778,142.489,#fb8177,2
+point,Spontaneous curvature,visible curve marker,122.5,3.586797,1180.981,158.468,7,#fb8177,0.7025,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,120.0,visible path,1159.778,142.489,,none,,raster_supported_connection,1180.981,158.468,#fb8177,2
+point,Spontaneous curvature,visible curve marker,125.0,3.556641,1202.185,181.236,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,122.5,visible path,1180.981,158.468,,none,,raster_supported_connection,1202.185,181.236,#fb8177,2
+point,Spontaneous curvature,visible curve marker,127.5,3.518472,1223.389,210.053,7,#fb8177,0.7014,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,125.0,visible path,1202.185,181.236,,none,,raster_supported_connection,1223.389,210.053,#fb8177,2
+point,Spontaneous curvature,visible curve marker,130.0,3.494678,1244.593,228.018,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,127.5,visible path,1223.389,210.053,,none,,raster_supported_connection,1244.593,228.018,#fb8177,2
+point,Spontaneous curvature,visible curve marker,132.5,3.468284,1265.796,247.946,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,130.0,visible path,1244.593,228.018,,none,,raster_supported_connection,1265.796,247.946,#fb8177,2
+point,Spontaneous curvature,visible curve marker,135.0,3.444072,1287.0,266.226,7,#fb8177,0.7,calibrated_raster_trace,,,,
+line,Spontaneous curvature,visible curve connection,132.5,visible path,1265.796,247.946,,none,,raster_supported_connection,1287.0,266.226,#fb8177,2
+point,Surface reconstruction,visible curve marker,2.5,3.408384,163.204,632.441,7,#2ba3ca,0.7013,calibrated_raster_trace,,,,
+point,Surface reconstruction,visible curve marker,5.0,3.388941,184.407,647.072,7,#2ba3ca,0.7463,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,2.5,visible path,163.204,632.441,,none,,raster_supported_connection,184.407,647.072,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,7.5,3.370756,205.611,660.756,7,#2ba3ca,0.7578,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,5.0,visible path,184.407,647.072,,none,,raster_supported_connection,205.611,660.756,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,10.0,3.490879,226.815,570.364,7,#2ba3ca,0.7,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,7.5,visible path,205.611,660.756,,none,,raster_supported_connection,226.815,570.364,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,12.5,3.337782,248.019,685.569,7,#2ba3ca,0.8441,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,10.0,visible path,226.815,570.364,,none,,raster_supported_connection,248.019,685.569,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,15.0,3.322802,269.222,696.842,7,#2ba3ca,0.8527,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,12.5,visible path,248.019,685.569,,none,,raster_supported_connection,269.222,696.842,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,17.5,3.30972,290.426,706.686,7,#2ba3ca,0.854,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,15.0,visible path,269.222,696.842,,none,,raster_supported_connection,290.426,706.686,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,20.0,3.304018,311.63,710.976,7,#2ba3ca,0.7611,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,17.5,visible path,290.426,706.686,,none,,raster_supported_connection,311.63,710.976,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,30.0,3.366278,396.444,664.126,7,#2ba3ca,0.8454,calibrated_raster_trace,,,,
+point,Surface reconstruction,visible curve marker,32.5,3.366384,417.648,664.046,7,#2ba3ca,0.856,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,30.0,visible path,396.444,664.126,,none,,raster_supported_connection,417.648,664.046,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,35.0,3.405314,438.852,634.751,7,#2ba3ca,0.7,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,32.5,visible path,417.648,664.046,,none,,raster_supported_connection,438.852,634.751,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,37.5,3.366131,460.056,664.236,7,#2ba3ca,0.8575,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,35.0,visible path,438.852,634.751,,none,,raster_supported_connection,460.056,664.236,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,40.0,3.411315,481.259,630.236,7,#2ba3ca,0.7,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,37.5,visible path,460.056,664.236,,none,,raster_supported_connection,481.259,630.236,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,42.5,3.364627,502.463,665.368,7,#2ba3ca,0.724,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,40.0,visible path,481.259,630.236,,none,,raster_supported_connection,502.463,665.368,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,45.0,3.384676,523.667,650.281,7,#2ba3ca,0.4614,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,42.5,visible path,502.463,665.368,,none,,raster_supported_connection,523.667,650.281,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,47.5,3.408249,544.87,632.543,7,#2ba3ca,0.4943,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,45.0,visible path,523.667,650.281,,none,,raster_supported_connection,544.87,632.543,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,50.0,3.412952,566.074,629.003,7,#2ba3ca,0.423,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,47.5,visible path,544.87,632.543,,none,,raster_supported_connection,566.074,629.003,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,52.5,3.412069,587.278,629.668,7,#2ba3ca,0.4736,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,50.0,visible path,566.074,629.003,,none,,raster_supported_connection,587.278,629.668,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,55.0,3.396292,608.481,641.54,7,#2ba3ca,0.4736,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,52.5,visible path,587.278,629.668,,none,,raster_supported_connection,608.481,641.54,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,57.5,3.389557,629.685,646.609,7,#2ba3ca,0.6311,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,55.0,visible path,608.481,641.54,,none,,raster_supported_connection,629.685,646.609,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,60.0,3.378299,650.889,655.08,7,#2ba3ca,0.7,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,57.5,visible path,629.685,646.609,,none,,raster_supported_connection,650.889,655.08,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,62.5,3.366234,672.093,664.159,7,#2ba3ca,0.8619,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,60.0,visible path,650.889,655.08,,none,,raster_supported_connection,672.093,664.159,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,65.0,3.380683,693.296,653.286,7,#2ba3ca,0.7,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,62.5,visible path,672.093,664.159,,none,,raster_supported_connection,693.296,653.286,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,67.5,3.366146,714.5,664.225,7,#2ba3ca,0.8284,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,65.0,visible path,693.296,653.286,,none,,raster_supported_connection,714.5,664.225,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,70.0,3.366465,735.704,663.985,7,#2ba3ca,0.8517,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,67.5,visible path,714.5,664.225,,none,,raster_supported_connection,735.704,663.985,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,77.5,3.303987,799.315,711.0,7,#2ba3ca,0.4698,calibrated_raster_trace,,,,
+point,Surface reconstruction,visible curve marker,80.0,3.307425,820.519,708.412,7,#2ba3ca,0.7795,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,77.5,visible path,799.315,711.0,,none,,raster_supported_connection,820.519,708.412,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,82.5,3.316669,841.722,701.457,7,#2ba3ca,0.8734,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,80.0,visible path,820.519,708.412,,none,,raster_supported_connection,841.722,701.457,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,85.0,3.33129,862.926,690.454,7,#2ba3ca,0.8746,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,82.5,visible path,841.722,701.457,,none,,raster_supported_connection,862.926,690.454,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,87.5,3.34711,884.13,678.55,7,#2ba3ca,0.8759,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,85.0,visible path,862.926,690.454,,none,,raster_supported_connection,884.13,678.55,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,90.0,3.363735,905.333,666.04,7,#2ba3ca,0.8505,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,87.5,visible path,884.13,678.55,,none,,raster_supported_connection,905.333,666.04,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,92.5,3.381605,926.537,652.592,7,#2ba3ca,0.8498,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,90.0,visible path,905.333,666.04,,none,,raster_supported_connection,926.537,652.592,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,95.0,3.399786,947.741,638.911,7,#2ba3ca,0.856,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,92.5,visible path,926.537,652.592,,none,,raster_supported_connection,947.741,638.911,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,97.5,3.418859,968.944,624.559,7,#2ba3ca,0.8099,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,95.0,visible path,947.741,638.911,,none,,raster_supported_connection,968.944,624.559,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,100.0,3.438373,990.148,609.874,7,#2ba3ca,0.8165,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,97.5,visible path,968.944,624.559,,none,,raster_supported_connection,990.148,609.874,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,102.5,3.457434,1011.352,595.531,7,#2ba3ca,0.8849,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,100.0,visible path,990.148,609.874,,none,,raster_supported_connection,1011.352,595.531,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,105.0,3.477486,1032.556,580.442,7,#2ba3ca,0.7265,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,102.5,visible path,1011.352,595.531,,none,,raster_supported_connection,1032.556,580.442,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,107.5,3.495117,1053.759,567.175,7,#2ba3ca,0.7336,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,105.0,visible path,1032.556,580.442,,none,,raster_supported_connection,1053.759,567.175,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,110.0,3.513796,1074.963,553.119,7,#2ba3ca,0.8233,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,107.5,visible path,1053.759,567.175,,none,,raster_supported_connection,1074.963,553.119,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,112.5,3.532439,1096.167,539.089,7,#2ba3ca,0.8129,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,110.0,visible path,1074.963,553.119,,none,,raster_supported_connection,1096.167,539.089,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,115.0,3.550016,1117.37,525.863,7,#2ba3ca,0.8622,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,112.5,visible path,1096.167,539.089,,none,,raster_supported_connection,1117.37,525.863,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,117.5,3.579523,1138.574,503.659,7,#2ba3ca,0.7813,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,115.0,visible path,1117.37,525.863,,none,,raster_supported_connection,1138.574,503.659,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,120.0,3.592469,1159.778,493.917,7,#2ba3ca,0.8786,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,117.5,visible path,1138.574,503.659,,none,,raster_supported_connection,1159.778,493.917,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,122.5,3.584555,1180.981,499.872,7,#2ba3ca,0.7347,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,120.0,visible path,1159.778,493.917,,none,,raster_supported_connection,1180.981,499.872,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,125.0,3.561735,1202.185,517.045,7,#2ba3ca,0.7,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,122.5,visible path,1180.981,499.872,,none,,raster_supported_connection,1202.185,517.045,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,127.5,3.541468,1223.389,532.295,7,#2ba3ca,0.7204,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,125.0,visible path,1202.185,517.045,,none,,raster_supported_connection,1223.389,532.295,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,130.0,3.525165,1244.593,544.563,7,#2ba3ca,0.701,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,127.5,visible path,1223.389,532.295,,none,,raster_supported_connection,1244.593,544.563,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,132.5,3.508433,1265.796,557.154,7,#2ba3ca,0.7005,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,130.0,visible path,1244.593,544.563,,none,,raster_supported_connection,1265.796,557.154,#2ba3ca,2
+point,Surface reconstruction,visible curve marker,135.0,3.491604,1287.0,569.818,7,#2ba3ca,0.7003,calibrated_raster_trace,,,,
+line,Surface reconstruction,visible curve connection,132.5,visible path,1265.796,557.154,,none,,raster_supported_connection,1287.0,569.818,#2ba3ca,2
+point,Rigid,visible curve marker,0.0,3.341447,142.0,1023.5,7,#808080,0.857,calibrated_raster_trace,,,,
+point,Rigid,visible curve marker,2.5,3.340789,163.204,1024.0,7,#808080,1.0,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,0.0,visible path,142.0,1023.5,,none,,raster_supported_connection,163.204,1024.0,#808080,2
+point,Rigid,visible curve marker,5.0,3.329605,184.407,1032.5,7,#808080,1.0,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,2.5,visible path,163.204,1024.0,,none,,raster_supported_connection,184.407,1032.5,#808080,2
+point,Rigid,visible curve marker,7.5,3.318421,205.611,1041.0,7,#808080,1.0,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,5.0,visible path,184.407,1032.5,,none,,raster_supported_connection,205.611,1041.0,#808080,2
+point,Rigid,visible curve marker,10.0,3.307895,226.815,1049.0,7,#808080,1.0,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,7.5,visible path,205.611,1041.0,,none,,raster_supported_connection,226.815,1049.0,#808080,2
+point,Rigid,visible curve marker,12.5,3.302632,248.019,1053.0,7,#808080,1.0,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,10.0,visible path,226.815,1049.0,,none,,raster_supported_connection,248.019,1053.0,#808080,2
+point,Rigid,visible curve marker,15.0,3.298684,269.222,1056.0,7,#808080,0.286,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,12.5,visible path,248.019,1053.0,,none,,raster_supported_connection,269.222,1056.0,#808080,2
+point,Rigid,visible curve marker,17.5,3.355263,290.426,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,15.0,visible path,269.222,1056.0,,none,,raster_supported_connection,290.426,1013.0,#808080,2
+point,Rigid,visible curve marker,20.0,3.355263,311.63,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,17.5,visible path,290.426,1013.0,,none,,raster_supported_connection,311.63,1013.0,#808080,2
+point,Rigid,visible curve marker,22.5,3.356579,332.833,1012.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,20.0,visible path,311.63,1013.0,,none,,raster_supported_connection,332.833,1012.0,#808080,2
+point,Rigid,visible curve marker,25.0,3.355921,354.037,1012.5,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,22.5,visible path,332.833,1012.0,,none,,raster_supported_connection,354.037,1012.5,#808080,2
+point,Rigid,visible curve marker,27.5,3.355921,375.241,1012.5,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,25.0,visible path,354.037,1012.5,,none,,raster_supported_connection,375.241,1012.5,#808080,2
+point,Rigid,visible curve marker,30.0,3.356579,396.444,1012.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,27.5,visible path,375.241,1012.5,,none,,raster_supported_connection,396.444,1012.0,#808080,2
+point,Rigid,visible curve marker,32.5,3.355263,417.648,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,30.0,visible path,396.444,1012.0,,none,,raster_supported_connection,417.648,1013.0,#808080,2
+point,Rigid,visible curve marker,35.0,3.355263,438.852,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,32.5,visible path,417.648,1013.0,,none,,raster_supported_connection,438.852,1013.0,#808080,2
+point,Rigid,visible curve marker,37.5,3.356579,460.056,1012.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,35.0,visible path,438.852,1013.0,,none,,raster_supported_connection,460.056,1012.0,#808080,2
+point,Rigid,visible curve marker,40.0,3.355263,481.259,1013.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,37.5,visible path,460.056,1012.0,,none,,raster_supported_connection,481.259,1013.0,#808080,2
+point,Rigid,visible curve marker,42.5,3.356579,502.463,1012.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,40.0,visible path,481.259,1013.0,,none,,raster_supported_connection,502.463,1012.0,#808080,2
+point,Rigid,visible curve marker,45.0,3.355263,523.667,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,42.5,visible path,502.463,1012.0,,none,,raster_supported_connection,523.667,1013.0,#808080,2
+point,Rigid,visible curve marker,47.5,3.355263,544.87,1013.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,45.0,visible path,523.667,1013.0,,none,,raster_supported_connection,544.87,1013.0,#808080,2
+point,Rigid,visible curve marker,50.0,3.356579,566.074,1012.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,47.5,visible path,544.87,1013.0,,none,,raster_supported_connection,566.074,1012.0,#808080,2
+point,Rigid,visible curve marker,52.5,3.355263,587.278,1013.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,50.0,visible path,566.074,1012.0,,none,,raster_supported_connection,587.278,1013.0,#808080,2
+point,Rigid,visible curve marker,55.0,3.355263,608.481,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,52.5,visible path,587.278,1013.0,,none,,raster_supported_connection,608.481,1013.0,#808080,2
+point,Rigid,visible curve marker,57.5,3.356579,629.685,1012.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,55.0,visible path,608.481,1013.0,,none,,raster_supported_connection,629.685,1012.0,#808080,2
+point,Rigid,visible curve marker,60.0,3.355921,650.889,1012.5,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,57.5,visible path,629.685,1012.0,,none,,raster_supported_connection,650.889,1012.5,#808080,2
+point,Rigid,visible curve marker,62.5,3.355921,672.093,1012.5,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,60.0,visible path,650.889,1012.5,,none,,raster_supported_connection,672.093,1012.5,#808080,2
+point,Rigid,visible curve marker,65.0,3.356579,693.296,1012.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,62.5,visible path,672.093,1012.5,,none,,raster_supported_connection,693.296,1012.0,#808080,2
+point,Rigid,visible curve marker,67.5,3.355263,714.5,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,65.0,visible path,693.296,1012.0,,none,,raster_supported_connection,714.5,1013.0,#808080,2
+point,Rigid,visible curve marker,70.0,3.355263,735.704,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,67.5,visible path,714.5,1013.0,,none,,raster_supported_connection,735.704,1013.0,#808080,2
+point,Rigid,visible curve marker,72.5,3.356579,756.907,1012.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,70.0,visible path,735.704,1013.0,,none,,raster_supported_connection,756.907,1012.0,#808080,2
+point,Rigid,visible curve marker,75.0,3.355263,778.111,1013.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,72.5,visible path,756.907,1012.0,,none,,raster_supported_connection,778.111,1013.0,#808080,2
+point,Rigid,visible curve marker,77.5,3.356579,799.315,1012.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,75.0,visible path,778.111,1013.0,,none,,raster_supported_connection,799.315,1012.0,#808080,2
+point,Rigid,visible curve marker,80.0,3.355263,820.519,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,77.5,visible path,799.315,1012.0,,none,,raster_supported_connection,820.519,1013.0,#808080,2
+point,Rigid,visible curve marker,82.5,3.355263,841.722,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,80.0,visible path,820.519,1013.0,,none,,raster_supported_connection,841.722,1013.0,#808080,2
+point,Rigid,visible curve marker,85.0,3.356579,862.926,1012.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,82.5,visible path,841.722,1013.0,,none,,raster_supported_connection,862.926,1012.0,#808080,2
+point,Rigid,visible curve marker,87.5,3.355921,884.13,1012.5,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,85.0,visible path,862.926,1012.0,,none,,raster_supported_connection,884.13,1012.5,#808080,2
+point,Rigid,visible curve marker,90.0,3.355263,905.333,1013.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,87.5,visible path,884.13,1012.5,,none,,raster_supported_connection,905.333,1013.0,#808080,2
+point,Rigid,visible curve marker,92.5,3.356579,926.537,1012.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,90.0,visible path,905.333,1013.0,,none,,raster_supported_connection,926.537,1012.0,#808080,2
+point,Rigid,visible curve marker,95.0,3.356579,947.741,1012.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,92.5,visible path,926.537,1012.0,,none,,raster_supported_connection,947.741,1012.0,#808080,2
+point,Rigid,visible curve marker,97.5,3.355263,968.944,1013.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,95.0,visible path,947.741,1012.0,,none,,raster_supported_connection,968.944,1013.0,#808080,2
+point,Rigid,visible curve marker,100.0,3.351316,990.148,1016.0,7,#808080,1.0,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,97.5,visible path,968.944,1013.0,,none,,raster_supported_connection,990.148,1016.0,#808080,2
+point,Rigid,visible curve marker,102.5,3.360526,1011.352,1009.0,7,#808080,0.619,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,100.0,visible path,990.148,1016.0,,none,,raster_supported_connection,1011.352,1009.0,#808080,2
+point,Rigid,visible curve marker,105.0,3.373684,1032.556,999.0,7,#808080,0.619,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,102.5,visible path,1011.352,1009.0,,none,,raster_supported_connection,1032.556,999.0,#808080,2
+point,Rigid,visible curve marker,107.5,3.391447,1053.759,985.5,7,#808080,0.667,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,105.0,visible path,1032.556,999.0,,none,,raster_supported_connection,1053.759,985.5,#808080,2
+point,Rigid,visible curve marker,110.0,3.398684,1074.963,980.0,7,#808080,0.095,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,107.5,visible path,1053.759,985.5,,none,,raster_supported_connection,1074.963,980.0,#808080,2
+point,Rigid,visible curve marker,112.5,3.424342,1096.167,960.5,7,#808080,0.952,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,110.0,visible path,1074.963,980.0,,none,,raster_supported_connection,1096.167,960.5,#808080,2
+point,Rigid,visible curve marker,115.0,3.428947,1117.37,957.0,7,#808080,0.667,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,112.5,visible path,1096.167,960.5,,none,,raster_supported_connection,1117.37,957.0,#808080,2
+point,Rigid,visible curve marker,117.5,3.438158,1138.574,950.0,7,#808080,0.048,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,115.0,visible path,1117.37,957.0,,none,,raster_supported_connection,1138.574,950.0,#808080,2
+point,Rigid,visible curve marker,120.0,3.453947,1159.778,938.0,7,#808080,0.143,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,117.5,visible path,1138.574,950.0,,none,,raster_supported_connection,1159.778,938.0,#808080,2
+point,Rigid,visible curve marker,122.5,3.461842,1180.981,932.0,7,#808080,0.286,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,120.0,visible path,1159.778,938.0,,none,,raster_supported_connection,1180.981,932.0,#808080,2
+point,Rigid,visible curve marker,125.0,3.459211,1202.185,934.0,7,#808080,0.143,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,122.5,visible path,1180.981,932.0,,none,,raster_supported_connection,1202.185,934.0,#808080,2
+point,Rigid,visible curve marker,127.5,3.443421,1223.389,946.0,7,#808080,0.143,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,125.0,visible path,1202.185,934.0,,none,,raster_supported_connection,1223.389,946.0,#808080,2
+point,Rigid,visible curve marker,130.0,3.427632,1244.593,958.0,7,#808080,0.143,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,127.5,visible path,1223.389,946.0,,none,,raster_supported_connection,1244.593,958.0,#808080,2
+point,Rigid,visible curve marker,132.5,3.410526,1265.796,971.0,7,#808080,0.143,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,130.0,visible path,1244.593,958.0,,none,,raster_supported_connection,1265.796,971.0,#808080,2
+point,Rigid,visible curve marker,135.0,3.4,1287.0,979.0,7,#808080,0.19,calibrated_raster_trace,,,,
+line,Rigid,visible curve connection,132.5,visible path,1265.796,971.0,,none,,raster_supported_connection,1287.0,979.0,#808080,2
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,571.988,260.095,12.565,#00b887,0.98,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,532.226,264.881,12.552,#00bb9e,0.98,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,611.658,264.851,12.476,#00bb9e,0.978,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,651.353,269.39,12.451,#00beb5,0.974,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,492.5,271.5,12.412,#00beb5,0.968,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,693.066,279.097,12.425,#41c0c3,0.97,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,450.805,281.836,12.451,#40c0c3,0.974,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,734.83,282.83,12.374,#66c2d3,0.962,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,409.052,285.518,12.374,#65c2d3,0.962,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,368.415,288.189,12.322,#81c3e2,0.954,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,545.684,306.559,12.463,#00b77c,0.976,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,598.954,307.698,12.565,#00b77e,0.98,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,498.481,315.943,12.502,#00beb2,0.98,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,645.051,317.616,12.451,#00beb3,0.974,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,411.34,321.693,10.779,#65c1d3,0.73,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,454.915,321.234,11.128,#3cc0c2,0.778,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,688.532,321.265,11.07,#3cc0c2,0.77,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,733.0,322.933,9.982,#66c2d3,0.626,raster_component_geometry,,,,
+point,local dot field 1,visible cyan/green dot,not axis-calibrated,colour/radius only,367.765,324.328,8.704,#84c3e3,0.476,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,368.208,621.954,12.374,#80c3e1,0.962,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,409.969,621.969,12.425,#55c0cb,0.97,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,452.238,622.008,12.451,#00bdb4,0.974,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,494.62,621.953,12.476,#00bb9c,0.978,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,536.895,622.022,12.54,#00b675,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,571.822,621.992,12.54,#00b461,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,607.238,621.966,12.552,#00b675,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,648.955,622.0,12.502,#00bb9c,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,691.118,621.992,12.489,#00beb5,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,733.533,621.94,12.361,#55c0cb,0.96,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,367.514,664.159,12.322,#80c3e1,0.954,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,411.12,664.12,12.425,#53c0cb,0.97,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,454.845,664.071,12.489,#00bdb3,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,498.203,664.108,12.514,#00ba99,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,543.607,664.108,12.502,#00b56f,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,600.706,664.142,12.54,#00b570,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,644.907,664.093,12.527,#00ba99,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,688.292,664.141,12.489,#00bdb3,0.98,raster_component_geometry,,,,
+point,local dot field 2,visible cyan/green dot,not axis-calibrated,colour/radius only,732.916,664.084,12.451,#55c0cb,0.974,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,368.394,922.429,12.296,#79c3de,0.95,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,409.091,922.416,12.425,#2cbfbd,0.97,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,449.858,922.294,12.527,#00bb9d,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,490.551,922.396,12.514,#00b780,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,531.203,922.353,12.527,#00b468,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,571.865,922.345,12.552,#00b358,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,612.551,922.398,12.489,#00b468,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,653.261,922.344,12.502,#00b780,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,693.926,922.321,12.476,#00bb9c,0.978,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,734.593,922.441,12.348,#2cbfbd,0.958,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,367.742,964.5,12.361,#7ac3de,0.96,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,413.128,964.547,12.399,#1bbeba,0.966,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,458.327,964.539,12.489,#00ba96,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,503.599,964.475,12.502,#00b678,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,548.921,964.463,12.552,#00b35e,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,594.264,964.489,12.476,#00b35e,0.978,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,639.548,964.475,12.502,#00b677,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,684.76,964.543,12.514,#00ba96,0.98,raster_component_geometry,,,,
+point,local dot field 3,visible cyan/green dot,not axis-calibrated,colour/radius only,730.097,964.54,12.425,#19beba,0.97,raster_component_geometry,,,,

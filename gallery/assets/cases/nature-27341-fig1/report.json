@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "case_id": "nature-27341-fig1",
+  "status": "visible_geometry_candidate",
+  "article_url": "https://www.nature.com/articles/s41467-021-27341-1",
+  "figure": "Fig. 1",
+  "input": {
+    "sha256": "ccf1f6921d907785103298b96fd971083dd6280fdf212318574920952780c313",
+    "dimensions": [
+      1999,
+      1579
+    ]
+  },
+  "visible_extraction": {
+    "status": "printed_counts_and_dot_matrix",
+    "count_labels": 30,
+    "membership_nodes": 570,
+    "method": "printed labels plus original-pixel dark-node support"
+  },
+  "source_data": {
+    "status": "official_source_available_not_panel_mapped",
+    "url": "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-021-27341-1/MediaObjects/41467_2021_27341_MOESM10_ESM.xlsx"
+  },
+  "coverage": {
+    "visible_records": 49,
+    "intersections": 30
+  },
+  "limitations": "Only printed intersection counts and visibly dark membership nodes are recovered. Underlying mutation records are not inferred."
+}

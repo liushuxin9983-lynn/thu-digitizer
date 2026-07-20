@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "case_id": "nature-28348-fig7",
+  "status": "source_mapped",
+  "article_url": "https://www.nature.com/articles/s41467-022-28348-y",
+  "figure": "Fig. 7",
+  "input": {
+    "sha256": "3705643fdd6257e8e4052e9863310b66d75c255be2225eace260590fd0be334c",
+    "dimensions": [
+      1000,
+      768
+    ]
+  },
+  "source_data": {
+    "status": "official_source_data_mapped",
+    "path": "source-data.xlsx",
+    "sha256": "3705643fdd6257e8e4052e9863310b66d75c255be2225eace260590fd0be334c",
+    "mapping_note": "Workbook sheet Figure 7 maps five set totals and twelve visible intersections; displayed columns are ordered by source intersection size."
+  },
+  "coverage": {
+    "visible_records": 17,
+    "source_records_mapped": 17,
+    "intersections": 12
+  },
+  "validation": {
+    "status": "source_mapped_replot",
+    "summary_error": 0
+  },
+  "limitations": "Source values verify plotted summaries/counts; browser font rendering remains an approximation."
+}

@@ -1,0 +1,13 @@
+record_id,metric,source_value,recreated_value,absolute_error,validation_status
+17,intersection,3219,3219,0,official_source_mapped
+16,intersection,1929,1929,0,official_source_mapped
+6,intersection,1347,1347,0,official_source_mapped
+12,intersection,878,878,0,official_source_mapped
+10,intersection,818,818,0,official_source_mapped
+13,intersection,249,249,0,official_source_mapped
+15,intersection,206,206,0,official_source_mapped
+8,intersection,121,121,0,official_source_mapped
+7,intersection,14,14,0,official_source_mapped
+11,intersection,3,3,0,official_source_mapped
+9,intersection,1,1,0,official_source_mapped
+14,intersection,1,1,0,official_source_mapped

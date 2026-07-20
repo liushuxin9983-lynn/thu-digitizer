@@ -1,0 +1,50 @@
+record_id,kind,set,value,source_status,intersection,members,count,metric
+1,set_total,Pa26T1,2626,visible_geometry_extracted,,,,
+2,set_total,Pa26T2,2735,visible_geometry_extracted,,,,
+3,set_total,Pa29T1,2784,visible_geometry_extracted,,,,
+4,set_total,Pa29T2,3899,visible_geometry_extracted,,,,
+5,set_total,Pa29T4,62,visible_geometry_extracted,,,,
+6,set_total,Pa30T1,62,visible_geometry_extracted,,,,
+7,set_total,Pa30T2,287,visible_geometry_extracted,,,,
+8,set_total,Pa31T1,1294,visible_geometry_extracted,,,,
+9,set_total,Pa31T2,0,visible_geometry_extracted,,,,
+10,set_total,Pa33T1,0,visible_geometry_extracted,,,,
+11,set_total,Pa33T2,0,visible_geometry_extracted,,,,
+12,set_total,Pa34T1,1276,visible_geometry_extracted,,,,
+13,set_total,Pa34T2,40,visible_geometry_extracted,,,,
+14,set_total,Pa35T1,0,visible_geometry_extracted,,,,
+15,set_total,Pa35T2,0,visible_geometry_extracted,,,,
+16,set_total,Pa36T1,0,visible_geometry_extracted,,,,
+17,set_total,Pa36T2,41,visible_geometry_extracted,,,,
+18,set_total,Pa37T1,998,visible_geometry_extracted,,,,
+19,set_total,Pa37T2,0,visible_geometry_extracted,,,,
+20,intersection,,,visible_geometry_extracted,1,Pa31T1;Pa34T1;Pa37T1,998,printed intersection size
+21,intersection,,,visible_geometry_extracted,2,,802,printed intersection size
+22,intersection,,,visible_geometry_extracted,3,Pa29T2,684,printed intersection size
+23,intersection,,,visible_geometry_extracted,4,Pa26T1;Pa26T2;Pa29T1;Pa29T2,675,printed intersection size
+24,intersection,,,visible_geometry_extracted,5,Pa26T1;Pa26T2;Pa29T1;Pa29T2,500,printed intersection size
+25,intersection,,,visible_geometry_extracted,6,Pa26T1;Pa26T2;Pa29T1;Pa29T2,441,printed intersection size
+26,intersection,,,visible_geometry_extracted,7,Pa26T1;Pa26T2;Pa29T1;Pa29T2;Pa30T2;Pa31T1,287,printed intersection size
+27,intersection,,,visible_geometry_extracted,8,Pa26T1;Pa26T2;Pa29T1;Pa29T2;Pa34T1,278,printed intersection size
+28,intersection,,,visible_geometry_extracted,9,Pa26T1;Pa26T2;Pa29T1;Pa29T2,229,printed intersection size
+29,intersection,,,visible_geometry_extracted,10,Pa29T2,124,printed intersection size
+30,intersection,,,visible_geometry_extracted,11,Pa29T2,117,printed intersection size
+31,intersection,,,visible_geometry_extracted,12,,110,printed intersection size
+32,intersection,,,visible_geometry_extracted,13,,110,printed intersection size
+33,intersection,,,visible_geometry_extracted,14,Pa29T2,108,printed intersection size
+34,intersection,,,visible_geometry_extracted,15,Pa26T1;Pa26T2;Pa29T1;Pa29T2,83,printed intersection size
+35,intersection,,,visible_geometry_extracted,16,Pa26T1;Pa26T2;Pa29T1;Pa29T2,71,printed intersection size
+36,intersection,,,visible_geometry_extracted,17,Pa26T1;Pa26T2;Pa29T1;Pa29T2;Pa29T4;Pa30T1,62,printed intersection size
+37,intersection,,,visible_geometry_extracted,18,Pa26T2;Pa29T1;Pa29T2;Pa36T2,41,printed intersection size
+38,intersection,,,visible_geometry_extracted,19,Pa26T2;Pa29T1;Pa29T2;Pa34T2,40,printed intersection size
+39,intersection,,,visible_geometry_extracted,20,Pa29T1;Pa29T2,40,printed intersection size
+40,intersection,,,visible_geometry_extracted,21,Pa29T2,39,printed intersection size
+41,intersection,,,visible_geometry_extracted,22,,38,printed intersection size
+42,intersection,,,visible_geometry_extracted,23,,37,printed intersection size
+43,intersection,,,visible_geometry_extracted,24,Pa26T2,28,printed intersection size
+44,intersection,,,visible_geometry_extracted,25,Pa29T2,23,printed intersection size
+45,intersection,,,visible_geometry_extracted,26,Pa29T1;Pa29T2,21,printed intersection size
+46,intersection,,,visible_geometry_extracted,27,Pa29T1;Pa29T2,16,printed intersection size
+47,intersection,,,visible_geometry_extracted,28,Pa29T2;Pa31T1,9,printed intersection size
+48,intersection,,,visible_geometry_extracted,29,Pa29T2,7,printed intersection size
+49,intersection,,,visible_geometry_extracted,30,Pa29T2,4,printed intersection size

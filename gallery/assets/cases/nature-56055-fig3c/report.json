@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "case_id": "nature-56055-fig3c",
+  "status": "visible_geometry_candidate",
+  "route": "calibrated_raster_scatter_trace_plus_component_geometry",
+  "input": {
+    "file": "figure3-complete.png",
+    "sha256": "8dfb2b17e43213bd85a40703d672cce5dfff4e715237b09cdd6bb13a06b62178",
+    "crop": [
+      0,
+      600,
+      1495,
+      1878
+    ]
+  },
+  "panel_mapping": "Fig. 3c: three calibrated scatter-line panels and three local cyan/green component fields.",
+  "coverage": {
+    "curve_samples_attempted": 165,
+    "curve_markers_visible": 144,
+    "local_dot_components": 57
+  },
+  "source_data": {
+    "used_for_recreation": false,
+    "role": "not used"
+  },
+  "limitations": [
+    "Only raster-supported curve positions and separable coloured components are retained.",
+    "Occluded curve positions remain absent rather than being filled from article source data.",
+    "The local cyan/green dot fields retain visible position, colour and radius, not a hidden numerical variable."
+  ]
+}
