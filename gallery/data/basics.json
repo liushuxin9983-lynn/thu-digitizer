@@ -150,19 +150,23 @@
     },
     {
       "id": "nature-56055-fig3c",
-      "title": "\\u591a\\u9762\\u677f\\u6563\\u70b9\\u6298\\u7ebf\\u56fe",
-      "subtitle": "\\u4e09\\u7ec4\\u6821\\u51c6\\u6563\\u70b9\\u8fde\\u7ebf\\u4e0e\\u5c40\\u90e8\\u70b9\\u9635",
+      "title": "多面板散点折线图",
+      "subtitle": "三组全覆盖标记曲线与局部点阵",
       "status": "visible_geometry_candidate",
-      "statusLabel": "\\u771f\\u5b9e\\u56fe \\u00b7 \\u53ef\\u89c1\\u51e0\\u4f55\\u63d0\\u53d6",
-      "description": "Fig. 3c \\u4e2d\\u4e09\\u7ec4\\u6563\\u70b9\\u6298\\u7ebf\\u4e0e\\u5c40\\u90e8\\u5f69\\u8272\\u70b9\\u9635\\u5747\\u4ece\\u56fe\\u50cf\\u5b9a\\u6807\\u63d0\\u53d6\\uff1b\\u88ab\\u906e\\u6321\\u70b9\\u4fdd\\u7559\\u7f3a\\u5931\\uff0c\\u4e0d\\u4f7f\\u7528\\u6e90\\u6570\\u636e\\u8865\\u9f50\\u3002",
+      "statusLabel": "真实图 · 候选标记路径",
+      "description": "Fig. 3c 三层曲线的 168 个可见标记中心均由原始像素、多锚点标定和全局路径选择恢复；同色参考虚线与阴影合成色已显式处理，并保留 57 个具有像素证据的局部点阵组件。",
       "metrics": [
         {
-          "label": "\\u53ef\\u89c1\\u66f2\\u7ebf\\u6807\\u8bb0",
-          "value": "144 / 165"
+          "label": "曲线标记覆盖",
+          "value": "168 / 168"
         },
         {
-          "label": "\\u5c40\\u90e8\\u70b9\\u9635",
-          "value": "57 \\u4e2a\\u53ef\\u5206\\u7ec4\\u4ef6"
+          "label": "局部点阵",
+          "value": "57 个可分组件"
+        },
+        {
+          "label": "路径平均置信度",
+          "value": "0.958"
         }
       ],
       "articleUrl": "https://www.nature.com/articles/s41467-025-56055-x",
@@ -180,8 +184,8 @@
       "styleSpec": {
         "renderer": "paper-native-geometry",
         "fidelity": "visible_geometry_candidate",
-        "label": "\\u56fe\\u50cf\\u51e0\\u4f55 \\u00b7 \\u4ea4\\u4e92\\u91cd\\u7ed8",
-        "note": "\\u60ac\\u505c\\u6570\\u636e\\u70b9\\u8bfb\\u53d6\\u63d0\\u53d6\\u503c\\u6216\\u53ef\\u89c1\\u989c\\u8272\\u3001\\u534a\\u5f84\\u3002",
+        "label": "全局标记路径 · 原像素证据",
+        "note": "悬停曲线标记可读取候选值、原始像素中心、置信度与不确定度；局部点阵仅展示可见位置、颜色和半径。",
         "canvas": {
           "width": 1495,
           "height": 1278
@@ -1419,8 +1423,8 @@
       "id": "pie",
       "title": "环形饼图 / Donut",
       "subtitle": "四组可见百分比标签",
-      "status": "partial_visible",
-      "statusLabel": "部分可见提取 · 18 标签",
+      "status": "candidate",
+      "statusLabel": "可见标签候选 · 18/18",
       "description": "从 Nature Communications Fig. 1f 提取四个 donut 上明确印出的 18 个百分比；原标签和不强制补到 100，扇区角度仅作案例级验证。",
       "metrics": [
         {

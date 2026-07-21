@@ -7,7 +7,17 @@ import hashlib
 import json
 import shutil
 import re
+import importlib.util
 from pathlib import Path, PureWindowsPath
+
+from PIL import Image
+
+try:
+    from candidate_digitize_labelled_donut import extract_labelled_donuts, write_outputs
+    from thu_digitizer import build_preflight
+except ImportError:  # pragma: no cover - package-style invocation
+    from .candidate_digitize_labelled_donut import extract_labelled_donuts, write_outputs
+    from .thu_digitizer import build_preflight
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -62,13 +72,7 @@ def build_case() -> dict:
     evidence = {
         "measurement-source.png": ARTIFACT / "figure1-original.png",
         "original.png": ARTIFACT / "panel-original.png",
-        "overlay.png": ARTIFACT / "overlay.png",
         "recreated.png": ARTIFACT / "recreated.png",
-        "candidate-data.csv": ARTIFACT / "data.csv",
-        "sector-geometry.csv": ARTIFACT / "sector-geometry.csv",
-        "candidate-report.json": ARTIFACT / "report.json",
-        "preflight-report.json": ARTIFACT / "preflight-report.json",
-        "figure-spec.json": ARTIFACT / "figure-spec.json",
         "candidate_digitize_donut_case.py": ARTIFACT / "candidate_digitize_donut_case.py",
         "test_candidate_digitize_donut_case.py": ARTIFACT / "test_candidate_digitize_donut_case.py",
         "README.md": ARTIFACT / "README.md",
@@ -77,23 +81,101 @@ def build_case() -> dict:
     for name, artifact_path in evidence.items():
         publish_evidence(first_existing(artifact_path, TARGET / name), TARGET / name)
 
+    module_path = TARGET / "candidate_digitize_donut_case.py"
+    module_spec = importlib.util.spec_from_file_location("nature_40822_fig1f", module_path)
+    case_module = importlib.util.module_from_spec(module_spec)
+    assert module_spec.loader is not None
+    module_spec.loader.exec_module(case_module)
+    shared_config = {
+        "schema_version": 1,
+        "source_contract": {
+            "sha256": case_module.EXPECTED_SOURCE_SHA256,
+            "dimensions": list(case_module.EXPECTED_SOURCE_SIZE),
+        },
+        "panel_bounds": [
+            case_module.PANEL_BOX[0],
+            case_module.PANEL_BOX[1],
+            case_module.PANEL_BOX[2] - 1,
+            case_module.PANEL_BOX[3] - 1,
+        ],
+        "palette": {
+            name: value["hex"] for name, value in case_module.PALETTE.items()
+        },
+        "groups": [
+            {
+                "name": group,
+                "center": list(meta["center"]),
+                "radial_band": list(meta["radial_band"]),
+                "labels": [
+                    {
+                        "series": cell_type,
+                        "anchor": list(anchor),
+                        "transcription_a": f"{value:.1f}",
+                        "transcription_b": f"{value:.1f}",
+                    }
+                    for label_group, cell_type, value, anchor in case_module.VISIBLE_LABELS
+                    if label_group == group
+                ],
+            }
+            for group, meta in case_module.DONUTS.items()
+        ],
+        "parameters": {
+            "angle_samples": 7200,
+            "color_tolerance": 20.0,
+            "minimum_sector_share_percent": 0.5,
+            "maximum_geometry_error_pp": 2.0,
+        },
+    }
+    (TARGET / "labelled-donut-config.json").write_text(
+        json.dumps(shared_config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    candidate = extract_labelled_donuts(TARGET / "measurement-source.png", shared_config)
+    full_overlay = TARGET / "overlay-full.png"
+    write_outputs(
+        TARGET / "measurement-source.png",
+        candidate,
+        output_csv=TARGET / "candidate-data.csv",
+        geometry_csv=TARGET / "sector-geometry.csv",
+        report_path=TARGET / "candidate-report.json",
+        overlay_path=full_overlay,
+    )
+    panel_box = tuple(case_module.PANEL_BOX)
+    with Image.open(full_overlay) as image:
+        image.convert("RGB").crop(panel_box).save(TARGET / "overlay.png")
+    full_overlay.unlink()
+    preflight, figure_spec = build_preflight(
+        TARGET / "measurement-source.png",
+        chart_type="donut",
+        panel_bounds=tuple(float(item) for item in panel_box),
+    )
+    (TARGET / "preflight-report.json").write_text(
+        json.dumps(scrub_local_paths(preflight), ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    (TARGET / "figure-spec.json").write_text(
+        json.dumps(scrub_local_paths(figure_spec), ensure_ascii=False, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
     rows: list[dict] = []
     with (TARGET / "candidate-data.csv").open(newline="", encoding="utf-8") as handle:
         for raw in csv.DictReader(handle):
+            if raw["numeric_output_authorized"].lower() != "true":
+                continue
             rows.append({
                 "kind": "point",
                 "shape": "circle",
-                "series": raw["cell_type"],
-                "category": raw["chart_group"],
+                "series": raw["series"],
+                "category": raw["group"],
                 "value": raw["displayed_value_percent"],
                 "unit": "percent",
-                "label_sum": raw["group_label_sum_percent"],
+                "label_sum": raw["group_visible_label_sum_percent"],
                 "numeric_use_allowed": "true",
                 "value_status": "visible_printed_label",
-                "pixel_x": round(float(raw["label_anchor_x_original_px"]) - 1000, 3),
-                "pixel_y": round(float(raw["label_anchor_y_original_px"]) - 420, 3),
+                "pixel_x": round(float(raw["label_anchor_x"]) - 1000, 3),
+                "pixel_y": round(float(raw["label_anchor_y"]) - 420, 3),
                 "radius": 12,
-                "fill": raw["color_hex"],
+                "fill": raw["color"],
             })
     fields = list(rows[0])
     with (TARGET / "data.csv").open("w", newline="", encoding="utf-8") as handle:
@@ -101,13 +183,12 @@ def build_case() -> dict:
         writer.writeheader()
         writer.writerows(rows)
 
-    candidate = json.loads((TARGET / "candidate-report.json").read_text(encoding="utf-8"))
     report = {
         "schema_version": 1,
         "case_id": "nature-40822-fig1f",
-        "status": "partial_visible",
-        "route": candidate["algorithm"],
-        "shared_pie_route": candidate["preflight"]["route_id"],
+        "status": "candidate",
+        "route": candidate["extractor"],
+        "shared_pie_route": "raster_labelled_donut_candidate",
         "expected_detection_count_passed": False,
         "source_data_role": "independent_validation_only",
         "normalization_applied_to_primary_values": False,
@@ -115,20 +196,34 @@ def build_case() -> dict:
             "file": "measurement-source.png",
             "sha256": digest(TARGET / "measurement-source.png"),
             "size": [2050, 1399],
-            "gallery_crop": candidate["panel"]["bounds_original_px"],
+            "gallery_crop": list(panel_box),
             "resampling_applied": False,
         },
-        "visible_label_extraction": candidate["visible_label_extraction"],
+        "visible_label_extraction": {
+            "method": "two matching visible-label transcriptions plus annular geometry validation",
+            "declared_label_count": candidate["coverage_ledger"]["declared_slot_count"],
+            "authorized_label_count": candidate["coverage_ledger"]["authorized_slot_count"],
+            "recovered_label_count": candidate["coverage_ledger"]["authorized_slot_count"],
+            "coverage": candidate["coverage_ledger"]["coverage_fraction"],
+            "group_label_sums_percent": {
+                group: next(
+                    row["group_visible_label_sum_percent"]
+                    for row in candidate["records"]
+                    if row["group"] == group
+                )
+                for group in case_module.DONUTS
+            },
+        },
         "sector_geometry_validation": {
-            "role": "validation_only_case_local_candidate",
-            "mean_absolute_percentage_point_error": candidate["sector_geometry_validation"]["mean_absolute_percentage_point_error"],
-            "maximum_absolute_percentage_point_error": candidate["sector_geometry_validation"]["maximum_absolute_percentage_point_error"],
+            "role": candidate["geometry_validation"]["role"],
+            "mean_absolute_percentage_point_error": candidate["geometry_validation"]["mean_absolute_error_pp"],
+            "maximum_absolute_percentage_point_error": candidate["geometry_validation"]["maximum_absolute_error_pp"],
         },
         "validation": {"status": "not_comparable", "filled_from_external_data": 0},
         "limitations": [
             "Numeric use is authorized only for the 18 explicitly printed labels.",
             "The four printed label sums are retained as 97.5, 90.6, 70.3, and 73.6 rather than forced to 100.",
-            "Sector geometry remains a case-local validation candidate; the shared pie/donut route is not implemented.",
+            "Sector geometry is validation-only; the shared route never derives or fills a primary label from angle geometry.",
         ],
     }
     (TARGET / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
@@ -136,8 +231,8 @@ def build_case() -> dict:
         "id": "pie",
         "title": "环形饼图 / Donut",
         "subtitle": "四组可见百分比标签",
-        "status": "partial_visible",
-        "statusLabel": "部分可见提取 · 18 标签",
+        "status": "candidate",
+        "statusLabel": "可见标签候选 · 18/18",
         "description": "从 Nature Communications Fig. 1f 提取四个 donut 上明确印出的 18 个百分比；原标签和不强制补到 100，扇区角度仅作案例级验证。",
         "metrics": [{"label": "可见标签", "value": "18 / 18"}, {"label": "几何验证 MAE", "value": "0.596 pp"}],
         "journal": "Nature Communications",

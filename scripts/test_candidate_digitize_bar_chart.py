@@ -12,6 +12,7 @@ RED = "#d62728"
 BLUE = "#1f77b4"
 GREEN = "#2ca02c"
 ERROR = "#6e6e6e"
+ROOT = Path(__file__).resolve().parents[1]
 
 
 def rgb(value):
@@ -37,6 +38,58 @@ def paint_horizontal_bar(image, center, height, value, axis, color, baseline=0.0
 
 
 class CandidateBarExtractorTests(unittest.TestCase):
+    def test_real_fig8a_error_spines_no_longer_split_three_visible_slots(self):
+        image_path = (
+            ROOT
+            / "gallery"
+            / "assets"
+            / "cases"
+            / "nature-70284-fig8a"
+            / "measurement-source.png"
+        )
+        cases = [
+            {
+                "plot_bounds": (224, 39, 959, 317),
+                "value_axis": (268.5, -0.004, 902.5, 0.002),
+                "color": "#e7f0f4",
+                "categories": [("TreeBL to CropR", 161.0)],
+            },
+            {
+                "plot_bounds": (1266, 39, 2000, 317),
+                "value_axis": (1438.5, -0.001, 1869.5, 0.001),
+                "color": "#b1d5e7",
+                "categories": [
+                    ("TreeBL to CropR", 230.0),
+                    ("Shrub to CropR", 265.0),
+                ],
+            },
+        ]
+        for case in cases:
+            with self.subTest(bounds=case["plot_bounds"]):
+                report = extract_bar_chart(
+                    image_path,
+                    plot_bounds=case["plot_bounds"],
+                    value_axis=case["value_axis"],
+                    orientation="horizontal",
+                    layout="grouped",
+                    series_colors={"NfN-SSP1": case["color"]},
+                    categories=case["categories"],
+                    tolerance=4,
+                    error_color="#000000",
+                    error_tolerance=8,
+                    error_search_radius=2,
+                    error_min_span=5,
+                )
+                self.assertEqual(report["status"], "candidate")
+                self.assertEqual(
+                    report["coverage_ledger"]["authorized_slot_count"],
+                    len(case["categories"]),
+                )
+                self.assertEqual(
+                    report["verified_occluder_bridging"]["maximum_verified_gap_pixels"],
+                    3.0,
+                )
+
     def test_extracts_vertical_grouped_positive_and_negative_bars(self):
         image = np.full((120, 180, 3), 255, dtype=np.uint8)
         value_axis = (10.0, 10.0, 110.0, -10.0)
@@ -243,7 +296,89 @@ class CandidateBarExtractorTests(unittest.TestCase):
         self.assertEqual(report["status"], "partial_visible")
         missing = next(mark for mark in report["marks"] if mark["series"] == "blue")
         self.assertEqual(missing["status"], "not_extracted")
+        self.assertEqual(missing["reason_code"], "no_supported_geometry")
+        self.assertFalse(missing["numeric_output_authorized"])
         self.assertNotIn("value", missing)
+
+    def test_verified_error_colour_bridges_a_thick_cross_axis_occlusion(self):
+        image = np.full((120, 190, 3), 255, dtype=np.uint8)
+        value_axis = (10.0, -10.0, 170.0, 10.0)
+        paint_horizontal_bar(image, 60, 18, -4.0, value_axis, RED)
+        start = round(_data_to_pixel(0.0, value_axis))
+        end = round(_data_to_pixel(-4.0, value_axis))
+        # A three-pixel horizontal error spine replaces the middle of the fill
+        # and would otherwise create two valid rectangles for one slot.
+        image[59:62, min(start, end) : max(start, end)] = rgb(ERROR)
+        lower = round(_data_to_pixel(-5.0, value_axis))
+        upper = round(_data_to_pixel(-3.0, value_axis))
+        image[59:62, min(lower, upper) : max(lower, upper) + 1] = rgb(ERROR)
+        image[54:67, lower : lower + 2] = rgb(ERROR)
+        image[54:67, upper : upper + 2] = rgb(ERROR)
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = save_image(directory, image)
+            report = extract_bar_chart(
+                path,
+                plot_bounds=(10, 10, 179, 109),
+                value_axis=value_axis,
+                orientation="horizontal",
+                layout="grouped",
+                series_colors={"red": RED},
+                categories=[("A", 60.0)],
+                tolerance=1,
+                error_color=ERROR,
+                error_tolerance=1,
+                verified_occluder_bridge_gap=4,
+            )
+
+        self.assertEqual(report["status"], "candidate")
+        self.assertTrue(report["numeric_output_authorized"])
+        self.assertAlmostEqual(report["marks"][0]["value"], -4.0, delta=0.2)
+        self.assertGreater(
+            report["verified_occluder_bridging"]["verified_bridge_edge_count"], 0
+        )
+        self.assertEqual(
+            report["verified_occluder_bridging"]["occluder_role"],
+            "topology_only_not_numeric_fill",
+        )
+
+    def test_percent_stack_accepts_visible_separator_shortfall_without_normalizing(self):
+        image = np.full((125, 120, 3), 255, dtype=np.uint8)
+        value_axis = (10.0, 100.0, 110.0, 0.0)
+        colors = {"red": RED, "blue": BLUE, "green": GREEN}
+        # Draw 20/30/50 with one white raster row between adjacent sectors.
+        segments = [(0.0, 20.0, RED), (20.0, 50.0, BLUE), (50.0, 100.0, GREEN)]
+        for low, high, color in segments:
+            first = round(_data_to_pixel(low, value_axis))
+            second = round(_data_to_pixel(high, value_axis))
+            image[min(first, second) : max(first, second), 50:70] = rgb(color)
+        for boundary in (20.0, 50.0):
+            row = round(_data_to_pixel(boundary, value_axis))
+            image[row : row + 1, 50:70] = 255
+
+        with tempfile.TemporaryDirectory() as directory:
+            path = save_image(directory, image)
+            report = extract_bar_chart(
+                path,
+                plot_bounds=(10, 10, 109, 110),
+                value_axis=value_axis,
+                orientation="vertical",
+                layout="percent_stacked",
+                series_colors=colors,
+                categories=[("A", 60.0)],
+                tolerance=1,
+                stack_total_tolerance=0.25,
+            )
+
+        diagnostic = next(
+            item for item in report["stack_diagnostics"] if item["kind"] == "stack_total"
+        )
+        self.assertEqual(report["status"], "candidate")
+        self.assertFalse(diagnostic["within_tolerance"])
+        self.assertTrue(diagnostic["separator_consistent"])
+        self.assertEqual(diagnostic["validation_status"], "visible_separator_shortfall")
+        self.assertFalse(diagnostic["values_normalized_or_completed"])
+        self.assertLess(diagnostic["observed_positive_total"], 100.0)
 
     def test_bridges_gridline_gap_and_prefers_baseline_connected_bar_over_legend(self):
         image = np.full((140, 160, 3), 255, dtype=np.uint8)

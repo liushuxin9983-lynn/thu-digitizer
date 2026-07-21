@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "status": "not_automated",
+  "status": "needs_verified_configuration",
   "inspection": {
-    "input_file": "figure1-original.png",
+    "input_file": "measurement-source.png",
     "input_sha256": "4dd50564058d2823dfe740ec3df49d6f451088cebd402b51d9890fdfc3282e46",
     "file_size_bytes": 339068,
     "media_kind": "raster",
@@ -20,54 +20,43 @@
     }
   },
   "route_selection": {
-    "chart_type": "pie",
+    "chart_type": "donut",
     "primary": {
-      "route_id": "unsupported_coordinate_route",
-      "title": "Coordinate-specific route not implemented",
+      "route_id": "raster_labelled_donut_candidate",
+      "title": "Visible-label pie/donut with annular geometry validation",
       "chart_types": [
-        "matrix_plot",
-        "area",
-        "stacked_area",
-        "waterfall",
         "pie",
-        "donut",
-        "radar",
-        "polar",
-        "ternary",
-        "geospatial_map",
-        "network_plot",
-        "sankey_alluvial",
-        "event_raster",
-        "table_like",
-        "density",
-        "violin",
-        "bubble_plot",
-        "dot_plot",
-        "volcano_plot",
-        "umap_tsne_pca"
+        "donut"
       ],
       "media_kinds": [
-        "raster",
-        "pdf"
+        "raster"
       ],
       "coordinate_models": [
-        "unknown"
+        "polar"
       ],
       "mark_grammars": [
-        "unknown"
+        "visible_numeric_label",
+        "color_sector",
+        "annular_band"
       ],
-      "maturity": "not_implemented_or_case_only",
-      "implementation": null,
+      "maturity": "assisted_candidate",
+      "implementation": "scripts/candidate_digitize_labelled_donut.py",
       "required_confirmations": [
-        "chart_specific_contract",
-        "coordinate_specific_benchmark"
+        "original_raster",
+        "panel_roi",
+        "group_centers",
+        "radial_bands",
+        "series_palette",
+        "two_pass_visible_label_transcription",
+        "label_anchors",
+        "overlay_review"
       ],
-      "recoverable": "A panel-specific visible representation only after a dedicated route is implemented.",
-      "non_recoverable": "No values should be accepted through a generic XY fallback.",
-      "automated_extraction": false
+      "recoverable": "Explicitly visible numeric labels whose duplicate transcription agrees and whose normalized shares match independently sampled sector geometry.",
+      "non_recoverable": "Unlabeled sectors, hidden source values, raw observations, and any value inferred only from an angle.",
+      "automated_extraction": true
     },
     "fallback": null,
-    "decision": "not_automated",
+    "decision": "needs_verified_configuration",
     "reason": "A route is registered, but all required confirmations remain explicit before extraction."
   },
   "figure_spec_status": "valid_template_not_yet_verified",

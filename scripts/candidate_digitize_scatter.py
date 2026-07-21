@@ -26,7 +26,7 @@ except ImportError:  # pragma: no cover - package import
 
 Bounds = tuple[int, int, int, int]
 Anchor = tuple[float, float]
-ALGORITHM_VERSION = "compact-scatter-distance-peaks-v1"
+ALGORITHM_VERSION = "compact-scatter-distance-peaks-v2-residual-audit"
 
 
 def _sha256(path: Path) -> str:
@@ -176,6 +176,130 @@ def _non_maximum_suppression(candidates: list[dict[str, float]]) -> tuple[list[d
     return sorted(accepted, key=lambda item: (item["x"], item["y"])), suppressed
 
 
+def _restrict_to_verified_region(
+    mask: np.ndarray,
+    *,
+    plot_bounds: Bounds,
+    edge_margin: int,
+    exclude_regions: Sequence[Bounds],
+) -> np.ndarray:
+    """Apply the same verified spatial contract to every detector pass."""
+
+    result = mask.copy()
+    outside = np.ones_like(result, dtype=bool)
+    left, top, right, bottom = plot_bounds
+    outside[top : bottom + 1, left : right + 1] = False
+    result[outside] = False
+    if edge_margin:
+        result[top : min(bottom + 1, top + edge_margin), left : right + 1] = False
+        result[max(top, bottom - edge_margin + 1) : bottom + 1, left : right + 1] = False
+        result[top : bottom + 1, left : min(right + 1, left + edge_margin)] = False
+        result[top : bottom + 1, max(left, right - edge_margin + 1) : right + 1] = False
+    for region_left, region_top, region_right, region_bottom in exclude_regions:
+        result[region_top : region_bottom + 1, region_left : region_right + 1] = False
+    return result
+
+
+def _residual_marker_candidates(
+    rgb: np.ndarray,
+    *,
+    accepted: list[dict[str, float]],
+    radius_reference: float | None,
+    plot_bounds: Bounds,
+    edge_margin: int,
+    exclude_regions: Sequence[Bounds],
+    marker_mode: str,
+    marker_color: str | Sequence[int] | None,
+    color_tolerance: float,
+    dark_threshold: int,
+    light_threshold: int,
+    min_radius: float,
+    max_radius: float,
+    peak_window: int,
+    threshold_delta: int,
+    color_tolerance_ratio: float,
+    radius_ratio_min: float,
+    radius_ratio_max: float,
+    core_fraction_min: float,
+) -> tuple[list[dict[str, Any]], dict[str, Any]]:
+    """Run a relaxed negative-space pass without adding points.
+
+    The pass can only block authorization.  It never promotes a residual peak
+    into the primary table.  A caller must refine verified exclusions or the
+    marker configuration and rerun the primary detector.
+    """
+
+    relaxed_mask = _marker_mask(
+        rgb,
+        marker_mode=marker_mode,
+        marker_color=marker_color,
+        color_tolerance=color_tolerance * color_tolerance_ratio,
+        dark_threshold=min(255, dark_threshold + threshold_delta),
+        light_threshold=max(0, light_threshold - threshold_delta),
+    )
+    relaxed_mask = _restrict_to_verified_region(
+        relaxed_mask,
+        plot_bounds=plot_bounds,
+        edge_margin=edge_margin,
+        exclude_regions=exclude_regions,
+    )
+    _, relaxed_peaks = _peak_candidates(
+        relaxed_mask,
+        min_radius=min_radius,
+        max_radius=max_radius,
+        peak_window=peak_window,
+    )
+    reference = radius_reference
+    if reference is None and relaxed_peaks:
+        reference = float(
+            np.percentile([candidate["radius"] for candidate in relaxed_peaks], 75)
+        )
+    residuals: list[dict[str, Any]] = []
+    if reference is not None:
+        minimum = max(min_radius, reference * radius_ratio_min)
+        maximum = min(max_radius, reference * radius_ratio_max)
+        for candidate in relaxed_peaks:
+            radius = float(candidate["radius"])
+            if not minimum <= radius <= maximum:
+                continue
+            if any(
+                math.hypot(candidate["x"] - point["x"], candidate["y"] - point["y"])
+                < max(2.0, 0.55 * (radius + float(point["radius"])))
+                for point in accepted
+            ):
+                continue
+            core_fraction = _disc_fraction(
+                relaxed_mask,
+                float(candidate["x"]),
+                float(candidate["y"]),
+                max(1.0, radius * 0.82),
+            )
+            if core_fraction < core_fraction_min:
+                continue
+            residuals.append(
+                {
+                    "pixel_x": round(float(candidate["x"]), 4),
+                    "pixel_y": round(float(candidate["y"]), 4),
+                    "marker_radius_evidence_pixels": round(radius, 4),
+                    "core_foreground_fraction_relaxed": round(core_fraction, 4),
+                    "reason_code": "detector_residual",
+                    "status": "review_required_not_promoted",
+                }
+            )
+    return residuals, {
+        "strategy": "relaxed_negative_space_peak_pass",
+        "role": "authorization_gate_only_never_adds_points",
+        "threshold_delta": threshold_delta,
+        "color_tolerance_ratio": color_tolerance_ratio,
+        "radius_ratio_range": [radius_ratio_min, radius_ratio_max],
+        "core_fraction_min": core_fraction_min,
+        "relaxed_raw_peak_count": len(relaxed_peaks),
+        "residual_candidate_count": len(residuals),
+        "status": "clear" if not residuals else "review_required",
+        "candidates": residuals,
+    }
+
+
 def extract_scatter_points(
     input_path: Path,
     *,
@@ -197,6 +321,11 @@ def extract_scatter_points(
     exclude_regions: Sequence[Bounds] = (),
     annotated_pearson_r: float | None = None,
     pearson_tolerance: float = 0.03,
+    residual_threshold_delta: int = 24,
+    residual_color_tolerance_ratio: float = 1.35,
+    residual_radius_ratio_min: float = 0.72,
+    residual_radius_ratio_max: float = 1.45,
+    residual_core_fraction_min: float = 0.70,
 ) -> dict[str, Any]:
     """Return calibrated centres supported by compact visible raster peaks."""
     if len(x_anchors) < 2 or len(y_anchors) < 2:
@@ -213,6 +342,14 @@ def extract_scatter_points(
         raise ValueError("edge_margin must be non-negative")
     if pearson_tolerance <= 0:
         raise ValueError("pearson_tolerance must be positive")
+    if residual_threshold_delta < 0:
+        raise ValueError("residual_threshold_delta must be non-negative")
+    if residual_color_tolerance_ratio < 1:
+        raise ValueError("residual_color_tolerance_ratio must be at least 1")
+    if not 0 < residual_radius_ratio_min <= residual_radius_ratio_max:
+        raise ValueError("residual radius ratios must be positive and ordered")
+    if not 0 < residual_core_fraction_min <= 1:
+        raise ValueError("residual_core_fraction_min must be in (0, 1]")
 
     input_path = Path(input_path)
     with Image.open(input_path) as source:
@@ -233,17 +370,12 @@ def extract_scatter_points(
         dark_threshold=dark_threshold,
         light_threshold=light_threshold,
     )
-    outside = np.ones_like(mask, dtype=bool)
-    left, top, right, bottom = plot_bounds
-    outside[top : bottom + 1, left : right + 1] = False
-    mask[outside] = False
-    if edge_margin:
-        mask[top : min(bottom + 1, top + edge_margin), left : right + 1] = False
-        mask[max(top, bottom - edge_margin + 1) : bottom + 1, left : right + 1] = False
-        mask[top : bottom + 1, left : min(right + 1, left + edge_margin)] = False
-        mask[top : bottom + 1, max(left, right - edge_margin + 1) : right + 1] = False
-    for region_left, region_top, region_right, region_bottom in exclude_regions:
-        mask[region_top : region_bottom + 1, region_left : region_right + 1] = False
+    mask = _restrict_to_verified_region(
+        mask,
+        plot_bounds=plot_bounds,
+        edge_margin=edge_margin,
+        exclude_regions=exclude_regions,
+    )
 
     distance, candidates = _peak_candidates(
         mask,
@@ -275,6 +407,27 @@ def extract_scatter_points(
     ]
     accepted, proximity_suppressed = _non_maximum_suppression(consistent_candidates)
     suppressed = [*radius_rejected, *proximity_suppressed]
+    residual_candidates, residual_audit = _residual_marker_candidates(
+        rgb,
+        accepted=accepted,
+        radius_reference=radius_reference,
+        plot_bounds=plot_bounds,
+        edge_margin=edge_margin,
+        exclude_regions=exclude_regions,
+        marker_mode=marker_mode,
+        marker_color=marker_color,
+        color_tolerance=color_tolerance,
+        dark_threshold=dark_threshold,
+        light_threshold=light_threshold,
+        min_radius=min_radius,
+        max_radius=max_radius,
+        peak_window=peak_window,
+        threshold_delta=residual_threshold_delta,
+        color_tolerance_ratio=residual_color_tolerance_ratio,
+        radius_ratio_min=residual_radius_ratio_min,
+        radius_ratio_max=residual_radius_ratio_max,
+        core_fraction_min=residual_core_fraction_min,
+    )
     component_count, labels, stats, _ = cv2.connectedComponentsWithStats(mask.astype(np.uint8), 8)
 
     points: list[dict[str, Any]] = []
@@ -354,6 +507,10 @@ def extract_scatter_points(
         reasons.append("no compact marker peaks met the visible-evidence thresholds")
     if annotated_pearson_r is not None and validation["status"] != "matched":
         reasons.append("recomputed Pearson correlation does not match the supplied annotation")
+    if residual_candidates:
+        reasons.append(
+            "relaxed negative-space audit found unresolved marker-like residuals"
+        )
     status = "candidate" if not reasons else "low_confidence"
     authorized = status == "candidate"
     for point in points:
@@ -382,6 +539,11 @@ def extract_scatter_points(
         "exclude_regions": [list(region) for region in exclude_regions],
         "annotated_pearson_r": annotated_pearson_r,
         "pearson_tolerance": pearson_tolerance,
+        "residual_threshold_delta": residual_threshold_delta,
+        "residual_color_tolerance_ratio": residual_color_tolerance_ratio,
+        "residual_radius_ratio_min": residual_radius_ratio_min,
+        "residual_radius_ratio_max": residual_radius_ratio_max,
+        "residual_core_fraction_min": residual_core_fraction_min,
     }
     run_id = hashlib.sha256(
         json.dumps(run_configuration, sort_keys=True, separators=(",", ":")).encode("utf-8")
@@ -424,10 +586,12 @@ def extract_scatter_points(
         "points": points,
         "components": components,
         "suppressed_peaks": suppressed,
+        "residual_audit": residual_audit,
         "validation": validation,
         "required_review": [
             "Open the overlay at original resolution and verify every accepted ring is centred on a visible marker.",
             "Review every multi-peak component and every suppressed peak before publishing numeric output.",
+            "The residual audit must be clear; residual candidates must be resolved by verified exclusions or configuration, never promoted by eye.",
         ],
         "limitations": [
             "This candidate recovers compact filled visible marker centres only.",
@@ -476,6 +640,11 @@ def write_overlay(input_path: Path, report: dict[str, Any], output_path: Path) -
         draw.ellipse((x - radius, y - radius, x + radius, y + radius), outline=colour, width=2)
         draw.line((x - 2, y, x + 2, y), fill=colour, width=1)
         draw.line((x, y - 2, x, y + 2), fill=colour, width=1)
+    for candidate in report.get("residual_audit", {}).get("candidates", []):
+        x = float(candidate["pixel_x"])
+        y = float(candidate["pixel_y"])
+        radius = max(4.0, float(candidate["marker_radius_evidence_pixels"]) + 2.0)
+        draw.rectangle((x - radius, y - radius, x + radius, y + radius), outline="#d000d0", width=2)
     output_path.parent.mkdir(parents=True, exist_ok=True)
     overlay.save(output_path)
 
@@ -504,6 +673,11 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--exclude-region", action="append", type=_parse_bounds)
     parser.add_argument("--annotated-pearson-r", type=float)
     parser.add_argument("--pearson-tolerance", type=float, default=0.03)
+    parser.add_argument("--residual-threshold-delta", type=int, default=24)
+    parser.add_argument("--residual-color-tolerance-ratio", type=float, default=1.35)
+    parser.add_argument("--residual-radius-ratio-min", type=float, default=0.72)
+    parser.add_argument("--residual-radius-ratio-max", type=float, default=1.45)
+    parser.add_argument("--residual-core-fraction-min", type=float, default=0.70)
     return parser
 
 
@@ -529,6 +703,11 @@ def main() -> None:
         exclude_regions=args.exclude_region or (),
         annotated_pearson_r=args.annotated_pearson_r,
         pearson_tolerance=args.pearson_tolerance,
+        residual_threshold_delta=args.residual_threshold_delta,
+        residual_color_tolerance_ratio=args.residual_color_tolerance_ratio,
+        residual_radius_ratio_min=args.residual_radius_ratio_min,
+        residual_radius_ratio_max=args.residual_radius_ratio_max,
+        residual_core_fraction_min=args.residual_core_fraction_min,
     )
     write_csv(report, args.output_csv)
     args.report.parent.mkdir(parents=True, exist_ok=True)

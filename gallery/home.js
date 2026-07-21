@@ -18,7 +18,7 @@ const dataTable = document.querySelector("#data-table");
 const dataChart = document.querySelector("#data-chart");
 const interactiveChart = document.querySelector("#interactive-chart");
 const chartTooltip = document.querySelector("#chart-tooltip");
-const ASSET_REVISION = "20260721-scatter-11point";
+const ASSET_REVISION = "20260721-marker-line-v02";
 const interactiveReadout = document.querySelector("#interactive-readout");
 const interactiveNote = document.querySelector("#interactive-note");
 const interactiveTitle = document.querySelector("#interactive-title");
@@ -1684,6 +1684,7 @@ function renderRasterEvidenceInteractive(sample, table) {
       ["x uncertainty", row.x_uncertainty],
       ["y uncertainty", row.y_uncertainty],
       ["confidence", row.confidence],
+      ["value uncertainty", row.value_uncertainty],
       ["component peaks", row.component_peak_count],
       ["status", row.value_status || "visible geometry"],
     ]);

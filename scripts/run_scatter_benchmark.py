@@ -190,6 +190,34 @@ def _fixtures(output_dir: Path) -> list[Fixture]:
         plot_bounds=bounds,
         marker_radius=5.5,
     )
+    residual_point = (278.0, 45.0)
+    residual_path = output_dir / "low_contrast_residual_refusal.png"
+    _render(
+        residual_path,
+        name="low_contrast_residual_refusal",
+        marker_color="#282829",
+        background="#ffffff",
+        axis_color="#252525",
+        line_color="#0058a2",
+        band_color="#dbe8f3",
+        points=points,
+        size=size,
+        plot_bounds=bounds,
+        marker_radius=5.5,
+    )
+    with Image.open(residual_path) as source:
+        residual_image = source.convert("RGB")
+    residual_draw = ImageDraw.Draw(residual_image)
+    residual_draw.ellipse(
+        (
+            residual_point[0] - 5.5,
+            residual_point[1] - 5.5,
+            residual_point[0] + 5.5,
+            residual_point[1] + 5.5,
+        ),
+        fill="#777777",
+    )
+    residual_image.save(residual_path)
 
     def axes_for(current_bounds: tuple[int, int, int, int]):
         left, top, right, bottom = current_bounds
@@ -206,6 +234,7 @@ def _fixtures(output_dir: Path) -> list[Fixture]:
         Fixture("light_on_dark", output_dir / "light_on_dark.png", bounds, x_axes, y_axes, points, "light", None, 120, 220, 2.8, 12.0, "candidate", 1.5),
         Fixture("dark_band_touching_lowres_jpeg", output_dir / "dark_band_touching_lowres.jpg", low_bounds, low_x_axes, low_y_axes, low_points, "dark", None, 145, 225, 2.4, 9.0, "candidate", 2.5),
         Fixture("line_text_only_refusal", output_dir / "line_text_only.png", bounds, x_axes, y_axes, (), "dark", None, 120, 225, 2.8, 12.0, "low_confidence", 1.5),
+        Fixture("low_contrast_residual_refusal", residual_path, bounds, x_axes, y_axes, points + (residual_point,), "dark", None, 105, 225, 2.8, 12.0, "low_confidence_residual", 1.5),
     ]
 
 
@@ -315,6 +344,14 @@ def _failure_reason(variant: dict[str, Any]) -> str | None:
         if extraction["numeric_output_authorized"] or extraction["points"]:
             return f"{variant['name']} emitted numeric point output while refusing"
         return None
+    if expected_status == "low_confidence_residual":
+        if extraction["status"] != "low_confidence":
+            return f"{variant['name']} did not block the unresolved residual"
+        if extraction["numeric_output_authorized"]:
+            return f"{variant['name']} authorized points despite a marker-like residual"
+        if extraction["residual_audit"]["residual_candidate_count"] != 1:
+            return f"{variant['name']} did not expose exactly one residual candidate"
+        return None
     if extraction["status"] != "candidate" or not extraction["numeric_output_authorized"]:
         return f"{variant['name']} did not authorize the supported candidate"
     metrics = variant["metrics"]
@@ -387,7 +424,7 @@ def run_benchmark(output_dir: Path) -> dict[str, Any]:
         if reason is None:
             variant["status"] = (
                 "rejected_as_expected"
-                if variant["expected_status"] == "low_confidence"
+                if variant["expected_status"].startswith("low_confidence")
                 else "passed"
             )
             variant["failure_reason"] = ""

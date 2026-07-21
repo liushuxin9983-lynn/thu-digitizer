@@ -79,6 +79,65 @@ class GallerySiteTests(unittest.TestCase):
         self.assertTrue(sample["styleSpec"]["rasterEvidenceInteractive"])
         self.assertEqual(sample["styleSpec"]["canvas"], {"width": 600, "height": 400})
 
+    def test_nature_56055_marker_line_case_publishes_full_original_pixel_evidence(self):
+        case_id = "nature-56055-fig3c"
+        sample = next(item for item in self.basics["samples"] if item["id"] == case_id)
+        root = GALLERY / "assets" / "cases" / case_id
+        original = root / "original.png"
+        expected_sha256 = "fd5fe57633c5535eedd61619cd4d60c7ca5136a523f08655a4b8c19ad8cb0078"
+
+        self.assertEqual(hashlib.sha256(original.read_bytes()).hexdigest(), expected_sha256)
+        self.assertEqual(sample["metrics"][0], {"value": "168 / 168", "label": "曲线标记覆盖"})
+        self.assertTrue(sample["styleSpec"]["rasterEvidenceInteractive"])
+
+        with (root / "data.csv").open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+        curve_points = [row for row in rows if row["category"] == "visible curve marker"]
+        curve_lines = [row for row in rows if row["category"] == "visible marker connection"]
+        local_dots = [row for row in rows if row["series"].startswith("local dot field")]
+        self.assertEqual(len(rows), 390)
+        self.assertEqual(
+            Counter(row["series"] for row in curve_points),
+            Counter({"Spontaneous curvature": 56, "Surface reconstruction": 56, "Rigid": 56}),
+        )
+        self.assertEqual(len(curve_lines), 165)
+        self.assertEqual(len(local_dots), 57)
+        self.assertTrue(all(row["pixel_x"] and row["pixel_y"] for row in curve_points))
+        self.assertTrue(all(row["confidence"] and row["value_uncertainty"] for row in curve_points))
+        self.assertEqual(
+            {row["value_status"] for row in curve_points},
+            {"candidate_marker_centre_global_path_v0.2.0"},
+        )
+
+        report = json.loads((root / "report.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "visible_geometry_candidate")
+        self.assertEqual(report["source"]["sha256"], expected_sha256)
+        self.assertEqual((report["source"]["width"], report["source"]["height"]), (1495, 1278))
+        self.assertEqual(report["source_data_role"], "not_used")
+        self.assertFalse(report["primary_csv"]["source_data_used"])
+        self.assertTrue(report["visible_extraction"]["numeric_output_authorized"])
+        self.assertEqual(report["coverage"]["declared_curve_marker_slots"], 168)
+        self.assertEqual(report["coverage"]["authorized_curve_markers"], 168)
+        self.assertEqual(report["coverage"]["retained_local_dot_components"], 57)
+
+        run_manifest = json.loads((root / "figure-spec-run-manifest.json").read_text(encoding="utf-8"))
+        self.assertTrue(run_manifest["numeric_output_authorized"])
+        self.assertEqual({panel["panel_id"] for panel in run_manifest["panels"]}, {
+            "spontaneous_curvature", "surface_reconstruction", "rigid",
+        })
+        self.assertTrue(all(panel["numeric_output_authorized"] for panel in run_manifest["panels"]))
+        for panel in report["visible_extraction"]["panels"]:
+            candidate = json.loads((root / panel["candidate_report"]).read_text(encoding="utf-8"))
+            self.assertTrue(candidate["numeric_output_authorized"])
+            self.assertEqual(candidate["series"][next(iter(candidate["series"]))]["summary"]["extracted"], 56)
+
+        for path in root.rglob("*.json"):
+            self.assertNotRegex(path.read_text(encoding="utf-8"), r"(?<![A-Za-z])[A-Za-z]:[\\\\/]", path.name)
+
+        with Image.open(original) as source_image, Image.open(root / "recreated.png") as recreated:
+            self.assertEqual(source_image.size, (1495, 1278))
+            self.assertEqual(recreated.size, source_image.size)
+
     def test_nature_27341_upset_case_uses_validated_original_pixel_geometry(self):
         sample = next(item for item in self.basics["samples"] if item["id"] == "nature-27341-fig1")
         with (GALLERY / sample["assets"]["data"]).open(newline="", encoding="utf-8") as handle:
@@ -214,8 +273,8 @@ class GallerySiteTests(unittest.TestCase):
             ],
         )
         self.assertEqual(sum(item["status"] == "validated_local_stable" for item in samples), 3)
-        self.assertEqual(sum(item["status"] == "candidate" for item in samples), 5)
-        self.assertEqual(sum(item["status"] == "partial_visible" for item in samples), 2)
+        self.assertEqual(sum(item["status"] == "candidate" for item in samples), 6)
+        self.assertEqual(sum(item["status"] == "partial_visible" for item in samples), 1)
         self.assertEqual(sum(item["status"] == "low_confidence" for item in samples), 1)
         self.assertEqual(next(item for item in samples if item["id"] == "forest")["status"], "visible_geometry_extracted")
         self.assertFalse(any(item["status"] == "source_mapped" for item in samples))
@@ -342,7 +401,7 @@ class GallerySiteTests(unittest.TestCase):
             sample["figureUrl"],
             "https://www.nature.com/articles/s41467-023-40822-9/figures/1",
         )
-        self.assertEqual(sample["status"], "partial_visible")
+        self.assertEqual(sample["status"], "candidate")
         self.assertTrue(sample["styleSpec"]["rasterEvidenceInteractive"])
         self.assertEqual(sample["styleSpec"]["canvas"], {"width": 1025, "height": 215})
         root = (GALLERY / sample["assets"]["report"]).parent
@@ -358,10 +417,11 @@ class GallerySiteTests(unittest.TestCase):
         }
         self.assertEqual(sums, {"Normal": 97.5, "AK": 90.6, "Primary": 70.3, "MET": 73.6})
         report = json.loads((root / "report.json").read_text(encoding="utf-8"))
-        self.assertEqual(report["status"], "partial_visible")
+        self.assertEqual(report["status"], "candidate")
         self.assertEqual(report["visible_label_extraction"]["recovered_label_count"], 18)
         self.assertFalse(report["normalization_applied_to_primary_values"])
-        self.assertEqual(report["shared_pie_route"], "unsupported_coordinate_route")
+        self.assertEqual(report["shared_pie_route"], "raster_labelled_donut_candidate")
+        self.assertTrue((root / "labelled-donut-config.json").is_file())
         self.assertEqual(report["source_data_role"], "independent_validation_only")
         for name in ["preflight-report.json", "figure-spec.json", "sector-geometry.csv", "candidate-report.json", "SOURCES.md"]:
             self.assertTrue((root / name).is_file(), name)

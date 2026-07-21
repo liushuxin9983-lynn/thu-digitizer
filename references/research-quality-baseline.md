@@ -21,7 +21,7 @@ Read this file together with [report-and-evolution.md](report-and-evolution.md) 
 
 ## Scope statement
 
-The stable skill currently provides dedicated extractors for calibrated colour-distinct lines, histograms, and vertical/horizontal boxplots. Compact filled raster scatter points have a deterministic candidate with synthetic evidence and retained real-case regression evidence, but it is not promoted as a universal or stable point detector. Repeated aligned lattice composites have a source-locked deterministic candidate with synthetic and retained UpSet regression evidence; irregular matrices and ambiguous cells remain outside that route. Grouped and stacked bars also remain candidate/benchmark routes. Do not describe a benchmark or candidate route as supported universal automation.
+The stable skill currently provides dedicated extractors for calibrated colour-distinct lines, histograms, and vertical/horizontal boxplots. Compact filled raster scatter points have a deterministic candidate with synthetic evidence, a blocking low-contrast residual audit, and retained real-case regression evidence, but it is not promoted as a universal or stable point detector. Repeated aligned lattice composites have a source-locked deterministic candidate with synthetic and retained UpSet regression evidence; irregular matrices and ambiguous cells remain outside that route. Grouped and stacked bars also remain candidate/benchmark routes. Visible-label pie/donut extraction is an assisted candidate limited to duplicate label transcription plus independent annular-geometry validation; it does not infer unlabeled sectors. Do not describe a benchmark or candidate route as supported universal automation.
 
 ## Priority order
 
@@ -50,8 +50,8 @@ Pursue superiority through these verifiable properties:
 
 - Parse PDF/SVG vector marks, transforms, text, and layers before rasterizing. Fall back to raster geometry only when vector structure is absent or unusable.
 - Separate chart type, panel/ROI, axis transform, OCR/tick association, legend/series association, mark segmentation, coordinate recovery, and validation. Do not use one opaque image-to-CSV step as the sole evidence.
-- Let a local or remote vision model propose type, ROI, OCR, colours, and extraction route; accept a numerical value only after local geometric and calibration checks. Remote model use needs explicit user approval.
-- Generate an evidence bundle: input hash, dimensions, crop/ROI, calibration anchors and transform, masks/components, matching records, CSV, JSON, overlay, recreation, confidence, rejection reasons, software version, and deterministic run identifier.
+- Let a vision model propose type, ROI, OCR, colours, and extraction route. Under [adaptive-execution.md](adaptive-execution.md), a local strong-model profile may also emit candidate pixel geometry and calibrated values when a deterministic route is incompatible or contradicted by its overlay. Accept those values only after original-pixel, geometric, calibration, ambiguity, and overlay checks, and label them `model_assisted_candidate`. Remote model use needs explicit user approval.
+- Generate an evidence bundle: input hash, dimensions, crop/ROI, calibration anchors and transform, matching records, CSV, JSON, overlay, recreation, confidence, and rejection reasons. For deterministic runs, also retain masks/components, software version, and run identifier; for model-assisted runs, retain the runtime model name/profile, strategy reason, and per-mark evidence/status.
 - Prefer selective automation: request confirmation or refuse when transform type, tick association, series identity, or visible mark geometry is ambiguous.
 
 ## Required benchmark protocol

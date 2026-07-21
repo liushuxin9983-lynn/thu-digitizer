@@ -19,7 +19,7 @@ The runner reports MAE and coverage. It ranks methods only inside the same chart
 
 ## Candidate compact-scatter benchmark contract
 
-`scripts/run_scatter_benchmark.py` exercises `candidate_digitize_scatter.py` on deterministic light-background dark markers over a pale band and fitted line, same-colour markers/line, light markers on a dark background, low-resolution JPEG, partially touching markers, thin axes/text distractors, and a line/text-only refusal panel. Every supported fixture must achieve point precision/recall/F1 of 1.0 within its declared pixel tolerance. The unsupported panel must return `low_confidence`, authorize no numeric output, and emit no point rows. This is synthetic candidate evidence only; held-out real-vector, held-out real-raster, and fair WebPlotDigitizer gates remain open.
+`scripts/run_scatter_benchmark.py` exercises `candidate_digitize_scatter.py` on deterministic light-background dark markers over a pale band and fitted line, same-colour markers/line, light markers on a dark background, low-resolution JPEG, partially touching markers, thin axes/text distractors, a line/text-only refusal panel, and a low-contrast marker that is visible only to the relaxed residual pass. Every supported fixture must achieve point precision/recall/F1 of 1.0 within its declared pixel tolerance. The unsupported panel must return `low_confidence`, authorize no numeric output, and emit no point rows. The residual fixture must retain its primary candidates but authorize none until the exposed `detector_residual` is resolved. This is synthetic candidate evidence only; held-out real-vector, held-out real-raster, and fair WebPlotDigitizer gates remain open.
 
 ## Stable boxplot benchmark contract
 
@@ -29,7 +29,7 @@ Each success variant must recover four groups with `group_coverage == 1.0`, `out
 
 ## Candidate dedicated bar benchmark contract
 
-`scripts/run_bar_benchmark.py` exercises `candidate_digitize_bar_chart.py` on deterministic vertical and horizontal grouped bars, positive and negative values, visible error intervals, vertical stacks, horizontal 100% stacks on a dark background, a low-resolution JPEG, and an ambiguous duplicate-rectangle refusal case.
+`scripts/run_bar_benchmark.py` exercises `candidate_digitize_bar_chart.py` on deterministic vertical and horizontal grouped bars, positive and negative values, visible error intervals, vertical stacks, horizontal 100% stacks on a dark background, a low-resolution JPEG, and an ambiguous duplicate-rectangle refusal case. Unit and retained real-raster regressions additionally cover thick verified error strokes that split a pale bar and percent stacks whose visible separator pixels reduce the unnormalized fill total.
 
 Every supported fixture must recover every expected rectangle with precision/coverage/F1 of 1.0, value MAE no greater than 0.25, and maximum absolute error no greater than 0.6. Clean error-interval coverage must be 1.0 with no endpoint error above 2.5 px. The low-resolution JPEG may return `partial_visible`; it must retain rectangle coverage 1.0, extract at least 75% of error intervals, keep accepted endpoint error at or below 3 px, and leave unsupported intervals as `not_extracted`. The ambiguous case must return `low_confidence` without a numeric value.
 

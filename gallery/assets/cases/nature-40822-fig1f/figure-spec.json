@@ -1,8 +1,8 @@
 {
   "schema_version": 1,
-  "status": "not_automated",
+  "status": "needs_verified_configuration",
   "source": {
-    "input_file": "figure1-original.png",
+    "input_file": "measurement-source.png",
     "sha256": "4dd50564058d2823dfe740ec3df49d6f451088cebd402b51d9890fdfc3282e46",
     "media_kind": "raster",
     "coordinate_space": "pixel",
@@ -16,44 +16,58 @@
     {
       "panel_id": "panel-1",
       "bounds": [
-        0.0,
-        0.0,
-        2050,
-        1399
+        1000.0,
+        420.0,
+        2025.0,
+        635.0
       ],
-      "bounds_verification": "proposed",
+      "bounds_verification": "user_provided",
       "plot_bounds": [
-        0.0,
-        0.0,
-        2050,
-        1399
+        1000.0,
+        420.0,
+        2025.0,
+        635.0
       ],
       "plot_bounds_verification": "proposed",
-      "chart_type": "pie",
+      "chart_type": "donut",
       "chart_type_verification": "user_provided",
-      "coordinate_model": "unknown",
-      "coordinate_model_verification": "missing",
+      "coordinate_model": "polar",
+      "coordinate_model_verification": "proposed",
       "axes": [],
       "series": [],
       "mark_grammars": [
-        "unknown"
+        "visible_numeric_label",
+        "color_sector",
+        "annular_band"
       ],
       "route": {
-        "route_id": "unsupported_coordinate_route",
-        "maturity": "not_implemented_or_case_only",
-        "implementation": null,
-        "automated_extraction": false
+        "route_id": "raster_labelled_donut_candidate",
+        "maturity": "assisted_candidate",
+        "implementation": "scripts/candidate_digitize_labelled_donut.py",
+        "automated_extraction": true
       },
       "required_confirmations": [
-        "chart_specific_contract",
-        "coordinate_specific_benchmark"
+        "original_raster",
+        "panel_roi",
+        "group_centers",
+        "radial_bands",
+        "series_palette",
+        "two_pass_visible_label_transcription",
+        "label_anchors",
+        "overlay_review"
       ],
       "confirmations": {
-        "chart_specific_contract": "missing",
-        "coordinate_specific_benchmark": "missing"
+        "original_raster": "missing",
+        "panel_roi": "user_provided",
+        "group_centers": "missing",
+        "radial_bands": "missing",
+        "series_palette": "missing",
+        "two_pass_visible_label_transcription": "missing",
+        "label_anchors": "missing",
+        "overlay_review": "missing"
       },
-      "recoverable": "A panel-specific visible representation only after a dedicated route is implemented.",
-      "non_recoverable": "No values should be accepted through a generic XY fallback."
+      "recoverable": "Explicitly visible numeric labels whose duplicate transcription agrees and whose normalized shares match independently sampled sector geometry.",
+      "non_recoverable": "Unlabeled sectors, hidden source values, raw observations, and any value inferred only from an angle."
     }
   ],
   "evidence_contract": {
