@@ -2,6 +2,12 @@
   <img src="assets/thu-digitizer-hero-handdrawn-white.png" alt="THU Digitizer" width="920">
 </p>
 
+<p align="center">
+  <a href="#一分钟开始"><img alt="Input: image and PDF" src="https://img.shields.io/badge/INPUT-IMAGE_%2B_PDF-25A9E0?style=for-the-badge&amp;labelColor=555555"></a>
+  <a href="#结果长什么样"><img alt="Output: CSV and evidence" src="https://img.shields.io/badge/OUTPUT-CSV_%2B_EVIDENCE-39A96B?style=for-the-badge&amp;labelColor=555555"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/LICENSE-MIT-FF6699?style=for-the-badge&amp;labelColor=555555"></a>
+</p>
+
 # THU Digitizer
 
 从科研图表图片和 PDF 中恢复可见数据，并同时交付 CSV、覆盖图和可复核报告。
@@ -35,6 +41,8 @@ https://github.com/Rimagination/thu-digitizer
 ```
 
 ## 结果长什么样
+
+> **查看当前适用的图片类型：** 打开[在线画廊](https://rimagination.github.io/thu-digitizer/#types)。画廊按散点图、柱状图、分布图、矩阵与复合图等类型整理当前案例，并标明每个案例的提取状态与成熟度，方便先判断自己的图片是否适合现有路线。
 
 每个案例都尽量保留同一条证据链：原图 → 提取覆盖 → 数据复现 → CSV/JSON 报告。
 
