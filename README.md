@@ -9,6 +9,18 @@
   <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-FF6699?style=for-the-badge">
 </p>
 
+> **真实论文图像验证：** THU Digitizer 已在多篇 *Nature Communications* 论文的真实公开图像上完成测试，覆盖散点图、折线图、柱状图、热图、UpSet 复合图和环形图等类型。画廊同时展示原图、提取覆盖、数据复现、CSV 与置信状态，未通过校验的图元会明确保留为 `not_extracted` 或低置信候选。
+>
+> **在线画廊：** [https://rimagination.github.io/thu-digitizer/](https://rimagination.github.io/thu-digitizer/)
+
+### 真实复合图提取示例
+
+以下示例来自 *Nature Communications* 真实 UpSet 复合图案例；原图、提取覆盖和数据复现使用同一像素画布，便于逐项核对。
+
+| 原图 | 提取覆盖 | 数据复现 |
+| --- | --- | --- |
+| [![真实 UpSet 复合图原图](gallery/assets/cases/nature-27341-fig1/original.png)](https://rimagination.github.io/thu-digitizer/#basic-nature-27341-fig1) | [![UpSet 复合图提取覆盖](gallery/assets/cases/nature-27341-fig1/overlay.png)](https://rimagination.github.io/thu-digitizer/#basic-nature-27341-fig1) | [![UpSet 复合图数据复现](gallery/assets/cases/nature-27341-fig1/recreated.png)](https://rimagination.github.io/thu-digitizer/#basic-nature-27341-fig1) |
+
 # THU Digitizer
 
 THU Digitizer 是一个研究优先的科研图表数字化 skill：从图片和 PDF 图中恢复**肉眼可见、坐标可校准、结果可复核**的数值，并把 CSV、JSON 报告、覆盖图、校准参数和来源记录一起保存下来。

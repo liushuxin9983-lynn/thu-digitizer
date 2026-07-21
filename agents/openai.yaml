@@ -1,4 +1,4 @@
 interface:
   display_name: "THU Digitizer"
   short_description: "Extract and validate chart data from images, PDFs, and source data"
-  default_prompt: "Use $thu-digitizer to extract verified chart data with the registered deterministic implementation; preserve CSV, report, overlay, provenance, and refusal status, and validate against official source data only as a separate step."
+  default_prompt: "Use $thu-digitizer to extract verified chart data with the registered deterministic implementation; measure rasters only in source-locked original-pixel coordinates, preserve CSV, report, overlay, provenance, ambiguity and refusal status, and validate official source data only as a separate step."

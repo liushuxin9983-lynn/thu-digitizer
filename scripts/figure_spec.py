@@ -24,6 +24,7 @@ COORDINATE_MODELS = {
     "cartesian_date_x",
     "categorical_value",
     "grid_color",
+    "lattice_composite",
     "interval_rows",
     "polar",
     "ternary",
@@ -147,6 +148,15 @@ def validate_figure_spec(spec: Any) -> list[str]:
         return errors
     if source.get("media_kind") not in MEDIA_KINDS:
         errors.append(f"source.media_kind must be one of {sorted(MEDIA_KINDS)}")
+    if source.get("media_kind") == "raster" and source.get("coordinate_space") != "pixel":
+        errors.append("raster source.coordinate_space must equal 'pixel'")
+    measurement_space = source.get("measurement_space")
+    if measurement_space not in {None, "original_raster_pixels", "pdf_page_points"}:
+        errors.append("source.measurement_space must be original_raster_pixels or pdf_page_points")
+    if source.get("media_kind") == "raster" and measurement_space not in {None, "original_raster_pixels"}:
+        errors.append("raster measurements must stay in original_raster_pixels")
+    if source.get("resampling_applied") is True:
+        errors.append("source.resampling_applied must be false for extraction measurements")
     width = source.get("width")
     height = source.get("height")
     if not _is_number(width) or float(width) <= 0:

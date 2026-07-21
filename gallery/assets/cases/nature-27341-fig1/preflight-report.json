@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "status": "needs_chart_type_confirmation",
+  "status": "needs_verified_configuration",
   "inspection": {
-    "input_file": "F:\\AI\\thu-digitizer\\tmp\\nature-27341\\fig1.png",
-    "input_sha256": "ccf1f6921d907785103298b96fd971083dd6280fdf212318574920952780c313",
-    "file_size_bytes": 162551,
+    "input_file": "F:\\AI\\thu-digitizer\\gallery\\assets\\cases\\nature-27341-fig1\\original.png",
+    "input_sha256": "8074417e4afa6a247e8d6b41e6fe86ad900abdec33748a88dba73da4df3f6dac",
+    "file_size_bytes": 161306,
     "media_kind": "raster",
     "coordinate_space": "pixel",
     "format": "PNG",
@@ -20,37 +20,47 @@
     }
   },
   "route_selection": {
-    "chart_type": null,
+    "chart_type": "upset",
     "primary": {
-      "route_id": "unknown_refuse",
-      "title": "Unknown chart: refuse numeric extraction",
+      "route_id": "raster_lattice_composite_candidate",
+      "title": "Repeated aligned bars with categorical membership lattice",
       "chart_types": [
-        "unknown"
+        "upset",
+        "lattice_composite"
       ],
       "media_kinds": [
-        "raster",
-        "pdf"
+        "raster"
       ],
       "coordinate_models": [
-        "unknown"
+        "lattice_composite"
       ],
       "mark_grammars": [
-        "unknown"
+        "aligned_bar",
+        "row_bar",
+        "membership_cell",
+        "connector",
+        "categorical_strip"
       ],
-      "maturity": "refusal",
-      "implementation": null,
+      "maturity": "candidate",
+      "implementation": "scripts/candidate_digitize_lattice_composite.py",
       "required_confirmations": [
-        "chart_type",
-        "coordinate_model",
-        "recoverable_representation"
+        "original_raster",
+        "panel_roi",
+        "layer_grammar",
+        "column_bar_color",
+        "row_bar_color",
+        "node_color",
+        "semantic_labels",
+        "row_value_axis",
+        "overlay_review"
       ],
-      "recoverable": "Input metadata and routing diagnostics only.",
-      "non_recoverable": "All numeric values until the chart grammar and coordinate model are verified.",
-      "automated_extraction": false
+      "recoverable": "Original-pixel repeated bar geometry, complete active/inactive/ambiguous cell classification, and independently validated visible values when supplied.",
+      "non_recoverable": "Hidden records, occluded cells, unverified text, and meanings not visibly encoded by the aligned layers.",
+      "automated_extraction": true
     },
     "fallback": null,
-    "decision": "needs_chart_type_confirmation",
-    "reason": "No chart-type hint was provided; numeric extraction is refused until classification is verified."
+    "decision": "needs_verified_configuration",
+    "reason": "A route is registered, but all required confirmations remain explicit before extraction."
   },
   "figure_spec_status": "valid_template_not_yet_verified",
   "safety": {

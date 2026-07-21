@@ -1,0 +1,58 @@
+{
+  "schema_version": 1,
+  "case_id": "nature-40822-fig1f",
+  "status": "partial_visible",
+  "route": "case_local_visible_label_donut_geometry",
+  "shared_pie_route": "unsupported_coordinate_route",
+  "expected_detection_count_passed": false,
+  "source_data_role": "independent_validation_only",
+  "normalization_applied_to_primary_values": false,
+  "measurement": {
+    "file": "measurement-source.png",
+    "sha256": "4dd50564058d2823dfe740ec3df49d6f451088cebd402b51d9890fdfc3282e46",
+    "size": [
+      2050,
+      1399
+    ],
+    "gallery_crop": [
+      1000,
+      420,
+      2025,
+      635
+    ],
+    "resampling_applied": false
+  },
+  "visible_label_extraction": {
+    "method": "manual double transcription from official full-size raster, checked against official PDF page 3 rendering",
+    "requested_label_count": 18,
+    "recovered_label_count": 18,
+    "coverage": 1.0,
+    "per_group_counts": {
+      "Normal": 4,
+      "AK": 5,
+      "Primary": 4,
+      "MET": 5
+    },
+    "group_label_sums_percent": {
+      "Normal": 97.5,
+      "AK": 90.60000000000001,
+      "Primary": 70.30000000000001,
+      "MET": 73.6
+    },
+    "important_semantics": "The printed values do not all sum to 100; rendered sector angles are proportional to the within-donut sum rather than interpreted as omitted percentages."
+  },
+  "sector_geometry_validation": {
+    "role": "validation_only_case_local_candidate",
+    "mean_absolute_percentage_point_error": 0.5960998333333334,
+    "maximum_absolute_percentage_point_error": 1.8986039999999988
+  },
+  "validation": {
+    "status": "not_comparable",
+    "filled_from_external_data": 0
+  },
+  "limitations": [
+    "Numeric use is authorized only for the 18 explicitly printed labels.",
+    "The four printed label sums are retained as 97.5, 90.6, 70.3, and 73.6 rather than forced to 100.",
+    "Sector geometry remains a case-local validation candidate; the shared pie/donut route is not implemented."
+  ]
+}

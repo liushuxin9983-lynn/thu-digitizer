@@ -115,7 +115,9 @@ class AxisCalibration:
             scale_estimate = 1.4826 * float(np.median(np.abs(residuals - np.median(residuals))))
             scale_estimate = max(scale_estimate, 0.25)
             robust_z = np.abs(residuals) / scale_estimate
-            weights = np.where(robust_z <= huber_delta, 1.0, huber_delta / robust_z)
+            weights = np.ones(len(pairs), dtype=float)
+            outliers = robust_z > huber_delta
+            weights[outliers] = huber_delta / robust_z[outliers]
         residuals = transformed - (slope * pixels + intercept)
         rmse = float(np.sqrt(np.mean(np.square(residuals))))
         # One pixel is a conservative raster-location floor; additional anchor

@@ -305,6 +305,22 @@ REFERENCE_CASES = [
         "evidenceStatus": "oa_reference",
         "coverage": ["ROC", "step curves", "network inset", "multi-panel"],
     },
+    {
+        "id": "nature-40822-fig1f",
+        "title": "四组细胞类型组成的环形饼图",
+        "articleTitle": "Driver gene combinations dictate cutaneous squamous cell carcinoma disease continuum progression",
+        "authors": "Bailey et al.",
+        "journal": "Nature Communications",
+        "year": 2023,
+        "figure": "Fig. 1f",
+        "doi": "10.1038/s41467-023-40822-9",
+        "articleUrl": "https://www.nature.com/articles/s41467-023-40822-9",
+        "figureUrl": "https://www.nature.com/articles/s41467-023-40822-9/figures/1",
+        "original": "assets/cases/nature-40822-fig1f/original.png",
+        "evidenceStatus": "partial_visible",
+        "coverage": ["donut", "visible percentage labels", "case-local sector geometry"],
+        "report": "assets/cases/nature-40822-fig1f/report.json",
+    },
 ]
 
 
@@ -382,6 +398,7 @@ CROPS = {
         "roc": (0, 0, 743, 720),
         "network_inset": (285, 205, 735, 630),
     },
+    "nature-40822-fig1f": {"donut": (0, 0, 1025, 215)},
 }
 
 
@@ -551,7 +568,7 @@ CAPABILITIES = [
     capability("scale-microscopy", "map-image", "Scale-bar image / microscopy", ["显微图", "比例尺图像", "遥感影像"], "coordinate_specific", "oa_reference", "比例尺标定后的点、距离、面积和对象轮廓", "nature-nagler-polar", "microscopy", route="map_scale"),
     capability("pixel-measurement", "map-image", "Generic pixel measurement", ["像素坐标", "长度", "面积", "周长"], "candidate", "oa_reference", "像素位置、轮廓、距离、面积与周长", "nature-nagler-polar", "microscopy", route="image_pixel", non_recoverable="没有比例尺时的物理单位"),
 
-    capability("pie-donut", "composition-hierarchy", "Pie / donut", ["饼图", "甜甜圈图"], "coordinate_specific", "oa_reference", "扇区角度、比例和可读标签", "nature-ribotie-multipanel", "donut", route="structure"),
+    capability("pie-donut", "composition-hierarchy", "Pie / donut", ["饼图", "甜甜圈图"], "coordinate_specific", "partial_visible", "可见百分比标签；扇区角度仅作案例级验证", "nature-40822-fig1f", "donut", route="structure"),
     capability("treemap-voronoi", "composition-hierarchy", "Treemap / Voronoi treemap", ["矩形树图", "Voronoi treemap"], "coordinate_specific", "oa_reference", "可见区域面积、标签与显式层级", "nature-spatial-treemap", "treemap", route="structure", non_recoverable="未编码或被裁切的隐藏层级"),
     capability("sunburst-packing", "composition-hierarchy", "Sunburst / circle packing", ["旭日图", "圆堆积", "径向层级"], "coordinate_specific", "no_case", "可见嵌套、面积或角度", route="structure"),
     capability("dendrogram", "composition-hierarchy", "Dendrogram", ["树状图", "聚类树"], "coordinate_specific", "no_case", "可见叶、分支与合并高度", route="structure", non_recoverable="生成树的原始距离矩阵"),

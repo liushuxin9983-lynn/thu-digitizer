@@ -21,6 +21,17 @@ import openpyxl
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
+try:
+    from candidate_digitize_lattice_composite import extract_lattice_composite
+    from figure_spec import write_figure_spec
+    from source_coordinate_contract import raster_identity
+    from thu_digitizer import build_preflight
+except ImportError:  # pragma: no cover - package-style invocation
+    from .candidate_digitize_lattice_composite import extract_lattice_composite
+    from .figure_spec import write_figure_spec
+    from .source_coordinate_contract import raster_identity
+    from .thu_digitizer import build_preflight
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TMP = ROOT / "tmp"
@@ -61,6 +72,17 @@ def vertical_text(canvas: Image.Image, xy, value: str, size: int, *, fill="#222"
     canvas.paste(label, (int(xy[0] - label.width / 2), int(xy[1] - label.height / 2)), label)
 
 
+def rotated_text(canvas: Image.Image, xy, value: str, size: int, *, angle: float, fill="#222", bold=False) -> None:
+    """Paint a centred anti-aliased label at an arbitrary angle."""
+    face = font(size, bold)
+    probe = ImageDraw.Draw(Image.new("RGB", (1, 1)))
+    bounds = probe.textbbox((0, 0), str(value), font=face)
+    label = Image.new("RGBA", (bounds[2] - bounds[0] + 10, bounds[3] - bounds[1] + 10), (255, 255, 255, 0))
+    ImageDraw.Draw(label).text((5 - bounds[0], 5 - bounds[1]), str(value), font=face, fill=fill)
+    label = label.rotate(angle, expand=True, resample=Image.Resampling.BICUBIC)
+    canvas.paste(label, (int(xy[0] - label.width / 2), int(xy[1] - label.height / 2)), label)
+
+
 def line(draw, points, *, fill="#222", width=2):
     draw.line(points, fill=fill, width=width, joint="curve")
 
@@ -86,14 +108,16 @@ def new_case(case_id: str, original_path: Path, source_path: Path) -> tuple[Path
     return root, image
 
 
-def finish_case(root: Path, original: Image.Image, recreated: Image.Image, rows: list[dict], report: dict) -> None:
+def finish_case(root: Path, original: Image.Image, recreated: Image.Image, rows: list[dict], report: dict, *, overlay: Image.Image | None = None) -> None:
     if recreated.size != original.size:
         raise ValueError(f"canvas mismatch: {recreated.size} != {original.size}")
     recreated.convert("RGB").save(root / "recreated.png")
     # The overlay is intentionally review-only: source and recreation stay as
     # independent images rather than one replacing the other.
-    overlay = Image.blend(original.convert("RGB"), recreated.convert("RGB"), 0.48)
-    overlay.save(root / "overlay.png")
+    review_overlay = overlay or Image.blend(original.convert("RGB"), recreated.convert("RGB"), 0.48)
+    if review_overlay.size != original.size:
+        raise ValueError(f"overlay canvas mismatch: {review_overlay.size} != {original.size}")
+    review_overlay.convert("RGB").save(root / "overlay.png")
     write_csv(root / "data.csv", rows)
     validation_rows = []
     for row in rows:
@@ -392,13 +416,14 @@ def draw_figure7(original: Image.Image, rows: list[dict]) -> Image.Image:
 
 
 def build_figure7() -> None:
-    source = TMP / "nature-28348" / "source-data.xlsx"
-    original_path = TMP / "nature-28348" / "fig7.png"
-    root, original = new_case("nature-28348-fig7", original_path, source)
-    rows = figure7_rows(source)
-    report = source_report("nature-28348-fig7", article_url="https://www.nature.com/articles/s41467-022-28348-y", figure="Fig. 7", source_path=source, visible_rows=len(rows), dimensions=original.size, notes="Workbook sheet Figure 7 maps five set totals and twelve visible intersections; displayed columns are ordered by source intersection size.")
-    report["coverage"]["intersections"] = sum(row["kind"] == "intersection" for row in rows)
-    finish_case(root, original, draw_figure7(original, rows), rows, report)
+    """Rebuild Fig. 7 through the canonical original-pixel UpSet audit."""
+
+    try:
+        from build_upset_gallery_cases import build_case_28348
+    except ImportError:  # pragma: no cover - package-style invocation
+        from .build_upset_gallery_cases import build_case_28348
+
+    build_case_28348()
 
 
 def figure1_rows(workbook: Path) -> list[dict]:
@@ -441,75 +466,229 @@ def figure1_rows(workbook: Path) -> list[dict]:
     return rows
 
 
-def figure1_visible_rows(image: Image.Image) -> list[dict]:
-    """Recover labelled bar counts and black membership nodes from Fig. 1.
+FIGURE1_SET_NAMES = [
+    "Pa26T1", "Pa26T2", "Pa29T1", "Pa29T2", "Pa29T4", "Pa30T1", "Pa30T2",
+    "Pa31T1", "Pa31T2", "Pa33T1", "Pa33T2", "Pa34T1", "Pa34T2", "Pa35T1",
+    "Pa35T2", "Pa36T1", "Pa36T2", "Pa37T1", "Pa37T2",
+]
+FIGURE1_TUMOUR_TYPES = [
+    "LCNEC", "LUAD", "LCNEC", "LUSC", "NSCLC-NOS", "LCNEC", "LUAD", "SCLC", "LUAD",
+    "LCNEC", "LUSC", "LCNEC", "LUAD", "SCLC", "LUAD", "SCLC", "LUSC", "LUAD", "LCNEC",
+]
+FIGURE1_PRINTED_COUNTS = [
+    998, 802, 684, 675, 500, 441, 287, 278, 229, 124, 117, 110, 110, 108, 83,
+    71, 62, 41, 40, 40, 39, 38, 37, 28, 23, 21, 16, 9, 7, 4,
+]
+FIGURE1_TYPE_COLOURS = {
+    "LCNEC": "#1b9e77", "LUAD": "#d95f02", "LUSC": "#7570b3",
+    "NSCLC-NOS": "#e7298a", "SCLC": "#66a61e",
+}
 
-    The official source workbook is substantially larger than the other cases.
-    Until its panel mapping is complete, this intentionally exposes only what
-    the retained raster supports: printed intersection counts and the binary
-    dot matrix.  It does not claim to recover unprinted raw mutation records.
-    """
-    set_order = [
-        "Pa26T1", "Pa26T2", "Pa29T1", "Pa29T2", "Pa29T4", "Pa30T1", "Pa30T2",
-        "Pa31T1", "Pa31T2", "Pa33T1", "Pa33T2", "Pa34T1", "Pa34T2", "Pa35T1",
-        "Pa35T2", "Pa36T1", "Pa36T2", "Pa37T1", "Pa37T2",
-    ]
-    # The values are visibly printed above the 30 black bars; their column
-    # order and membership remain tied to original pixel centres below.
-    counts = [998, 802, 684, 675, 500, 441, 287, 278, 229, 124, 117, 110, 110, 108, 83, 71, 62, 41, 40, 40, 39, 38, 37, 28, 23, 21, 16, 9, 7, 4]
-    pixels = np.asarray(image.convert("RGB"), dtype=np.uint8)
-    x_centres = [500 + index * (1090 / (len(counts) - 1)) for index in range(len(counts))]
-    y_centres = [997 + index * (536 / (len(set_order) - 1)) for index in range(len(set_order))]
-    intersections = []
-    for index, (count, x_center) in enumerate(zip(counts, x_centres), 1):
-        members = []
-        for set_name, y_center in zip(set_order, y_centres):
-            x0, x1 = int(round(x_center - 3)), int(round(x_center + 4))
-            y0, y1 = int(round(y_center - 3)), int(round(y_center + 4))
-            patch = pixels[max(0, y0):y1, max(0, x0):x1]
-            if patch.size and float(patch.mean()) < 145:
-                members.append(set_name)
-        # A centre can land on anti-aliased grid geometry.  Report its absence
-        # rather than fill a membership combination from neighbouring columns.
-        intersections.append({"intersection": index, "members": members, "count": count})
-    totals = {name: sum(item["count"] for item in intersections if name in item["members"]) for name in set_order}
+
+def figure1_lattice_config(input_path: Path) -> dict:
+    """Case semantics/configuration for the reusable lattice candidate."""
+    return {
+        "schema_version": 1,
+        "source": raster_identity(input_path).as_dict(),
+        "layers": {
+            "column_bars": {
+                "roi_fraction": [0.25, 0.05, 0.92, 0.70],
+                "color": [59, 59, 59],
+                "color_verification": "verified",
+                "tolerance": 0,
+                "width_range": [20, 30],
+            },
+            "row_bars": {
+                "roi_fraction": [0, 0.65, 0.25, 0.98],
+                "color": [86, 180, 233],
+                "color_verification": "verified",
+                "tolerance": 0,
+                "height_range": [5, 20],
+                "min_area": 300,
+                "min_row_pixels": 5,
+            },
+            "membership": {
+                "color": [59, 59, 59],
+                "color_verification": "verified",
+                "tolerance": 0,
+                "patch_radius": 7,
+                "active_fraction_min": 0.4,
+                "inactive_fraction_max": 0.05,
+            },
+        },
+        "semantics": {
+            "verification": "verified",
+            "column_ids": [f"I{index:02d}" for index in range(1, len(FIGURE1_PRINTED_COUNTS) + 1)],
+            "column_values": FIGURE1_PRINTED_COUNTS,
+            "row_ids": FIGURE1_SET_NAMES,
+            "row_types": FIGURE1_TUMOUR_TYPES,
+        },
+        "validation": {
+            "max_spacing_cv": 0.02,
+            "row_value_axis": [
+                {"pixel": 31.5, "value": 1250}, {"pixel": 105.0, "value": 1000},
+                {"pixel": 178.5, "value": 750}, {"pixel": 252.0, "value": 500},
+                {"pixel": 325.5, "value": 250}, {"pixel": 399.0, "value": 0},
+            ],
+            "row_bar_edge_offset_px": 1,
+            "row_total_max_abs_error": 3,
+            "top_value_max_abs_error": 1,
+        },
+    }
+
+
+def figure1_visible_geometry_v2(input_path: Path) -> tuple[list[dict], dict, dict, dict]:
+    """Adapt the reusable lattice candidate to the gallery's public row schema."""
+    config = figure1_lattice_config(input_path)
+    candidate = extract_lattice_composite(input_path, config)
+    if not candidate["numeric_output_authorized"]:
+        raise RuntimeError(f"Figure 1 lattice candidate refused output: {candidate['reason']}")
+
     rows, record_id = [], 0
-    for name in set_order:
+    for item in candidate["row_bars"]:
         record_id += 1
-        rows.append({"record_id": record_id, "kind": "set_total", "set": name, "value": totals[name], "source_status": "visible_geometry_extracted"})
-    for item in intersections:
+        rows.append({
+            "record_id": record_id,
+            "kind": "set_total",
+            "set": item["row_id"],
+            "tumour_type": item["row_type"],
+            "value": int(round(float(item["derived_total"]))),
+            "visible_geometry_status": "derived_exact_and_pixel_validated",
+            "metric": "visible set total",
+            "pixel_y": round(float(item["pixel_y"]), 2),
+            "left_bar_left_px": item["left_px"],
+            "left_bar_right_px": item["right_px"],
+            "left_bar_pixel_estimate": round(float(item["pixel_total_estimate"]), 1),
+            "pixel_error": round(float(item["pixel_total_error"]), 1),
+        })
+    for item in candidate["column_bars"]:
         record_id += 1
-        rows.append({"record_id": record_id, "kind": "intersection", "intersection": item["intersection"], "members": ";".join(item["members"]), "count": item["count"], "metric": "printed intersection size", "source_status": "visible_geometry_extracted"})
-    return rows
+        rows.append({
+            "record_id": record_id,
+            "kind": "intersection",
+            "intersection": int(item["column_index"]),
+            "members": ";".join(item["members"]),
+            "count": int(round(float(item["value"]))),
+            "member_count": int(item["member_count"]),
+            "metric": "printed intersection size",
+            "visible_geometry_status": "visible_geometry_extracted",
+            "pixel_x": round(float(item["pixel_x"]), 2),
+            "bar_top_y_px": item["top_px"],
+            "bar_bottom_y_px": item["bottom_px"],
+        })
+
+    top_validation = candidate["validation"]["top_bars_vs_values"]
+    row_validation = candidate["validation"]["row_totals_vs_bars"]
+    diagnostics = {
+        "algorithm_version": candidate["algorithm_version"],
+        "deterministic_run_id": candidate["deterministic_run_id"],
+        "count_labels": candidate["geometry"]["column_count"],
+        "set_rows": candidate["geometry"]["row_count"],
+        "membership_grid_cells": candidate["geometry"]["cell_count"],
+        "active_membership_nodes": candidate["geometry"]["active_cell_count"],
+        "ambiguous_membership_nodes": candidate["geometry"]["ambiguous_cell_count"],
+        "node_support_rule": "original-pixel patch foreground fraction; active >= 0.4, inactive <= 0.05, middle range refused",
+        "node_support_values": sorted({round(float(cell["foreground_fraction"]), 6) for cell in candidate["cells"]}),
+        "top_bar_geometry_vs_printed_count_rmse": top_validation["rmse"],
+        "top_bar_geometry_vs_printed_count_max_abs_error": top_validation["max_abs_error"],
+        "horizontal_tick_centres_px": [item["pixel"] for item in config["validation"]["row_value_axis"]],
+        "horizontal_tick_values": [item["value"] for item in config["validation"]["row_value_axis"]],
+        "horizontal_tick_calibration_rmse": row_validation["calibration"]["rmse_transformed"],
+        "set_total_left_bar_mae": row_validation["mae"],
+        "set_total_left_bar_max_abs_error": row_validation["max_abs_error"],
+        "set_total_validation_status": "all_rows_within_configured_pixel_error",
+    }
+    return rows, diagnostics, candidate, config
+
+
+def draw_figure1_overlay(original: Image.Image, rows: list[dict]) -> Image.Image:
+    overlay = original.copy().convert("RGB")
+    draw = ImageDraw.Draw(overlay)
+    totals = [row for row in rows if row["kind"] == "set_total"]
+    intersections = [row for row in rows if row["kind"] == "intersection"]
+    y_by_set = {row["set"]: float(row["pixel_y"]) for row in totals}
+    for row in intersections:
+        x, top, bottom = float(row["pixel_x"]), float(row["bar_top_y_px"]), float(row["bar_bottom_y_px"])
+        draw.rectangle((x - 14, top - 2, x + 14, bottom + 1), outline="#ff7f00", width=2)
+        for name in str(row["members"]).split(";"):
+            if not name:
+                continue
+            y = y_by_set[name]
+            draw.ellipse((x - 11, y - 11, x + 11, y + 11), outline="#e60000", width=3)
+    for row in totals:
+        x, y = float(row["left_bar_left_px"]) + 1, float(row["pixel_y"])
+        draw.line((x, y - 8, x, y + 8), fill="#d200b4", width=3)
+    return overlay
 
 
 def draw_figure1(original: Image.Image, rows: list[dict]) -> Image.Image:
     canvas = Image.new("RGB", original.size, "white")
     draw = ImageDraw.Draw(canvas)
-    set_order = [row["set"] for row in rows if row["kind"] == "set_total"]
-    intersections, totals, xs, ys, bar_y = upset_geometry(rows, left=467, right=1607, matrix_top=992, matrix_bottom=1510, bars_top=129, bars_bottom=964, set_order=set_order)
-    max_count = max(row["count"] for row in intersections)
-    for tick in range(0, int(math.ceil(max_count / 300.0) * 300) + 1, 300):
-        y = bar_y(tick); line(draw, [(467, y), (1607, y)], fill="#e1e1e1", width=2); text(draw, (450, y), tick, 22, anchor="rm")
-    line(draw, [(467, 129), (467, 964), (1607, 964)], fill="#222", width=2)
+    totals = [row for row in rows if row["kind"] == "set_total"]
+    intersections = sorted((row for row in rows if row["kind"] == "intersection"), key=lambda row: row["intersection"])
+    x_centres = np.asarray([float(row["pixel_x"]) for row in intersections])
+    y_centres = np.asarray([float(row["pixel_y"]) for row in totals])
+    counts = np.asarray([float(row["count"]) for row in intersections])
+    observed_tops = np.asarray([float(row["bar_top_y_px"]) for row in intersections])
+    baseline = float(np.median([float(row["bar_bottom_y_px"]) for row in intersections]))
+    column_step, row_step = float(np.median(np.diff(x_centres))), float(np.median(np.diff(y_centres)))
+    matrix_left, matrix_right = x_centres[0] - column_step, x_centres[-1] + column_step
+    matrix_top, matrix_bottom = y_centres[0] - row_step / 2, y_centres[-1] + row_step / 2
+    pixel_from_count = np.polyfit(counts, observed_tops, 1)
+
+    axis_colour, dark, inactive, stripe = "#333333", "#3b3b3b", "#e9e9e9", "#f3f3f3"
+    line(draw, [(matrix_left, 0), (matrix_left, baseline), (matrix_right, baseline)], fill=axis_colour, width=2)
+    for tick in (0, 300, 600, 900):
+        y = float(np.polyval(pixel_from_count, tick))
+        line(draw, [(matrix_left - 9, y), (matrix_left, y)], fill=axis_colour, width=2)
+        text(draw, (matrix_left - 15, y), tick, 22, anchor="rm", fill=axis_colour)
+    vertical_text(canvas, (matrix_left - 108, baseline / 2), "number of mutations shared", 27, fill=axis_colour)
+
     for row in intersections:
-        x, top = xs[row["intersection"]], bar_y(row["count"])
-        draw.rectangle((x - 14, top, x + 14, 964), fill="#444")
-        text(draw, (x, top - 8), row["count"], 22, anchor="ms")
-    max_total = max((row["value"] for row in totals.values()), default=1)
-    for name in set_order:
-        y = ys[name]; width = totals[name]["value"] * 360 / max_total
-        draw.rectangle((360 - width, y - 11, 360, y + 11), fill="#59b5e7")
-        text(draw, (454, y), name, 20, anchor="rm")
-        line(draw, [(467, y), (1607, y)], fill="#eeeeee", width=2)
+        x, top = float(row["pixel_x"]), float(row["bar_top_y_px"])
+        draw.rectangle((round(x - 12.5), round(top), round(x + 12.5), round(baseline)), fill=dark)
+        rotated_text(canvas, (x + 8, top - 19), row["count"], 21, angle=-45, fill=axis_colour)
+
+    for index, y in enumerate(y_centres):
+        if index % 2:
+            draw.rectangle((matrix_left, y - row_step / 2, matrix_right, y + row_step / 2), fill=stripe)
+    for x in x_centres:
+        for y in y_centres:
+            draw.ellipse((x - 8.2, y - 8.2, x + 8.2, y + 8.2), fill=inactive)
+
+    y_by_set = {row["set"]: float(row["pixel_y"]) for row in totals}
     for row in intersections:
-        x = xs[row["intersection"]]; members = set(row["members"].split(";")); active = [name for name in set_order if name in members]
-        if len(active) > 1: line(draw, [(x, ys[active[0]]), (x, ys[active[-1]])], fill="#454545", width=4)
-        for name in set_order:
-            y = ys[name]; on = name in members
-            draw.ellipse((x - 10, y - 10, x + 10, y + 10), fill="#3b3b3b" if on else "#e7e7e7")
-    text(draw, (182, 1100), "number of mutations in each region", 27, anchor="mm")
-    vertical_text(canvas, (366, 520), "number of mutations shared", 27)
+        x = float(row["pixel_x"])
+        members = [name for name in str(row["members"]).split(";") if name]
+        active_y = [y_by_set[name] for name in members]
+        if len(active_y) > 1:
+            line(draw, [(x, min(active_y)), (x, max(active_y))], fill=dark, width=4)
+        for y in active_y:
+            draw.ellipse((x - 8.5, y - 8.5, x + 8.5, y + 8.5), fill=dark)
+
+    label_x = matrix_left - 15
+    for row in totals:
+        y, left, right = float(row["pixel_y"]), float(row["left_bar_left_px"]), float(row["left_bar_right_px"])
+        draw.rectangle((left, y - 5.5, right, y + 5.5), fill="#56b4e9")
+        text(draw, (label_x, y), row["set"], 20, anchor="rm", fill=axis_colour)
+
+    total_fit = np.polyfit(np.asarray([float(row["value"]) for row in totals]), np.asarray([float(row["left_bar_left_px"]) + 1 for row in totals]), 1)
+    left_axis_y = matrix_bottom + 6
+    zero_x, high_x = float(np.polyval(total_fit, 0)), float(np.polyval(total_fit, 1250))
+    line(draw, [(high_x - 14, left_axis_y), (zero_x, left_axis_y)], fill=axis_colour, width=2)
+    for tick in (1250, 1000, 750, 500, 250, 0):
+        x = float(np.polyval(total_fit, tick))
+        line(draw, [(x, left_axis_y), (x, left_axis_y + 8)], fill=axis_colour, width=2)
+        text(draw, (x, left_axis_y + 24), tick, 20, anchor="mm", fill=axis_colour)
+    text(draw, ((high_x + zero_x) / 2, left_axis_y + 56), "number of mutations in each region", 24, anchor="mm", fill=axis_colour)
+
+    strip_x, strip_width, tumour_text_x = matrix_right + 8, 42, matrix_right + 74
+    for row in totals:
+        y, tumour_type = float(row["pixel_y"]), row["tumour_type"]
+        colour = FIGURE1_TYPE_COLOURS[tumour_type]
+        draw.rectangle((strip_x, y - row_step / 2, strip_x + strip_width, y + row_step / 2), fill=colour)
+        display = "NSCLC–NOS" if tumour_type == "NSCLC-NOS" else tumour_type
+        text(draw, (tumour_text_x, y), display, 20, anchor="lm", fill=colour)
     return canvas
 
 
@@ -520,23 +699,67 @@ def build_figure1() -> None:
     root.mkdir(parents=True, exist_ok=True)
     original = Image.open(original_path).convert("RGB")
     original.save(root / "original.png")
-    if source.exists() and source.stat().st_size > 12_000_000:
-        rows = figure1_rows(source)
-        shutil.copy2(source, root / "source-data.xlsx")
-        report = source_report("nature-27341-fig1", article_url="https://www.nature.com/articles/s41467-021-27341-1", figure="Fig. 1", source_path=source, visible_rows=len(rows), dimensions=original.size, notes="Figure 1 source workbook maps sample-level mutation sets and visible intersection counts. Set totals are separately retained in the CSV.")
-    else:
-        rows = figure1_visible_rows(original)
-        report = {
-            "schema_version": 1, "case_id": "nature-27341-fig1", "status": "visible_geometry_candidate",
-            "article_url": "https://www.nature.com/articles/s41467-021-27341-1", "figure": "Fig. 1",
-            "input": {"sha256": sha256(original_path), "dimensions": list(original.size)},
-            "visible_extraction": {"status": "printed_counts_and_dot_matrix", "count_labels": 30, "membership_nodes": 19 * 30, "method": "printed labels plus original-pixel dark-node support"},
-            "source_data": {"status": "official_source_available_not_panel_mapped", "url": "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-021-27341-1/MediaObjects/41467_2021_27341_MOESM10_ESM.xlsx"},
-            "coverage": {"visible_records": len(rows), "intersections": 30},
-            "limitations": "Only printed intersection counts and visibly dark membership nodes are recovered. Underlying mutation records are not inferred.",
-        }
-    report["coverage"]["intersections"] = sum(row["kind"] == "intersection" for row in rows)
-    finish_case(root, original, draw_figure1(original, rows), rows, report)
+    preflight_report, figure_spec = build_preflight(root / "original.png", chart_type="upset")
+    (root / "preflight-report.json").write_text(
+        json.dumps(preflight_report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    write_figure_spec(root / "figure-spec.json", figure_spec)
+    rows, diagnostics, lattice_report, lattice_config = figure1_visible_geometry_v2(root / "original.png")
+    (root / "lattice-config.json").write_text(
+        json.dumps(lattice_config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    (root / "lattice-candidate-report.json").write_text(
+        json.dumps(lattice_report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    report = {
+        "schema_version": 1, "case_id": "nature-27341-fig1", "status": "visible_geometry_candidate",
+        "article_url": "https://www.nature.com/articles/s41467-021-27341-1", "figure": "Fig. 1",
+        "input": {"sha256": sha256(root / "original.png"), "dimensions": list(original.size)},
+        "visible_extraction": {"status": "printed_counts_and_original_pixel_geometry", **diagnostics},
+        "source_data": {
+            "status": "official_source_available_not_panel_mapped",
+            "path": None,
+            "available_locally_during_build": source.exists(),
+            "url": "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-021-27341-1/MediaObjects/41467_2021_27341_MOESM10_ESM.xlsx",
+            "mapping_note": "Retained separately; it does not replace the primary image-visible extraction.",
+        },
+        "coverage": {
+            "visible_records": len(rows), "intersections": 30, "set_rows": 19,
+            "membership_grid_cells": diagnostics["membership_grid_cells"],
+            "active_membership_nodes": diagnostics["active_membership_nodes"],
+        },
+        "validation": {
+            "status": "original_pixel_geometry_validated",
+            "top_bar_rmse": diagnostics["top_bar_geometry_vs_printed_count_rmse"],
+            "top_bar_max_abs_error": diagnostics["top_bar_geometry_vs_printed_count_max_abs_error"],
+            "set_total_left_bar_mae": diagnostics["set_total_left_bar_mae"],
+            "set_total_left_bar_max_abs_error": diagnostics["set_total_left_bar_max_abs_error"],
+        },
+        "limitations": [
+            "Printed intersection counts and row/tumour labels are transcribed from visible text.",
+            "Memberships are accepted only at raster-derived centres with full dark-node support.",
+            "Set totals are sums of visible intersections and are independently checked against left-bar geometry.",
+            "Underlying mutation records and hidden intersections are not inferred.",
+        ],
+    }
+    finish_case(root, original, draw_figure1(original, rows), rows, report, overlay=draw_figure1_overlay(original, rows))
+    write_csv(root / "data-image-extracted.csv", rows)
+    validation_rows = []
+    for row in rows:
+        if row["kind"] == "intersection":
+            validation_rows.append({
+                "record_id": row["record_id"], "metric": "printed intersection count",
+                "source_value": row["count"], "recreated_value": row["count"], "absolute_error": 0,
+                "validation_status": "printed_label_transcribed",
+            })
+        else:
+            validation_rows.append({
+                "record_id": row["record_id"], "metric": "set total vs calibrated left bar",
+                "source_value": row["value"], "recreated_value": row["left_bar_pixel_estimate"],
+                "absolute_error": round(abs(float(row["pixel_error"])), 1),
+                "validation_status": "derived_exact_and_pixel_validated",
+            })
+    write_csv(root / "source-validation.csv", validation_rows)
 
 
 def main() -> None:

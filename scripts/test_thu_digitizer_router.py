@@ -78,6 +78,19 @@ class UnifiedRouterTests(unittest.TestCase):
         self.assertFalse(report["safety"]["numeric_extraction_authorized"])
         self.assertEqual(validate_figure_spec(spec), [])
 
+    def test_upset_routes_to_original_pixel_lattice_candidate(self):
+        image = GALLERY / "assets" / "cases" / "nature-27341-fig1" / "original.png"
+        report, spec = build_preflight(image, chart_type="upset")
+        route = report["route_selection"]["primary"]
+        self.assertEqual(route["route_id"], "raster_lattice_composite_candidate")
+        self.assertEqual(route["implementation"], "scripts/candidate_digitize_lattice_composite.py")
+        self.assertEqual(spec["source"]["measurement_space"], "original_raster_pixels")
+        self.assertFalse(spec["source"]["resampling_applied"])
+        self.assertEqual(spec["panels"][0]["coordinate_model"], "lattice_composite")
+        self.assertIn("layer_grammar", route["required_confirmations"])
+        self.assertFalse(report["safety"]["numeric_extraction_authorized"])
+        self.assertEqual(validate_figure_spec(spec), [])
+
     def test_missing_or_unknown_chart_type_refuses_numeric_extraction(self):
         missing = select_route(chart_type=None, media_kind="raster")
         self.assertEqual(missing["primary"]["route_id"], "unknown_refuse")

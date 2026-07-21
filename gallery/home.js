@@ -18,7 +18,7 @@ const dataTable = document.querySelector("#data-table");
 const dataChart = document.querySelector("#data-chart");
 const interactiveChart = document.querySelector("#interactive-chart");
 const chartTooltip = document.querySelector("#chart-tooltip");
-const ASSET_REVISION = "20260721-visual-audit2";
+const ASSET_REVISION = "20260721-requested-nature-cases";
 const interactiveReadout = document.querySelector("#interactive-readout");
 const interactiveNote = document.querySelector("#interactive-note");
 const interactiveTitle = document.querySelector("#interactive-title");
@@ -49,6 +49,7 @@ const familyById = {
   "bar-horizontal": "bar",
   "bar-stacked": "bar",
   "bar-percent-stacked": "bar",
+  pie: "other",
   forest: "bar",
   histogram: "distribution",
   boxplot: "distribution",
@@ -95,6 +96,7 @@ const typeNameById = {
   "bar-horizontal": "水平柱状图",
   "bar-stacked": "堆叠柱状图",
   "bar-percent-stacked": "堆叠柱状图",
+  pie: "环形饼图",
   histogram: "直方图",
   heatmap: "热力图",
   boxplot: "箱线图",
@@ -159,7 +161,7 @@ function escapeHtml(value) {
 }
 
 function statusTone(status) {
-  if (status === "candidate" || status === "visible_geometry_candidate") return "geometry";
+  if (["candidate", "visible_geometry_candidate", "partial_visible", "low_confidence"].includes(status)) return "geometry";
   if (status === "visible_geometry_extracted") return "geometry";
   return "stable";
 }
@@ -170,6 +172,8 @@ function publicStatusLabel(status) {
     candidate: "可见几何提取",
     visible_geometry_candidate: "可见几何提取",
     visible_geometry_extracted: "可见几何提取",
+    partial_visible: "部分可见提取",
+    low_confidence: "低置信候选",
   };
   return labels[status] || "提取结果";
 }
@@ -319,7 +323,7 @@ async function openCase(sample, updateHash = true) {
   detailLinks.innerHTML = [
     detailLink("完整报告 ↗", sample.assets.report),
     sample.articleUrl ? detailLink("论文原文 ↗", sample.articleUrl) : "",
-    sample.figureUrl ? detailLink("图 1 ↗", sample.figureUrl) : "",
+    sample.figureUrl ? detailLink(`${sample.figure || "图"} ↗`, sample.figureUrl) : "",
     sample.validationDataUrl ? detailLink("验证数据 ↗", sample.validationDataUrl) : "",
   ].join("");
   csvDownload.href = sample.assets.data;
@@ -1655,24 +1659,34 @@ function renderRasterEvidenceInteractive(sample, table) {
   });
 
   table.rows.forEach((row, index) => {
-    const px = number(row.pixel_x);
-    const py = number(row.pixel_y);
+    const px = number(row.hit_x) ?? number(row.pixel_x);
+    const py = number(row.hit_y) ?? number(row.pixel_y);
     if (px === null || py === null) return;
+    const shape = row.shape || row.kind;
     const tooltip = exactTooltip([
       ["kind", row.kind || "visible mark"],
+      ["set", row.set],
+      ["intersection", row.intersection],
+      ["column", row.column_id],
+      ["members", row.members],
+      ["count", row.count],
+      ["present", row.present],
       ["series", row.series],
       ["category", row.category],
       ["x", row.x],
       ["y", row.y],
       ["value", row.value],
+      ["error lower", row.error_lower],
+      ["error upper", row.error_upper],
+      ["error status", row.error_status],
       ["pixel x", row.pixel_x],
       ["pixel y", row.pixel_y],
       ["status", row.value_status || "visible geometry"],
     ]);
     const shared = { fill: "rgba(0,0,0,0.001)", stroke: "transparent", "stroke-width": 0, tabindex: index % 8 === 0 ? 0 : -1 };
-    if (row.kind === "rect" || row.kind === "cell") {
+    if (shape === "rect" || row.kind === "cell") {
       makeMark("rect", { ...shared, x: px, y: py, width: Math.max(8, number(row.width) || 8), height: Math.max(8, number(row.height) || 8) }, tooltip);
-    } else if (row.kind === "line") {
+    } else if (shape === "line") {
       makeMark("line", { ...shared, x1: px, y1: py, x2: number(row.x2) ?? px, y2: number(row.y2) ?? py, stroke: "rgba(0,0,0,0.001)", "stroke-width": Math.max(10, number(row.stroke_width) || 10) }, tooltip);
     } else {
       makeMark("circle", { ...shared, cx: px, cy: py, r: Math.max(8, number(row.radius) || 5) }, tooltip);
@@ -1897,21 +1911,48 @@ function renderPaperSourceUpset(sample, table) {
   const order = spec.setOrder || sets.map((row) => row.set);
   const totals = Object.fromEntries(sets.map((row) => [row.set, row]));
   const rows = [...table.rows.filter((row) => row.kind === "intersection")].sort((a, b) => number(a.intersection) - number(b.intersection));
-  const colors = spec.colors || {};
+  const colors = spec.colors || {}; const typeColors = spec.typeColors || {};
   const maxCount = Math.max(...rows.map((row) => number(row.count) || 0), 1);
-  const x = (index) => layout.left + (index + 0.5) * (layout.right - layout.left) / Math.max(rows.length, 1);
+  const fallbackX = (index) => layout.left + (index + 1) * (layout.right - layout.left) / Math.max(rows.length + 1, 1);
+  const xForRow = (row, index) => number(row.pixel_x) ?? fallbackX(index);
   const y = linearScale(0, maxCount, layout.barsBottom, layout.barsTop);
-  const yForSet = (index) => layout.matrixTop + index * (layout.matrixBottom - layout.matrixTop) / Math.max(1, order.length - 1);
+  const fallbackSetY = (index) => layout.matrixTop + index * (layout.matrixBottom - layout.matrixTop) / Math.max(1, order.length - 1);
+  const yForSet = (name, index) => number(totals[name]?.pixel_y) ?? fallbackSetY(index);
+  const yValues = order.map((name, index) => yForSet(name, index));
+  const rowSteps = yValues.slice(1).map((value, index) => value - yValues[index]).sort((a, b) => a - b);
+  const rowStep = rowSteps[Math.floor(rowSteps.length / 2)] || 21;
   setChartCanvas(spec.canvas.width, spec.canvas.height, spec.fontFamily);
   appendSvg("rect", { x: 0, y: 0, width: spec.canvas.width, height: spec.canvas.height, fill: "#fff" });
   const step = spec.yTickStep || Math.max(1, Math.ceil(maxCount / 6 / 10) * 10);
-  for (let tick = 0; tick <= maxCount + 0.001; tick += step) { const py = y(tick); paperLine(layout.left, py, layout.right, py, { stroke: "#dedede", "stroke-width": 2 }); paperText(String(tick), layout.left - 14, py, { "font-size": spec.tickFontSize || 20, "text-anchor": "end", "dominant-baseline": "middle", fill: "#333" }); }
-  paperLine(layout.left, layout.barsTop, layout.left, layout.barsBottom, { stroke: "#222", "stroke-width": 2 }); paperLine(layout.left, layout.barsBottom, layout.right, layout.barsBottom, { stroke: "#bbb", "stroke-width": 2 });
-  rows.forEach((row, index) => { const cx = x(index); const top = y(number(row.count)); const barWidth = spec.barWidth || Math.min(48, (layout.right - layout.left) / Math.max(rows.length, 1) * .76); makeMark("rect", { x: cx - barWidth / 2, y: top, width: barWidth, height: layout.barsBottom - top, fill: "#444" }, exactTooltip([["intersection", row.intersection], ["members", row.members], ["count", row.count], ["status", "visible printed value"]])); paperText(row.count, cx, top - 8, { "font-size": spec.countFontSize || 20, "text-anchor": "middle", fill: "#333" }); });
-  const maxTotal = Math.max(...sets.map((row) => number(row.value) || 0), 1);
-  order.forEach((name, rowIndex) => { const py = yForSet(rowIndex); const total = totals[name]; paperLine(layout.left, py, layout.right, py, { stroke: "#e8e8e8", "stroke-width": 2 }); paperText(name, layout.left - 14, py, { "font-size": spec.setFontSize || 16, "text-anchor": "end", "dominant-baseline": "middle", fill: "#333" }); if (total && layout.leftBarsRight) { const width = number(total.value) * (layout.leftBarsWidth || 210) / maxTotal; makeMark("rect", { x: layout.leftBarsRight - width, y: py - (spec.setBarHeight || 22) / 2, width, height: spec.setBarHeight || 22, fill: colors[name] || spec.setBarColor || "#59b5e7", stroke: spec.setBarStroke || "none" }, exactTooltip([["set", name], ["total", total.value], ["status", "visible printed value"]])); paperText(total.value, layout.leftBarsRight - width - 8, py, { "font-size": spec.totalFontSize || 18, "text-anchor": "end", "dominant-baseline": "middle", fill: "#333" }); } });
-  rows.forEach((row, index) => { const cx = x(index); const members = new Set(String(row.members || "").split(";").filter(Boolean)); const active = order.map((name, rowIndex) => members.has(name) ? rowIndex : null).filter((value) => value !== null); if (active.length > 1) paperLine(cx, yForSet(active[0]), cx, yForSet(active[active.length - 1]), { stroke: "#333", "stroke-width": spec.connectorWidth || 4 }); order.forEach((name, rowIndex) => { const on = members.has(name); makeMark("circle", { cx, cy: yForSet(rowIndex), r: on ? (spec.activeRadius || 12) : (spec.inactiveRadius || 10), fill: on ? (colors[name] || "#444") : "#e7e7e7", stroke: on ? "#111" : "none", "stroke-width": on ? 1.5 : 0 }, exactTooltip([["intersection", row.intersection], ["set", name], ["present", on ? "yes" : "no"], ["count", row.count]])); }); });
-  if (spec.yLabel) paperText(spec.yLabel, spec.yLabelX || 35, (layout.barsTop + layout.barsBottom) / 2, { "font-size": spec.yLabelSize || 25, "text-anchor": "middle", transform: `rotate(-90 ${spec.yLabelX || 35} ${(layout.barsTop + layout.barsBottom) / 2})`, fill: "#222" });
+  for (let tick = 0; tick <= 900; tick += step) { const py = y(tick); paperLine(layout.left - 9, py, layout.left, py, { stroke: "#333", "stroke-width": 2 }); paperText(String(tick), layout.left - 15, py, { "font-size": spec.tickFontSize || 22, "text-anchor": "end", "dominant-baseline": "middle", fill: "#333" }); }
+  paperLine(layout.left, 0, layout.left, layout.barsBottom, { stroke: "#333", "stroke-width": 2 });
+  paperLine(layout.left, layout.barsBottom, layout.right, layout.barsBottom, { stroke: "#333", "stroke-width": 2 });
+  rows.forEach((row, index) => {
+    const cx = xForRow(row, index); const top = number(row.bar_top_y_px) ?? y(number(row.count)); const bottom = number(row.bar_bottom_y_px) ?? layout.barsBottom; const barWidth = spec.barWidth || 25;
+    makeMark("rect", { x: cx - barWidth / 2, y: top, width: barWidth, height: bottom - top, fill: "#3b3b3b" }, exactTooltip([["intersection", row.intersection], ["members", row.members], ["count", row.count], ["pixel x", row.pixel_x], ["status", "visible printed count + original-pixel geometry"]]));
+    paperText(row.count, cx + 4, top - 18, { "font-size": spec.countFontSize || 21, "text-anchor": "start", "dominant-baseline": "middle", transform: `rotate(45 ${cx + 4} ${top - 18})`, fill: "#333" });
+  });
+  order.forEach((name, rowIndex) => { if (rowIndex % 2) appendSvg("rect", { x: layout.left, y: yValues[rowIndex] - rowStep / 2, width: layout.right - layout.left, height: rowStep, fill: "#f3f3f3" }); });
+  rows.forEach((row, index) => { const cx = xForRow(row, index); order.forEach((name, rowIndex) => appendSvg("circle", { cx, cy: yValues[rowIndex], r: spec.inactiveRadius || 8.2, fill: "#e9e9e9" })); });
+  rows.forEach((row, index) => {
+    const cx = xForRow(row, index); const members = new Set(String(row.members || "").split(";").filter(Boolean)); const active = order.map((name, rowIndex) => members.has(name) ? rowIndex : null).filter((value) => value !== null);
+    if (active.length > 1) paperLine(cx, yValues[active[0]], cx, yValues[active[active.length - 1]], { stroke: "#3b3b3b", "stroke-width": spec.connectorWidth || 4.2 });
+    active.forEach((rowIndex) => makeMark("circle", { cx, cy: yValues[rowIndex], r: spec.activeRadius || 8.5, fill: colors[order[rowIndex]] || "#3b3b3b" }, exactTooltip([["intersection", row.intersection], ["set", order[rowIndex]], ["present", "yes"], ["count", row.count], ["source", "original-pixel dark-node support"]])));
+  });
+  const leftScale = (value) => layout.leftBarsRight - value * (layout.leftBarsWidth || 368) / 1250;
+  order.forEach((name, rowIndex) => {
+    const py = yValues[rowIndex]; const total = totals[name];
+    paperText(name, layout.left - 15, py, { "font-size": spec.setFontSize || 20, "text-anchor": "end", "dominant-baseline": "middle", fill: "#333" });
+    if (!total) return;
+    const left = number(total.left_bar_left_px) ?? leftScale(number(total.value)); const right = number(total.left_bar_right_px) ?? layout.leftBarsRight;
+    makeMark("rect", { x: left, y: py - (spec.setBarHeight || 11) / 2, width: right - left, height: spec.setBarHeight || 11, fill: colors[name] || spec.setBarColor || "#56b4e9" }, exactTooltip([["set", name], ["tumour type", total.tumour_type], ["total from visible intersections", total.value], ["left-bar pixel estimate", total.left_bar_pixel_estimate], ["pixel error", total.pixel_error], ["status", total.visible_geometry_status]]));
+  });
+  const leftAxisY = yValues[yValues.length - 1] + rowStep / 2 + 6;
+  paperLine(leftScale(1250) - 14, leftAxisY, leftScale(0), leftAxisY, { stroke: "#333", "stroke-width": 2 });
+  (spec.leftTicks || [1250, 1000, 750, 500, 250, 0]).forEach((tick) => { const px = leftScale(tick); paperLine(px, leftAxisY, px, leftAxisY + 8, { stroke: "#333", "stroke-width": 2 }); paperText(String(tick), px, leftAxisY + 24, { "font-size": 20, "text-anchor": "middle", "dominant-baseline": "middle", fill: "#333" }); });
+  paperText("number of mutations in each region", (leftScale(1250) + leftScale(0)) / 2, leftAxisY + 56, { "font-size": 24, "text-anchor": "middle", "dominant-baseline": "middle", fill: "#333" });
+  order.forEach((name, rowIndex) => { const total = totals[name]; const tumourType = total?.tumour_type; if (!tumourType) return; const color = typeColors[tumourType] || "#777"; appendSvg("rect", { x: layout.typeStripX, y: yValues[rowIndex] - rowStep / 2, width: layout.typeStripWidth, height: rowStep, fill: color }); paperText(tumourType === "NSCLC-NOS" ? "NSCLC–NOS" : tumourType, layout.typeTextX, yValues[rowIndex], { "font-size": 20, "text-anchor": "start", "dominant-baseline": "middle", fill: color }); });
+  if (spec.yLabel) paperText(spec.yLabel, spec.yLabelX || 35, layout.barsBottom / 2, { "font-size": spec.yLabelSize || 25, "text-anchor": "middle", transform: `rotate(-90 ${spec.yLabelX || 35} ${layout.barsBottom / 2})`, fill: "#222" });
   interactiveNote.textContent = spec.note;
 }
 

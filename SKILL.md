@@ -1,6 +1,6 @@
 ---
 name: thu-digitizer
-description: Extract and validate numeric data from chart images, PDF figures, and official source-data files locally and reproducibly, with calibrated axes, deterministic compact-scatter recovery including partially touching filled markers, PDF vector inspection, line tracing, histograms, boxplots, error bars, CSV/JSON evidence, source-data cross-validation, and regression evaluation. Use when a user asks to recover or recreate chart data, extract scatter points, check a PDF chart, assess digitization accuracy, validate against source data, or improve a chart-digitization workflow from corrected examples.
+description: Extract and validate numeric data from chart images, PDF figures, and official source-data files locally and reproducibly, with calibrated axes, deterministic compact-scatter recovery including partially touching filled markers, original-pixel aligned lattice composites such as UpSet plots, PDF vector inspection, line tracing, histograms, boxplots, error bars, CSV/JSON evidence, source-data cross-validation, and regression evaluation. Use when a user asks to recover or recreate chart data, extract scatter points or aligned memberships, check a PDF chart, assess digitization accuracy, validate against source data, or improve a chart-digitization workflow from corrected examples.
 ---
 
 # THU Digitizer
@@ -25,6 +25,12 @@ The registry in `scripts/extractor_registry.py` is the single machine-readable m
 ## Model-independent execution contract
 
 Treat registered bundled scripts as normative implementations. When a compatible implementation exists, run it; do not replace it with model-written thresholding, visual point counting, or a new connected-component script. A model may propose a chart type, plot bounds, calibration anchors, marker polarity/colour, and verified exclusions, but only the registered implementation may emit candidate numeric values. Preserve its input hash, algorithm version, deterministic run ID, parameters, report, CSV, and overlay. If the script returns `low_confidence` or `numeric_output_authorized: false`, do not override it from visual reasoning.
+
+## Original-raster coordinate invariant
+
+Measure every raster against the exact original file recorded by SHA-256, width, and height. Keep all pixel coordinates in `original_raster_pixels`. Never measure a chat preview, thumbnail, browser screenshot, resized copy, enlarged crop, overlay, or recreation; use enlargement only for review. Refuse a source-contract mismatch instead of estimating a scale factor. Preserve the original canvas dimensions in every recreation.
+
+For repeated aligned layers such as top bars, row bars, a membership lattice, connectors, and categorical strips, read [references/original-pixel-lattice-composites.md](references/original-pixel-lattice-composites.md) and run the registered lattice-composite candidate. Never pass expected row, column, active-node, or intersection counts to detection.
 
 ## Binding research-quality baseline
 
@@ -218,6 +224,20 @@ For a Cartesian raster scatter panel with compact filled markers, read [referenc
 
 Open the overlay at original resolution. Accept candidate values only when the report says `numeric_output_authorized: true`, every ring is centred on a visible marker, multi-peak components are plausible touching markers, and suppressed peaks are reviewed. If the panel prints Pearson's `R`, pass `--annotated-pearson-r`; use it only as a validation gate, never as a target for adding or removing points. Do not pass an expected point count. Hollow markers, bubbles, dense swarms, and perfectly coincident or fully occluded points are outside this route.
 
+## Aligned lattice composites (candidate, low freedom)
+
+For an UpSet plot or another raster composite with repeated column bars, row bars, and a complete categorical membership grid, create a source-locked configuration and run the registered candidate:
+
+```powershell
+python scripts/candidate_digitize_lattice_composite.py init-config `
+  --input figure.png --output lattice-config.json
+
+python scripts/candidate_digitize_lattice_composite.py extract `
+  --input figure.png --config lattice-config.json --output-dir evidence
+```
+
+Fill only visibly verified ROIs, one colour or a verified colour list per layer, rendered-size ranges, support thresholds, labels, printed values, and optional independent axis anchors. Prefer actual row/column bars as guides; when bars are separate from the matrix or subpixel, a complete repeated glyph row/column may be declared `membership_guides`, with the role recorded and inapplicable value-bar geometry validation disabled. The implementation must derive guide centres before consulting semantic array lengths and must classify every row-by-column cell as `active`, `inactive`, or `ambiguous`. Accept numeric output only when `numeric_output_authorized: true`, the source identity matches, every configured validation passes, and no cell is ambiguous. Never select guide roles or tune thresholds from expected counts. Keep this route `candidate`; it recovers visible aligned geometry and verified printed values, not hidden records or occluded memberships.
+
 ### Assisted grouped and stacked bars (candidate)
 
 Use `scripts/candidate_digitize_bar_chart.py` for colour-distinct vertical or horizontal simple/grouped bars and visible stacked segments after verifying the plot bounds, linear value-axis anchors, category centres, layout, baseline, and one colour per series. The output is visible rectangle geometry and calibrated endpoints, not the records summarized by each bar.
@@ -259,6 +279,8 @@ Treat a colour template, a local-shape test, and bar geometry as complementary e
 - Keep series colors distinct from gridlines, fills, and error bars. Sample a representative interior pixel, not an anti-aliased edge.
 - Treat a value as missing when no color evidence is found. Never interpolate merely to make a CSV look complete.
 - For scatter points over bars, expose the unresolved-candidate layer rather than converting edge conflicts or fused blobs into accepted points.
+- For an aligned lattice, classify every Cartesian cell and refuse numeric output when any cell is ambiguous. Never tune geometry from supplied semantic labels, printed totals, or expected counts.
+- Reject any raster measurement whose input hash or dimensions differ from its original-pixel source contract.
 - Treat error bars as separate geometry. Report their endpoints in both pixels and data units.
 - Generate a recreation or overlay for visual review. Image similarity alone never proves numeric correctness.
 
@@ -291,4 +313,4 @@ Keep the stable skill code unchanged during normal extraction. Record a candidat
 
 ## Limits of v0.1
 
-The bundled executables support calibrated colour-distinct lines plus pale error bars, a continuity-aware raster line candidate, a candidate compact filled-scatter route with distance-peak splitting, calibrated histograms, colour-distinct vertical or horizontal boxplots, and PDF vector inspection. The compact-scatter route is not a universal point detector: hollow markers, bubbles, dense swarms, perfect coincidences, and occluded marks remain unsupported or `not_extracted`. Direct PDF marker recovery and source-data validation are assisted workflows. Histogram output is limited to visible bin edges/heights and boxplot output to visible summaries/outliers. For bars, OCR-heavy images, nonlinear or unsupported coordinates, overlapping series, or unverified vector paths, retain the same evidence/refusal gates and do not claim automation without dedicated held-out evidence.
+The bundled executables support calibrated colour-distinct lines plus pale error bars, a continuity-aware raster line candidate, a candidate compact filled-scatter route with distance-peak splitting, a candidate original-pixel aligned-lattice route, calibrated histograms, colour-distinct vertical or horizontal boxplots, and PDF vector inspection. The compact-scatter route is not a universal point detector: hollow markers, bubbles, dense swarms, perfect coincidences, and occluded marks remain unsupported or `not_extracted`. The lattice route does not cover irregular matrices, merged or occluded cells, or unverified semantic text. Direct PDF marker recovery and source-data validation are assisted workflows. Histogram output is limited to visible bin edges/heights and boxplot output to visible summaries/outliers. For bars, OCR-heavy images, nonlinear or unsupported coordinates, overlapping series, or unverified vector paths, retain the same evidence/refusal gates and do not claim automation without dedicated held-out evidence.

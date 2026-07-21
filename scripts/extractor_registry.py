@@ -181,6 +181,30 @@ ROUTES = (
         True,
     ),
     RouteDescriptor(
+        "raster_lattice_composite_candidate",
+        "Repeated aligned bars with categorical membership lattice",
+        ("upset", "lattice_composite"),
+        ("raster",),
+        ("lattice_composite",),
+        ("aligned_bar", "row_bar", "membership_cell", "connector", "categorical_strip"),
+        "candidate",
+        "scripts/candidate_digitize_lattice_composite.py",
+        (
+            "original_raster",
+            "panel_roi",
+            "layer_grammar",
+            "column_bar_color",
+            "row_bar_color",
+            "node_color",
+            "semantic_labels",
+            "row_value_axis",
+            "overlay_review",
+        ),
+        "Original-pixel repeated bar geometry, complete active/inactive/ambiguous cell classification, and independently validated visible values when supplied.",
+        "Hidden records, occluded cells, unverified text, and meanings not visibly encoded by the aligned layers.",
+        True,
+    ),
+    RouteDescriptor(
         "pdf_dose_response_vector",
         "Vector-PDF dose-response geometry",
         ("dose_response",),
@@ -298,6 +322,9 @@ ALIASES = {
     "heat_map": "heatmap",
     "scatter_fit": "scatter_with_fit",
     "scatter_plot": "scatter",
+    "upset_plot": "upset",
+    "upsetplot": "upset",
+    "lattice": "lattice_composite",
 }
 
 

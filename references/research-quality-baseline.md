@@ -21,7 +21,7 @@ Read this file together with [report-and-evolution.md](report-and-evolution.md) 
 
 ## Scope statement
 
-The stable skill currently provides dedicated extractors for calibrated colour-distinct lines, histograms, and vertical/horizontal boxplots. Compact filled raster scatter points have a deterministic candidate with synthetic evidence and retained real-case regression evidence, but it is not promoted as a universal or stable point detector. Grouped and stacked bars also remain candidate/benchmark routes. Do not describe a benchmark or candidate route as supported universal automation.
+The stable skill currently provides dedicated extractors for calibrated colour-distinct lines, histograms, and vertical/horizontal boxplots. Compact filled raster scatter points have a deterministic candidate with synthetic evidence and retained real-case regression evidence, but it is not promoted as a universal or stable point detector. Repeated aligned lattice composites have a source-locked deterministic candidate with synthetic and retained UpSet regression evidence; irregular matrices and ambiguous cells remain outside that route. Grouped and stacked bars also remain candidate/benchmark routes. Do not describe a benchmark or candidate route as supported universal automation.
 
 ## Priority order
 

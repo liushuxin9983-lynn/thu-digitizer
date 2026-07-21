@@ -20,8 +20,8 @@
     "wpdCalibrationFamilies": 7,
     "extensionRoutes": 2,
     "oaRepresentatives": 51,
-    "validatedDemos": 8,
-    "referenceFigures": 17
+    "validatedDemos": 9,
+    "referenceFigures": 18
   },
   "groups": [
     {
@@ -1183,15 +1183,15 @@
         "甜甜圈图"
       ],
       "engineStatus": "coordinate_specific",
-      "demoStatus": "oa_reference",
-      "recoverableRepresentation": "扇区角度、比例和可读标签",
+      "demoStatus": "partial_visible",
+      "recoverableRepresentation": "可见百分比标签；扇区角度仅作案例级验证",
       "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
-      "caseId": "nature-ribotie-multipanel",
+      "caseId": "nature-40822-fig1f",
       "thumbnailKey": "donut",
       "calibrationFamily": "structure",
-      "thumbnail": "assets/cases/nature-ribotie-multipanel/atlas-donut.jpg",
-      "articleUrl": "https://www.nature.com/articles/s41467-025-56543-0",
-      "figure": "Fig. 2"
+      "thumbnail": "assets/cases/nature-40822-fig1f/atlas-donut.jpg",
+      "articleUrl": "https://www.nature.com/articles/s41467-023-40822-9",
+      "figure": "Fig. 1f"
     },
     {
       "id": "treemap-voronoi",
@@ -2170,6 +2170,32 @@
       "thumbnails": {
         "roc": "assets/cases/nature-hypergraph-roc/atlas-roc.jpg",
         "network_inset": "assets/cases/nature-hypergraph-roc/atlas-network_inset.jpg"
+      }
+    },
+    {
+      "id": "nature-40822-fig1f",
+      "title": "四组细胞类型组成的环形饼图",
+      "articleTitle": "Driver gene combinations dictate cutaneous squamous cell carcinoma disease continuum progression",
+      "authors": "Bailey et al.",
+      "journal": "Nature Communications",
+      "year": 2023,
+      "figure": "Fig. 1f",
+      "doi": "10.1038/s41467-023-40822-9",
+      "articleUrl": "https://www.nature.com/articles/s41467-023-40822-9",
+      "figureUrl": "https://www.nature.com/articles/s41467-023-40822-9/figures/1",
+      "original": "assets/cases/nature-40822-fig1f/original.png",
+      "evidenceStatus": "partial_visible",
+      "coverage": [
+        "donut",
+        "visible percentage labels",
+        "case-local sector geometry"
+      ],
+      "report": "assets/cases/nature-40822-fig1f/report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "93f61668886166f8cc23fd15abdd1aa5033c441dd35b4fa2a43c47c5af62c30d",
+      "thumbnails": {
+        "donut": "assets/cases/nature-40822-fig1f/atlas-donut.jpg"
       }
     }
   ],

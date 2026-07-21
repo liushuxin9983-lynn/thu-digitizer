@@ -1,4 +1,5 @@
 import csv
+import hashlib
 import json
 import math
 import unittest
@@ -13,6 +14,13 @@ GALLERY = ROOT / "gallery"
 
 
 class GallerySiteTests(unittest.TestCase):
+    def test_requested_nature_case_json_does_not_expose_local_absolute_paths(self):
+        for case_id in ("nature-70284-fig8a", "nature-36825-fig1b", "nature-40822-fig1f"):
+            case_root = GALLERY / "assets" / "cases" / case_id
+            for path in case_root.glob("*.json"):
+                with self.subTest(case=case_id, file=path.name):
+                    self.assertNotRegex(path.read_text(encoding="utf-8"), r"(?<![A-Za-z])[A-Za-z]:[\\\\/]")
+
     @classmethod
     def setUpClass(cls):
         cls.manifest = json.loads((GALLERY / "data" / "cases.json").read_text(encoding="utf-8"))
@@ -39,6 +47,138 @@ class GallerySiteTests(unittest.TestCase):
                     with Image.open(GALLERY / sample["assets"]["recreated"]) as recreated:
                         self.assertEqual(recreated.size, original.size)
 
+    def test_first_line_case_uses_the_attached_image_and_semantic_extraction(self):
+        sample = self.basics["samples"][0]
+        self.assertEqual(sample["id"], "line")
+        root = GALLERY / "assets" / "basics" / "line"
+        original = root / "original.png"
+        self.assertEqual(
+            hashlib.sha256(original.read_bytes()).hexdigest(),
+            "04efe900130ee60e291fdff77374c2283a16b0a0f0ae7a6568e6e3d134991d84",
+        )
+
+        with (root / "data.csv").open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+        points = [row for row in rows if row["kind"] == "point"]
+        self.assertEqual(len(points), 33)
+        self.assertEqual(
+            Counter(row["series"] for row in points),
+            Counter({"biodiversity": 11, "context": 11, "economic_language": 11}),
+        )
+        self.assertTrue(all(row["pixel_x"] and row["pixel_y"] for row in points))
+        self.assertTrue(all(row["value_status"] == "calibrated_original_pixel_sample" for row in points))
+        context = [row for row in points if row["series"] == "context"]
+        self.assertEqual(sum(row["error_status"] == "visible_endpoints_extracted" for row in context), 11)
+
+        report = json.loads((root / "report.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["source"]["sha256"], hashlib.sha256(original.read_bytes()).hexdigest())
+        self.assertEqual(report["visible_extraction"]["implementation"], "scripts/digitize_line_chart.py")
+        self.assertEqual(report["coverage"], {"points_found": 33, "points_expected": 33, "error_bars_found": 11, "error_bars_expected": 11})
+        self.assertEqual(report["validation"]["role"], "independent_synthetic_truth_validation_only")
+        self.assertLess(report["validation"]["point_mae"], 0.35)
+        self.assertTrue(sample["styleSpec"]["rasterEvidenceInteractive"])
+        self.assertEqual(sample["styleSpec"]["canvas"], {"width": 600, "height": 400})
+
+    def test_nature_27341_upset_case_uses_validated_original_pixel_geometry(self):
+        sample = next(item for item in self.basics["samples"] if item["id"] == "nature-27341-fig1")
+        with (GALLERY / sample["assets"]["data"]).open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+        totals = [row for row in rows if row["kind"] == "set_total"]
+        intersections = [row for row in rows if row["kind"] == "intersection"]
+
+        self.assertEqual(len(totals), 19)
+        self.assertEqual(len(intersections), 30)
+        self.assertEqual([int(row["count"]) for row in intersections], [
+            998, 802, 684, 675, 500, 441, 287, 278, 229, 124, 117, 110, 110, 108, 83,
+            71, 62, 41, 40, 40, 39, 38, 37, 28, 23, 21, 16, 9, 7, 4,
+        ])
+        self.assertEqual([row["members"] for row in intersections], [
+            "Pa35T2", "Pa37T1;Pa37T2", "Pa36T1;Pa36T2", "Pa35T1",
+            "Pa29T1;Pa29T2;Pa29T4", "Pa33T1;Pa33T2", "Pa30T1;Pa30T2", "Pa37T2",
+            "Pa35T1;Pa35T2", "Pa33T2", "Pa31T2", "Pa31T1;Pa31T2", "Pa34T1;Pa34T2",
+            "Pa26T1;Pa26T2", "Pa37T1", "Pa34T1", "Pa26T1", "Pa29T2", "Pa31T1",
+            "Pa34T2", "Pa29T1;Pa29T2", "Pa33T1", "Pa26T2", "Pa29T4", "Pa30T2",
+            "Pa30T1", "Pa29T1", "Pa29T2;Pa29T4", "Pa36T2", "Pa36T1",
+        ])
+        self.assertEqual(sum(int(row["member_count"]) for row in intersections), 42)
+
+        expected_totals = {
+            "Pa26T1": 170, "Pa26T2": 145, "Pa29T1": 555, "Pa29T2": 589, "Pa29T4": 537,
+            "Pa30T1": 308, "Pa30T2": 310, "Pa31T1": 150, "Pa31T2": 227, "Pa33T1": 479,
+            "Pa33T2": 565, "Pa34T1": 181, "Pa34T2": 150, "Pa35T1": 904, "Pa35T2": 1227,
+            "Pa36T1": 688, "Pa36T2": 691, "Pa37T1": 885, "Pa37T2": 1080,
+        }
+        self.assertEqual({row["set"]: int(row["value"]) for row in totals}, expected_totals)
+        for name, expected in expected_totals.items():
+            derived = sum(int(row["count"]) for row in intersections if name in row["members"].split(";"))
+            self.assertEqual(derived, expected, name)
+        self.assertTrue(all(abs(float(row["pixel_error"])) <= 3 for row in totals))
+        self.assertAlmostEqual(float(intersections[0]["pixel_x"]), 560.5)
+        self.assertAlmostEqual(float(intersections[-1]["pixel_x"]), 1761.5)
+        self.assertAlmostEqual(float(totals[0]["pixel_y"]), 1119.0)
+        self.assertAlmostEqual(float(totals[-1]["pixel_y"]), 1499.0)
+
+        report = json.loads((GALLERY / sample["assets"]["report"]).read_text(encoding="utf-8"))
+        self.assertEqual(report["visible_extraction"]["algorithm_version"], "lattice-composite-original-pixel-v2")
+        self.assertEqual(report["coverage"]["membership_grid_cells"], 570)
+        self.assertEqual(report["coverage"]["active_membership_nodes"], 42)
+        self.assertLess(report["validation"]["set_total_left_bar_max_abs_error"], 3)
+        self.assertEqual(sample["styleSpec"]["canvas"], {"width": 1999, "height": 1579})
+        self.assertEqual(sample["styleSpec"]["layout"]["left"], 519)
+        self.assertEqual(sample["styleSpec"]["layout"]["right"], 1803)
+        candidate = json.loads(
+            (GALLERY / "assets" / "cases" / "nature-27341-fig1" / "lattice-candidate-report.json").read_text(encoding="utf-8")
+        )
+        self.assertTrue(candidate["numeric_output_authorized"])
+        self.assertEqual(candidate["coordinate_provenance"]["measurement_space"], "original_raster_pixels")
+        preflight = json.loads(
+            (GALLERY / "assets" / "cases" / "nature-27341-fig1" / "preflight-report.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(preflight["route_selection"]["primary"]["route_id"], "raster_lattice_composite_candidate")
+        spec = json.loads(
+            (GALLERY / "assets" / "cases" / "nature-27341-fig1" / "figure-spec.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(spec["source"]["measurement_space"], "original_raster_pixels")
+        self.assertFalse(spec["source"]["resampling_applied"])
+
+    def test_every_other_upset_case_is_original_pixel_extracted_and_source_validated(self):
+        expected = {
+            "nature-19006-fig2b": {"columns": 15, "rows": 4, "active": 32, "primary": 51},
+            "nature-28348-fig7": {"columns": 12, "rows": 5, "active": 40, "primary": 57},
+        }
+        for case_id, counts in expected.items():
+            with self.subTest(case=case_id):
+                sample = next(item for item in self.basics["samples"] if item["id"] == case_id)
+                root = GALLERY / "assets" / "cases" / case_id
+                with (GALLERY / sample["assets"]["data"]).open(newline="", encoding="utf-8") as handle:
+                    rows = list(csv.DictReader(handle))
+                self.assertEqual(len(rows), counts["primary"])
+                self.assertEqual(sum(row["kind"] == "intersection" for row in rows), counts["columns"])
+                self.assertEqual(sum(row["kind"] == "set_total" for row in rows), counts["rows"])
+                self.assertEqual(sum(row["kind"] == "membership_cell" for row in rows), counts["active"])
+                self.assertTrue(all(row["pixel_x"] and row["pixel_y"] for row in rows))
+
+                report = json.loads((root / "report.json").read_text(encoding="utf-8"))
+                self.assertEqual(report["status"], "visible_geometry_candidate")
+                self.assertEqual(report["source_data_role"], "independent_validation_only")
+                self.assertTrue(report["visible_extraction"]["numeric_output_authorized"])
+                self.assertEqual(report["visible_extraction"]["algorithm_version"], "lattice-composite-original-pixel-v2")
+                self.assertEqual(report["coverage"]["membership_grid_cells"], counts["columns"] * counts["rows"])
+                self.assertEqual(report["coverage"]["active_membership_nodes"], counts["active"])
+                self.assertEqual(report["coverage"]["ambiguous_membership_nodes"], 0)
+                self.assertEqual(report["validation"]["source_mismatch_count"], 0)
+                self.assertEqual(report["validation"]["official_source"]["status"], "validated")
+
+                candidate = json.loads((root / "lattice-candidate-report.json").read_text(encoding="utf-8"))
+                self.assertEqual(candidate["coordinate_provenance"]["measurement_space"], "original_raster_pixels")
+                self.assertFalse(candidate["coordinate_provenance"]["resampling_applied"])
+                with (root / "source-validation.csv").open(newline="", encoding="utf-8") as handle:
+                    validation = list(csv.DictReader(handle))
+                self.assertEqual(len(validation), counts["columns"])
+                self.assertTrue(all(row["validation_status"] == "validated" for row in validation))
+                preflight = json.loads((root / "preflight-report.json").read_text(encoding="utf-8"))
+                self.assertEqual(preflight["route_selection"]["primary"]["route_id"], "raster_lattice_composite_candidate")
+
     def test_homepage_leads_with_image_extraction_only_chart_cases(self):
         samples = self.basics["samples"]
         self.assertEqual(
@@ -52,6 +192,7 @@ class GallerySiteTests(unittest.TestCase):
                 "bar-horizontal",
                 "bar-stacked",
                 "bar-percent-stacked",
+                "pie",
                 "histogram",
                 "heatmap",
                 "boxplot",
@@ -62,6 +203,8 @@ class GallerySiteTests(unittest.TestCase):
                 "nature-00142-fig4a",
                 "nature-02571-fig1d",
                 "nature-63786-fig1c",
+                "nature-19006-fig2b",
+                "nature-28348-fig7",
                 "nature-27341-fig1",
                 "nature-70099-fig5e",
                 "nature-37200-fig8e",
@@ -71,7 +214,9 @@ class GallerySiteTests(unittest.TestCase):
             ],
         )
         self.assertEqual(sum(item["status"] == "validated_local_stable" for item in samples), 3)
-        self.assertEqual(sum(item["status"] == "candidate" for item in samples), 7)
+        self.assertEqual(sum(item["status"] == "candidate" for item in samples), 5)
+        self.assertEqual(sum(item["status"] == "partial_visible" for item in samples), 2)
+        self.assertEqual(sum(item["status"] == "low_confidence" for item in samples), 1)
         self.assertEqual(next(item for item in samples if item["id"] == "forest")["status"], "visible_geometry_extracted")
         self.assertFalse(any(item["status"] == "source_mapped" for item in samples))
 
@@ -86,6 +231,80 @@ class GallerySiteTests(unittest.TestCase):
         self.assertIn('fetch("data/basics.json")', script)
         for label in ["原图", "提取覆盖", "复现"]:
             self.assertIn(label, script)
+
+    def test_requested_nature_bar_cases_replace_the_synthetic_examples(self):
+        expected = {
+            "bar-horizontal": {
+                "figureUrl": "https://www.nature.com/articles/s41467-026-70284-8/figures/8",
+                "rows": 16,
+                "extracted": 13,
+                "authorized": 13,
+                "missing": 3,
+                "canvas": (2001, 360),
+                "report_status": "partial_visible",
+            },
+            "bar-stacked": {
+                "figureUrl": "https://www.nature.com/articles/s41467-023-36825-1/figures/1",
+                "rows": 33,
+                "extracted": 29,
+                "authorized": 0,
+                "missing": 4,
+                "canvas": (709, 600),
+                "report_status": "low_confidence",
+            },
+        }
+        for case_id, wanted in expected.items():
+            with self.subTest(case=case_id):
+                sample = next(item for item in self.basics["samples"] if item["id"] == case_id)
+                self.assertEqual(sample["figureUrl"], wanted["figureUrl"])
+                self.assertTrue(sample["styleSpec"]["rasterEvidenceInteractive"])
+                self.assertEqual(
+                    (sample["styleSpec"]["canvas"]["width"], sample["styleSpec"]["canvas"]["height"]),
+                    wanted["canvas"],
+                )
+                root = (GALLERY / sample["assets"]["report"]).parent
+                with (GALLERY / sample["assets"]["data"]).open(newline="", encoding="utf-8") as handle:
+                    rows = list(csv.DictReader(handle))
+                self.assertEqual(len(rows), wanted["rows"])
+                self.assertEqual(sum(row["numeric_use_allowed"] == "true" for row in rows), wanted["authorized"])
+                self.assertEqual(sum(row["value_status"] != "not_extracted" for row in rows), wanted["extracted"])
+                self.assertEqual(sum(row["value_status"] == "not_extracted" for row in rows), wanted["missing"])
+                report = json.loads((root / "report.json").read_text(encoding="utf-8"))
+                self.assertEqual(report["status"], wanted["report_status"])
+                self.assertFalse(report["expected_detection_count_passed"])
+                self.assertEqual(report["source_data_role"], "independent_validation_only")
+                for name in ["preflight-report.json", "figure-spec.json", "source-validation.json", "SOURCES.md"]:
+                    self.assertTrue((root / name).is_file(), f"{case_id}:{name}")
+
+    def test_requested_nature_donut_case_preserves_visible_labels_without_forcing_100(self):
+        sample = next(item for item in self.basics["samples"] if item["id"] == "pie")
+        self.assertEqual(
+            sample["figureUrl"],
+            "https://www.nature.com/articles/s41467-023-40822-9/figures/1",
+        )
+        self.assertEqual(sample["status"], "partial_visible")
+        self.assertTrue(sample["styleSpec"]["rasterEvidenceInteractive"])
+        self.assertEqual(sample["styleSpec"]["canvas"], {"width": 1025, "height": 215})
+        root = (GALLERY / sample["assets"]["report"]).parent
+        with (root / "data.csv").open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+        self.assertEqual(len(rows), 18)
+        self.assertEqual(Counter(row["category"] for row in rows), Counter({"Normal": 4, "AK": 5, "Primary": 4, "MET": 5}))
+        self.assertTrue(all(row["value_status"] == "visible_printed_label" for row in rows))
+        self.assertTrue(all(row["numeric_use_allowed"] == "true" for row in rows))
+        sums = {
+            group: round(sum(float(row["value"]) for row in rows if row["category"] == group), 1)
+            for group in {row["category"] for row in rows}
+        }
+        self.assertEqual(sums, {"Normal": 97.5, "AK": 90.6, "Primary": 70.3, "MET": 73.6})
+        report = json.loads((root / "report.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "partial_visible")
+        self.assertEqual(report["visible_label_extraction"]["recovered_label_count"], 18)
+        self.assertFalse(report["normalization_applied_to_primary_values"])
+        self.assertEqual(report["shared_pie_route"], "unsupported_coordinate_route")
+        self.assertEqual(report["source_data_role"], "independent_validation_only")
+        for name in ["preflight-report.json", "figure-spec.json", "sector-geometry.csv", "candidate-report.json", "SOURCES.md"]:
+            self.assertTrue((root / name).is_file(), name)
 
     def test_homepage_detail_has_scrollable_table_download_and_interactive_values(self):
         html = (GALLERY / "index.html").read_text(encoding="utf-8")
@@ -154,6 +373,7 @@ class GallerySiteTests(unittest.TestCase):
         self.assertEqual(
             {sample["id"] for sample in style_samples},
             {
+                "line",
                 "dose-response",
                 "bar",
                 "heatmap",
@@ -164,6 +384,8 @@ class GallerySiteTests(unittest.TestCase):
                 "nature-02571-fig1d",
                 "nature-56055-fig3c",
                 "nature-63786-fig1c",
+                "nature-19006-fig2b",
+                "nature-28348-fig7",
                 "nature-27341-fig1",
                 "scatter",
                 "nature-70099-fig5e",
@@ -171,6 +393,9 @@ class GallerySiteTests(unittest.TestCase):
                 "nature-31408-fig2d",
                 "nature-06199-fig1",
                 "nature-60895-fig4c",
+                "bar-horizontal",
+                "bar-stacked",
+                "pie",
             },
         )
         renderers = {sample["styleSpec"]["renderer"] for sample in style_samples}
@@ -239,7 +464,8 @@ class GallerySiteTests(unittest.TestCase):
                 for key in ["original", "overlay", "recreated"]:
                     with Image.open(GALLERY / sample["assets"][key]) as image:
                         self.assertGreater(image.width, 350)
-                        self.assertGreater(image.height, 250)
+                        minimum_height = 200 if sample["id"] == "pie" else 250
+                        self.assertGreater(image.height, minimum_height)
                 with (GALLERY / sample["assets"]["data"]).open(newline="", encoding="utf-8") as handle:
                     self.assertGreater(len(list(csv.DictReader(handle))), 0)
                 report = json.loads((GALLERY / sample["assets"]["report"]).read_text(encoding="utf-8"))

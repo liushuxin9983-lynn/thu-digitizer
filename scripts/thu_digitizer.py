@@ -169,6 +169,13 @@ def _axis_templates(coordinate_model: str) -> list[dict[str, Any]]:
             {"axis_id": "column", "orientation": "column", "scale": "categorical", "verification": "missing", "anchors": []},
             {"axis_id": "color", "orientation": "color", "scale": "color", "verification": "missing", "anchors": []},
         ]
+    if coordinate_model == "lattice_composite":
+        return [
+            {"axis_id": "column", "orientation": "column", "scale": "categorical", "verification": "missing", "anchors": []},
+            {"axis_id": "row", "orientation": "row", "scale": "categorical", "verification": "missing", "anchors": []},
+            {"axis_id": "column_value", "orientation": "y", "scale": "linear", "verification": "missing", "anchors": []},
+            {"axis_id": "row_value", "orientation": "x", "scale": "linear", "verification": "missing", "anchors": []},
+        ]
     if coordinate_model == "interval_rows":
         return [
             {"axis_id": "row", "orientation": "row", "scale": "categorical", "verification": "missing", "anchors": []},
@@ -204,6 +211,12 @@ def build_preflight(
             "sha256": inspection["input_sha256"],
             "media_kind": inspection["media_kind"],
             "coordinate_space": inspection["coordinate_space"],
+            "measurement_space": (
+                "original_raster_pixels"
+                if inspection["media_kind"] == "raster"
+                else "pdf_page_points"
+            ),
+            "resampling_applied": False,
             "width": inspection["width"],
             "height": inspection["height"],
             "page": inspection.get("selected_page"),

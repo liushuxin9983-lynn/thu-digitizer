@@ -63,96 +63,13 @@ def standard_axis(title: str, xlabel: str, ylabel: str):
 
 
 def build_line(synthetic_dir: Path) -> dict:
-    case_dir = OUTPUT / "line"
-    case_dir.mkdir(parents=True, exist_ok=True)
-    original = synthetic_dir / "fixtures" / "line_clean.png"
-    report = json.loads((synthetic_dir / "benchmark_report.json").read_text(encoding="utf-8"))
-    meta = next(item for item in report["fixtures"] if item["name"] == "line_clean")
-    bounds = meta["bounds"]
-    data_path = case_dir / "data.csv"
-    report_path = case_dir / "report.json"
-    overlay_path = case_dir / "overlay.png"
-    command = [
-        sys.executable,
-        str(SCRIPTS / "digitize_line_chart.py"),
-        "--input",
-        str(original),
-        "--output-csv",
-        str(data_path),
-        "--report",
-        str(report_path),
-        "--overlay",
-        str(overlay_path),
-        "--x-px-min",
-        str(bounds["left"]),
-        "--x-value-min",
-        str(meta["xlim"][0]),
-        "--x-px-max",
-        str(bounds["right"]),
-        "--x-value-max",
-        str(meta["xlim"][1]),
-        "--y-px-min",
-        str(bounds["top"]),
-        "--y-value-min",
-        str(meta["ylim"][1]),
-        "--y-px-max",
-        str(bounds["bottom"]),
-        "--y-value-max",
-        str(meta["ylim"][0]),
-        "--plot-bounds",
-        f"{round(bounds['left'])},{round(bounds['top'])},{round(bounds['right'])},{round(bounds['bottom'])}",
-        "--sample-values",
-        ",".join(str(value) for value in range(11)),
-        "--series",
-        "red=#d62728",
-        "--series",
-        "gray=#7f7f7f",
-        "--series",
-        "blue=#1f77b4",
-        "--error-color",
-        "#d0d0d0",
-        "--error-tolerance",
-        "18",
-    ]
-    subprocess.run(command, cwd=ROOT, check=True)
-    copy(original, case_dir / "original.png")
+    sys.path.insert(0, str(SCRIPTS))
+    from build_line_gallery_case import build_case
 
-    with data_path.open(newline="", encoding="utf-8") as handle:
-        rows = list(csv.DictReader(handle))
-    extraction = json.loads(report_path.read_text(encoding="utf-8"))
-    figure, axis = standard_axis("Recreated from extracted values", "Sample", "Value")
-    x = [float(row["x"]) for row in rows]
-    for name, marker, linestyle in [("gray", "o", "-"), ("red", "s", "-"), ("blue", "^", "--")]:
-        values = [float(row[name]) if row[name] else np.nan for row in rows]
-        axis.plot(x, values, color=COLORS[name], marker=marker, linestyle=linestyle, linewidth=1.5, label=name)
-    errors = extraction.get("error_bars", [])
-    if errors and all(item.get("status") == "extracted" for item in errors):
-        gray = np.asarray([float(row["gray"]) for row in rows])
-        lower = np.asarray([item["lower"] for item in errors])
-        upper = np.asarray([item["upper"] for item in errors])
-        axis.errorbar(x, gray, yerr=np.vstack([gray - lower, upper - gray]), fmt="none", ecolor="#c8c8c8", capsize=3)
-    axis.set_xlim(-0.3, 10.3)
-    axis.set_ylim(0, 70)
-    axis.legend(frameon=False, ncols=3, fontsize=8)
-    save_clean_figure(figure, case_dir / "recreated.png")
-
-    truth = {
-        "red": [26, 10, 9, 6, 8, 10, 14, 8, 6, 18, 10],
-        "gray": [27, 13, 12, 14, 19, 20, 28, 35, 32, 28, 21],
-        "blue": [40, 33, 25, 32, 35, 30, 43, 44, 37, 37, 40],
-    }
-    errors_numeric = [abs(float(row[name]) - truth[name][index]) for index, row in enumerate(rows) for name in truth]
-    mae = float(np.mean(errors_numeric))
-    return {
-        "id": "line",
-        "title": "折线图",
-        "subtitle": "多系列、标记与可见误差线",
-        "status": "validated_local_stable",
-        "statusLabel": "稳定 · 合成基准",
-        "description": "按已确认的线性坐标与系列颜色，恢复 3 条曲线的 33 个采样值；浅灰误差线只按可见端点解释。",
-        "metrics": [{"label": "点覆盖", "value": "33 / 33"}, {"label": "MAE", "value": f"{mae:.3f}"}],
-        "assets": assets("line"),
-    }
+    canonical_source = OUTPUT / "line" / "original.png"
+    if not canonical_source.is_file():
+        canonical_source = synthetic_dir / "fixtures" / "line_clean.png"
+    return build_case(canonical_source, write_manifest=False)
 
 
 def build_scatter(synthetic_dir: Path) -> dict:
@@ -523,23 +440,17 @@ def build_bar(bar_dir: Path) -> dict:
 
 
 def build_horizontal_bar(bar_dir: Path) -> dict:
-    return build_bar_variant(
-        bar_dir,
-        variant_name="grouped_horizontal_clean",
-        case_id="bar-horizontal",
-        title="横向分组柱",
-        subtitle="横向数值轴与误差区间",
-    )
+    del bar_dir
+    from build_requested_nature_bar_gallery_cases import build_horizontal
+
+    return build_horizontal()
 
 
 def build_stacked_bar(bar_dir: Path) -> dict:
-    return build_bar_variant(
-        bar_dir,
-        variant_name="stacked_vertical_clean",
-        case_id="bar-stacked",
-        title="堆叠柱状图",
-        subtitle="逐段恢复可见高度",
-    )
+    del bar_dir
+    from build_requested_nature_bar_gallery_cases import build_stacked
+
+    return build_stacked()
 
 
 def build_percent_stacked_bar(bar_dir: Path) -> dict:
@@ -604,6 +515,12 @@ def build_percent_stacked_bar(bar_dir: Path) -> dict:
     }
 
 
+def build_pie_case() -> dict:
+    from build_requested_nature_pie_gallery_case import build_case
+
+    return build_case()
+
+
 def build_forest_plot() -> dict:
     return {
         "id": "forest",
@@ -634,14 +551,50 @@ def assets(case_id: str) -> dict:
     }
 
 
+def normalize_recreated_canvases(samples: list[dict]) -> None:
+    """Keep generated recreations on the same pixel canvas as their originals.
+
+    Several benchmark renderers use Matplotlib's tight bounding box, which can
+    change the exported dimensions even when the plotted content is correct.
+    The gallery overlay/compare UI requires an immutable one-to-one canvas.
+    """
+    for sample in samples:
+        sample_assets = sample.get("assets", {})
+        original_rel = sample_assets.get("original")
+        recreated_rel = sample_assets.get("recreated")
+        if not original_rel or not recreated_rel:
+            continue
+        original_path = GALLERY / original_rel
+        recreated_path = GALLERY / recreated_rel
+        if not original_path.is_file() or not recreated_path.is_file():
+            continue
+        with Image.open(original_path) as original, Image.open(recreated_path) as recreated:
+            if recreated.size == original.size:
+                continue
+            resized = recreated.convert("RGB").resize(original.size, Image.Resampling.LANCZOS)
+            resized.save(recreated_path)
+
+
 def build_manifest(samples: list[dict]) -> None:
-    manifest = {
-        "schemaVersion": 1,
-        "generated": date.today().isoformat(),
-        "title": "thu-digitizer Basic Extraction Gallery",
-        "columnLabels": ["原图", "提取覆盖", "数据复现"],
-        "samples": samples,
-        "paperCases": [
+    target = GALLERY / "data" / "basics.json"
+    existing_manifest = {}
+    if target.is_file():
+        existing_manifest = json.loads(target.read_text(encoding="utf-8"))
+
+    generated_by_id = {sample["id"]: sample for sample in samples}
+    merged_samples = []
+    seen = set()
+    for existing in existing_manifest.get("samples", []):
+        case_id = existing["id"]
+        generated = generated_by_id.get(case_id)
+        # Case-specific builders carry richer provenance and pixel geometry.
+        # Keep those fields authoritative while still accepting a newly added
+        # basic sample on a clean checkout.
+        merged_samples.append({**generated, **existing} if generated else existing)
+        seen.add(case_id)
+    merged_samples.extend(sample for sample in samples if sample["id"] not in seen)
+
+    default_paper_cases = [
             {
                 "id": "nature-borneo-edge",
                 "title": "散点 + 模型曲线 + 重叠直方图",
@@ -676,10 +629,20 @@ def build_manifest(samples: list[dict]) -> None:
                     "report": "assets/cases/nature-ribotie-multipanel/report.json",
                 },
             },
-        ],
-        "claimNote": "稳定状态仅指当前仓库中已通过本地基准的专用提取器。柱状图、剂量—反应曲线、论文配对箱线图与校准热力图路线仍为候选；WebPlotDigitizer 尚未进行同输入、同校准与同人工干预条件的比较。",
+        ]
+    manifest = {
+        **existing_manifest,
+        "schemaVersion": 1,
+        "generated": date.today().isoformat(),
+        "title": "thu-digitizer Basic Extraction Gallery",
+        "columnLabels": ["原图", "提取覆盖", "数据复现"],
+        "samples": merged_samples,
+        "paperCases": existing_manifest.get("paperCases", default_paper_cases),
+        "claimNote": existing_manifest.get(
+            "claimNote",
+            "稳定状态仅指当前仓库中已通过本地基准的专用提取器。柱状图、剂量—反应曲线、论文配对箱线图与校准热力图路线仍为候选；WebPlotDigitizer 尚未进行同输入、同校准与同人工干预条件的比较。",
+        ),
     }
-    target = GALLERY / "data" / "basics.json"
     target.write_text(json.dumps(manifest, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
@@ -770,12 +733,14 @@ def main() -> None:
         build_horizontal_bar(bar_dir),
         build_stacked_bar(bar_dir),
         build_percent_stacked_bar(bar_dir),
+        build_pie_case(),
         build_histogram(histogram_dir),
         build_heatmap(),
         build_boxplot(boxplot_dir),
         build_horizontal_boxplot(boxplot_dir),
         build_forest_plot(),
     ]
+    normalize_recreated_canvases(samples)
     build_manifest(samples)
     print(f"BASIC_GALLERY={GALLERY / 'data' / 'basics.json'}")
 

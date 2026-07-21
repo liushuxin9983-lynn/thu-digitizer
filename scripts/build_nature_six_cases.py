@@ -778,19 +778,14 @@ def build_bubble() -> None:
 
 
 def build_upset() -> None:
-    source = TMP / "19006-source" / "Source Data" / "fig2b.tsv"
-    with source.open(encoding="utf-8") as handle:
-        reader = csv.DictReader(handle, delimiter="\t")
-        counts: dict[tuple[int, int, int, int], int] = {}
-        for row in reader:
-            mask = tuple(int(row[f"FunC_{i}"]) for i in range(1, 5))
-            counts[mask] = counts.get(mask, 0) + 1
-    ordered = sorted(counts.items(), key=lambda item: (-item[1], item[0]))
-    rows = []
-    for index, (mask, count) in enumerate(ordered):
-        rows.append({"intersection": index + 1, "combination": "+".join(f"FunC-{i + 1}" for i, bit in enumerate(mask) if bit) or "none", "count": count, "FunC_1": mask[0], "FunC_2": mask[1], "FunC_3": mask[2], "FunC_4": mask[3], "value_status": "official_source_mapped"})
-    report = {"status": "source_mapped", "route": "official_source_data_mapped", "source_file": "Source Data/fig2b.tsv", "panel_mapping": "Fig. 2b intersection bars are grouped by the four FunC columns; count is unique KO annotation count", "rows": len(rows), "pixel_extraction": "not_run", "limitations": ["The original panel contains an UpSet matrix and inset; the interactive chart focuses on the intersection counts and membership matrix."]}
-    make_case("nature-19006-fig2b", "nature-19006-fig2.png", (0, 650, 1200, 1295), "upset", rows, report)
+    """Rebuild Fig. 2b through the canonical original-pixel UpSet audit."""
+
+    try:
+        from build_upset_gallery_cases import build_case_19006
+    except ImportError:  # pragma: no cover - package-style invocation
+        from .build_upset_gallery_cases import build_case_19006
+
+    build_case_19006()
 
 
 def build_lines() -> None:

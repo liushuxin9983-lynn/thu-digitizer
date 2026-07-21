@@ -1,11 +1,13 @@
 {
   "schema_version": 1,
-  "status": "needs_chart_type_confirmation",
+  "status": "needs_verified_configuration",
   "source": {
     "input_file": "F:\\AI\\thu-digitizer\\gallery\\assets\\cases\\nature-19006-fig2b\\original.png",
     "sha256": "e7c1dbef62958ed5a8ceb035c0ba3020052e6dcd8248ff7af96c2236ecfb05f8",
     "media_kind": "raster",
     "coordinate_space": "pixel",
+    "measurement_space": "original_raster_pixels",
+    "resampling_applied": false,
     "width": 1200,
     "height": 645,
     "page": null
@@ -27,33 +29,78 @@
         645
       ],
       "plot_bounds_verification": "proposed",
-      "chart_type": "unknown",
-      "chart_type_verification": "missing",
-      "coordinate_model": "unknown",
-      "coordinate_model_verification": "missing",
-      "axes": [],
+      "chart_type": "upset",
+      "chart_type_verification": "user_provided",
+      "coordinate_model": "lattice_composite",
+      "coordinate_model_verification": "proposed",
+      "axes": [
+        {
+          "axis_id": "column",
+          "orientation": "column",
+          "scale": "categorical",
+          "verification": "missing",
+          "anchors": []
+        },
+        {
+          "axis_id": "row",
+          "orientation": "row",
+          "scale": "categorical",
+          "verification": "missing",
+          "anchors": []
+        },
+        {
+          "axis_id": "column_value",
+          "orientation": "y",
+          "scale": "linear",
+          "verification": "missing",
+          "anchors": []
+        },
+        {
+          "axis_id": "row_value",
+          "orientation": "x",
+          "scale": "linear",
+          "verification": "missing",
+          "anchors": []
+        }
+      ],
       "series": [],
       "mark_grammars": [
-        "unknown"
+        "aligned_bar",
+        "row_bar",
+        "membership_cell",
+        "connector",
+        "categorical_strip"
       ],
       "route": {
-        "route_id": "unknown_refuse",
-        "maturity": "refusal",
-        "implementation": null,
-        "automated_extraction": false
+        "route_id": "raster_lattice_composite_candidate",
+        "maturity": "candidate",
+        "implementation": "scripts/candidate_digitize_lattice_composite.py",
+        "automated_extraction": true
       },
       "required_confirmations": [
-        "chart_type",
-        "coordinate_model",
-        "recoverable_representation"
+        "original_raster",
+        "panel_roi",
+        "layer_grammar",
+        "column_bar_color",
+        "row_bar_color",
+        "node_color",
+        "semantic_labels",
+        "row_value_axis",
+        "overlay_review"
       ],
       "confirmations": {
-        "chart_type": "missing",
-        "coordinate_model": "missing",
-        "recoverable_representation": "missing"
+        "original_raster": "missing",
+        "panel_roi": "missing",
+        "layer_grammar": "missing",
+        "column_bar_color": "missing",
+        "row_bar_color": "missing",
+        "node_color": "missing",
+        "semantic_labels": "missing",
+        "row_value_axis": "missing",
+        "overlay_review": "missing"
       },
-      "recoverable": "Input metadata and routing diagnostics only.",
-      "non_recoverable": "All numeric values until the chart grammar and coordinate model are verified."
+      "recoverable": "Original-pixel repeated bar geometry, complete active/inactive/ambiguous cell classification, and independently validated visible values when supplied.",
+      "non_recoverable": "Hidden records, occluded cells, unverified text, and meanings not visibly encoded by the aligned layers."
     }
   ],
   "evidence_contract": {

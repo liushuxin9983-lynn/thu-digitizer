@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-20",
+  "generated": "2026-07-21",
   "title": "thu-digitizer Basic Extraction Gallery",
   "columnLabels": [
     "原图",
@@ -10,18 +10,22 @@
   "samples": [
     {
       "id": "line",
-      "title": "折线图",
-      "subtitle": "多系列、标记与可见误差线",
+      "title": "折线散点图",
+      "subtitle": "三个语义系列、标记与可见误差线",
       "status": "validated_local_stable",
       "statusLabel": "稳定 · 合成基准",
-      "description": "按已确认的线性坐标与系列颜色，恢复 3 条曲线的 33 个采样值；浅灰误差线只按可见端点解释。",
+      "description": "从附件原始像素中恢复 biodiversity、economic language 与 context 的 33 个采样点，并单独记录 11 组浅灰误差线可见端点。",
       "metrics": [
         {
           "label": "点覆盖",
           "value": "33 / 33"
         },
         {
-          "label": "MAE",
+          "label": "误差线",
+          "value": "11 / 11"
+        },
+        {
+          "label": "验证 MAE",
           "value": "0.221"
         }
       ],
@@ -31,6 +35,18 @@
         "recreated": "assets/basics/line/recreated.png",
         "data": "assets/basics/line/data.csv",
         "report": "assets/basics/line/report.json"
+      },
+      "styleSpec": {
+        "renderer": "paper-native-geometry",
+        "fidelity": "evidence_backed_style_reconstruction",
+        "label": "原图像素提取 · 交互命中",
+        "note": "复现底图来自提取值；悬停点读取 data.csv 中的坐标、像素证据与可见误差端点。",
+        "canvas": {
+          "width": 600,
+          "height": 400
+        },
+        "fontFamily": "DejaVu Sans, Arial, sans-serif",
+        "rasterEvidenceInteractive": true
       }
     },
     {
@@ -50,11 +66,6 @@
           "value": "可见像素"
         }
       ],
-      "articleUrl": "https://www.nature.com/articles/s41467-019-09789-4",
-      "journal": "Nature Communications",
-      "articleTitle": "Bayesian nonparametric models characterize instantaneous strategies in a competitive dynamic game",
-      "figure": "Fig. 4a",
-      "figureUrl": "https://www.nature.com/articles/s41467-019-09789-4/figures/4",
       "assets": {
         "original": "assets/cases/nature-09789-fig4a/original.png",
         "overlay": "assets/cases/nature-09789-fig4a/overlay.png",
@@ -62,6 +73,11 @@
         "data": "assets/cases/nature-09789-fig4a/data.csv",
         "report": "assets/cases/nature-09789-fig4a/report.json"
       },
+      "articleUrl": "https://www.nature.com/articles/s41467-019-09789-4",
+      "journal": "Nature Communications",
+      "articleTitle": "Bayesian nonparametric models characterize instantaneous strategies in a competitive dynamic game",
+      "figure": "Fig. 4a",
+      "figureUrl": "https://www.nature.com/articles/s41467-019-09789-4/figures/4",
       "styleSpec": {
         "renderer": "paper-native-geometry",
         "fidelity": "visible_geometry_candidate",
@@ -1139,10 +1155,6 @@
         }
       ],
       "articleUrl": "https://www.nature.com/articles/s41467-026-71361-8",
-      "journal": "Nature Communications",
-      "articleTitle": "Molecular mechanisms of native ligand selectivity in catecholamine G protein-coupled receptors",
-      "figure": "Fig. 4d",
-      "figureUrl": "https://www.nature.com/articles/s41467-026-71361-8/figures/4",
       "assets": {
         "original": "assets/cases/nature-kahlous-dose-response/original.png",
         "overlay": "assets/cases/nature-kahlous-dose-response/overlay.png",
@@ -1150,6 +1162,15 @@
         "data": "assets/cases/nature-kahlous-dose-response/data-image-extracted.csv",
         "report": "assets/cases/nature-kahlous-dose-response/report.json"
       },
+      "evidence": {
+        "visibleMarkers": 21,
+        "visibleErrorBars": 14,
+        "tracedCurves": 3
+      },
+      "journal": "Nature Communications",
+      "articleTitle": "Molecular mechanisms of native ligand selectivity in catecholamine G protein-coupled receptors",
+      "figure": "Fig. 4d",
+      "figureUrl": "https://www.nature.com/articles/s41467-026-71361-8/figures/4",
       "interactiveLayers": {
         "curves": "assets/cases/nature-kahlous-dose-response/curves.csv"
       },
@@ -1211,11 +1232,6 @@
             "marker": "circle"
           }
         }
-      },
-      "evidence": {
-        "visibleMarkers": 21,
-        "visibleErrorBars": 14,
-        "tracedCurves": 3
       }
     },
     {
@@ -1236,10 +1252,6 @@
         }
       ],
       "articleUrl": "https://www.nature.com/articles/s41467-026-68864-9",
-      "journal": "Nature Communications",
-      "articleTitle": "Integrative epigenomic landscape of Alzheimer’s Disease brains reveals oligodendrocyte molecular perturbations associated with tau",
-      "figure": "Fig. 2b",
-      "figureUrl": "https://www.nature.com/articles/s41467-026-68864-9/figures/2",
       "assets": {
         "original": "assets/cases/nature-oatman-grouped-bar/original.png",
         "overlay": "assets/cases/nature-oatman-grouped-bar/overlay.png",
@@ -1247,6 +1259,10 @@
         "data": "assets/cases/nature-oatman-grouped-bar/data.csv",
         "report": "assets/cases/nature-oatman-grouped-bar/report.json"
       },
+      "journal": "Nature Communications",
+      "articleTitle": "Integrative epigenomic landscape of Alzheimer’s Disease brains reveals oligodendrocyte molecular perturbations associated with tau",
+      "figure": "Fig. 2b",
+      "figureUrl": "https://www.nature.com/articles/s41467-026-68864-9/figures/2",
       "styleSpec": {
         "renderer": "paper-grouped-bar",
         "fidelity": "evidence_backed_style_reconstruction",
@@ -1290,52 +1306,84 @@
     },
     {
       "id": "bar-horizontal",
-      "title": "横向分组柱",
-      "subtitle": "横向数值轴与误差区间",
-      "status": "candidate",
-      "statusLabel": "候选 · 仅合成基准",
-      "description": "候选引擎已在确定性基准中恢复 8 个矩形与可见区间；尚未完成真实矢量、真实栅格和同条件 WPD 对比。",
+      "title": "横向发散柱状图",
+      "subtitle": "双面板均值与 Bootstrap 区间",
+      "status": "partial_visible",
+      "statusLabel": "部分可见提取 · 13/16",
+      "description": "从 Nature Communications Fig. 8a 的原始像素恢复两组发散横柱及区间；3 个被黑色区间线切断的浅色柱保留为未提取。",
       "metrics": [
         {
-          "label": "柱覆盖",
-          "value": "8 / 8"
+          "label": "授权柱",
+          "value": "13 / 16"
         },
         {
-          "label": "数值 MAE",
-          "value": "0.009"
+          "label": "区间覆盖",
+          "value": "13 / 13"
         }
       ],
+      "journal": "Nature Communications",
+      "figure": "Fig. 8a",
+      "articleTitle": "Climate response to Nature Future scenarios in a regional Earth System Model",
+      "articleUrl": "https://www.nature.com/articles/s41467-026-70284-8",
+      "figureUrl": "https://www.nature.com/articles/s41467-026-70284-8/figures/8",
+      "styleSpec": {
+        "renderer": "paper-native-geometry",
+        "fidelity": "visible_geometry_candidate",
+        "label": "论文原生画布 · 部分可见提取",
+        "note": "复现只绘制 13 个授权柱及其可见 Bootstrap 区间；橙色叉号对应 3 个未授权槽位。",
+        "canvas": {
+          "width": 2001,
+          "height": 360
+        },
+        "rasterEvidenceInteractive": true
+      },
       "assets": {
-        "original": "assets/basics/bar-horizontal/original.png",
-        "overlay": "assets/basics/bar-horizontal/overlay.png",
-        "recreated": "assets/basics/bar-horizontal/recreated.png",
-        "data": "assets/basics/bar-horizontal/data.csv",
-        "report": "assets/basics/bar-horizontal/report.json"
+        "original": "assets/cases/nature-70284-fig8a/original.png",
+        "overlay": "assets/cases/nature-70284-fig8a/overlay.png",
+        "recreated": "assets/cases/nature-70284-fig8a/recreated.png",
+        "data": "assets/cases/nature-70284-fig8a/data.csv",
+        "report": "assets/cases/nature-70284-fig8a/report.json"
       }
     },
     {
       "id": "bar-stacked",
-      "title": "堆叠柱状图",
-      "subtitle": "逐段恢复可见高度",
-      "status": "candidate",
-      "statusLabel": "候选 · 仅合成基准",
-      "description": "候选引擎已在确定性基准中恢复 8 个矩形与可见区间；尚未完成真实矢量、真实栅格和同条件 WPD 对比。",
+      "title": "百分比堆叠柱状图",
+      "subtitle": "三中心古菌属组成",
+      "status": "low_confidence",
+      "statusLabel": "低置信候选 · 29/33",
+      "description": "从 Nature Communications Fig. 1b 恢复 29 个可见堆叠段；4 个未检出槽位保留为空，整例维持低置信候选而不宣称数值已授权。",
       "metrics": [
         {
-          "label": "柱覆盖",
-          "value": "12 / 12"
+          "label": "可见候选段",
+          "value": "29 / 33"
         },
         {
-          "label": "数值 MAE",
-          "value": "0.241"
+          "label": "缺失保持",
+          "value": "4"
         }
       ],
+      "journal": "Nature Communications",
+      "figure": "Fig. 1b",
+      "articleTitle": "Clinical NEC prevention practices drive different microbiome profiles and functional responses in the preterm intestine",
+      "articleUrl": "https://www.nature.com/articles/s41467-023-36825-1",
+      "figureUrl": "https://www.nature.com/articles/s41467-023-36825-1/figures/1",
+      "styleSpec": {
+        "renderer": "paper-native-geometry",
+        "fidelity": "visible_geometry_candidate",
+        "label": "论文原生画布 · 低置信候选",
+        "note": "透明命中层展示 29 个可见候选段；4 个未检出槽位不会被补零或由源数据回填。",
+        "canvas": {
+          "width": 709,
+          "height": 600
+        },
+        "rasterEvidenceInteractive": true
+      },
       "assets": {
-        "original": "assets/basics/bar-stacked/original.png",
-        "overlay": "assets/basics/bar-stacked/overlay.png",
-        "recreated": "assets/basics/bar-stacked/recreated.png",
-        "data": "assets/basics/bar-stacked/data.csv",
-        "report": "assets/basics/bar-stacked/report.json"
+        "original": "assets/cases/nature-36825-fig1b/original.png",
+        "overlay": "assets/cases/nature-36825-fig1b/overlay.png",
+        "recreated": "assets/cases/nature-36825-fig1b/recreated.png",
+        "data": "assets/cases/nature-36825-fig1b/data.csv",
+        "report": "assets/cases/nature-36825-fig1b/report.json"
       }
     },
     {
@@ -1361,6 +1409,47 @@
         "recreated": "assets/basics/bar-percent-stacked/recreated.png",
         "data": "assets/basics/bar-percent-stacked/data.csv",
         "report": "assets/basics/bar-percent-stacked/report.json"
+      }
+    },
+    {
+      "id": "pie",
+      "title": "环形饼图 / Donut",
+      "subtitle": "四组可见百分比标签",
+      "status": "partial_visible",
+      "statusLabel": "部分可见提取 · 18 标签",
+      "description": "从 Nature Communications Fig. 1f 提取四个 donut 上明确印出的 18 个百分比；原标签和不强制补到 100，扇区角度仅作案例级验证。",
+      "metrics": [
+        {
+          "label": "可见标签",
+          "value": "18 / 18"
+        },
+        {
+          "label": "几何验证 MAE",
+          "value": "0.596 pp"
+        }
+      ],
+      "journal": "Nature Communications",
+      "figure": "Fig. 1f",
+      "articleTitle": "Driver gene combinations dictate cutaneous squamous cell carcinoma disease continuum progression",
+      "articleUrl": "https://www.nature.com/articles/s41467-023-40822-9",
+      "figureUrl": "https://www.nature.com/articles/s41467-023-40822-9/figures/1",
+      "styleSpec": {
+        "renderer": "paper-native-geometry",
+        "fidelity": "visible_geometry_candidate",
+        "label": "论文原生画布 · 可见标签提取",
+        "note": "交互命中层对应 18 个印刷标签；显示值保持原样，环形角度按组内可见值重建但不替代原值。",
+        "canvas": {
+          "width": 1025,
+          "height": 215
+        },
+        "rasterEvidenceInteractive": true
+      },
+      "assets": {
+        "original": "assets/cases/nature-40822-fig1f/original.png",
+        "overlay": "assets/cases/nature-40822-fig1f/overlay.png",
+        "recreated": "assets/cases/nature-40822-fig1f/recreated.png",
+        "data": "assets/cases/nature-40822-fig1f/data.csv",
+        "report": "assets/cases/nature-40822-fig1f/report.json"
       }
     },
     {
@@ -1406,10 +1495,6 @@
         }
       ],
       "articleUrl": "https://www.nature.com/articles/s41591-026-04303-y",
-      "journal": "Nature Medicine",
-      "articleTitle": "A deep joint-learning proteomics model for diagnosis of six conditions associated with dementia",
-      "figure": "Fig. 4c",
-      "figureUrl": "https://www.nature.com/articles/s41591-026-04303-y/figures/4",
       "assets": {
         "original": "assets/cases/nature-protaide-heatmap/original.png",
         "overlay": "assets/cases/nature-protaide-heatmap/overlay.png",
@@ -1417,6 +1502,10 @@
         "data": "assets/cases/nature-protaide-heatmap/data.csv",
         "report": "assets/cases/nature-protaide-heatmap/report.json"
       },
+      "journal": "Nature Medicine",
+      "articleTitle": "A deep joint-learning proteomics model for diagnosis of six conditions associated with dementia",
+      "figure": "Fig. 4c",
+      "figureUrl": "https://www.nature.com/articles/s41591-026-04303-y/figures/4",
       "styleSpec": {
         "renderer": "paper-heatmap",
         "fidelity": "evidence_backed_style_reconstruction",
@@ -1466,10 +1555,6 @@
         }
       ],
       "articleUrl": "https://www.nature.com/articles/s41591-026-04303-y",
-      "journal": "Nature Medicine",
-      "articleTitle": "A deep joint-learning proteomics model for diagnosis of six conditions associated with dementia",
-      "figure": "Fig. 4b",
-      "figureUrl": "https://www.nature.com/articles/s41591-026-04303-y/figures/4",
       "assets": {
         "original": "assets/cases/nature-protaide-boxplot/original.png",
         "overlay": "assets/cases/nature-protaide-boxplot/overlay.png",
@@ -1477,6 +1562,10 @@
         "data": "assets/cases/nature-protaide-boxplot/data.csv",
         "report": "assets/cases/nature-protaide-boxplot/report.json"
       },
+      "journal": "Nature Medicine",
+      "articleTitle": "A deep joint-learning proteomics model for diagnosis of six conditions associated with dementia",
+      "figure": "Fig. 4b",
+      "figureUrl": "https://www.nature.com/articles/s41591-026-04303-y/figures/4",
       "styleSpec": {
         "renderer": "paper-boxplot",
         "fidelity": "evidence_backed_style_reconstruction",
@@ -1983,6 +2072,90 @@
       }
     },
     {
+      "id": "nature-19006-fig2b",
+      "title": "UpSet 复合图",
+      "subtitle": "Functional intersections across four FunC sets",
+      "status": "visible_geometry_candidate",
+      "statusLabel": "真实图 · 原像素候选",
+      "description": "从原图恢复 15 个交集柱、4×15 成员格阵和 32 个激活节点；独立 inset 仅用于显示由可见交集推导的集合总量。",
+      "metrics": [
+        {
+          "label": "visible intersections",
+          "value": "15"
+        },
+        {
+          "label": "active membership nodes",
+          "value": "32"
+        }
+      ],
+      "journal": "Nature Communications",
+      "articleTitle": "Integration of time-series meta-omics data reveals how microbial ecosystems respond to disturbance",
+      "articleUrl": "https://www.nature.com/articles/s41467-020-19006-2",
+      "figure": "Fig. 2b",
+      "figureUrl": "https://www.nature.com/articles/s41467-020-19006-2/figures/2",
+      "assets": {
+        "original": "assets/cases/nature-19006-fig2b/original.png",
+        "overlay": "assets/cases/nature-19006-fig2b/overlay.png",
+        "recreated": "assets/cases/nature-19006-fig2b/recreated.png",
+        "data": "assets/cases/nature-19006-fig2b/data-image-extracted.csv",
+        "report": "assets/cases/nature-19006-fig2b/report.json"
+      },
+      "styleSpec": {
+        "renderer": "paper-visible-upset",
+        "rasterEvidenceInteractive": true,
+        "fidelity": "visible_geometry_candidate",
+        "label": "Original-pixel lattice recreation",
+        "note": "交互层复用同尺寸复现底图；命中区域直接来自原图像素 CSV。",
+        "canvas": {
+          "width": 1200,
+          "height": 645
+        },
+        "fontFamily": "Arial, Helvetica, sans-serif"
+      }
+    },
+    {
+      "id": "nature-28348-fig7",
+      "title": "UpSet 复合图",
+      "subtitle": "Therapeutic-match intersections across samples",
+      "status": "visible_geometry_candidate",
+      "statusLabel": "真实图 · 原像素候选",
+      "description": "从原图恢复 12 个交集、5×12 成员格阵和 40 个多色激活节点；工作簿只作为独立验证。",
+      "metrics": [
+        {
+          "label": "visible intersections",
+          "value": "12"
+        },
+        {
+          "label": "active membership nodes",
+          "value": "40"
+        }
+      ],
+      "journal": "Nature Communications",
+      "articleTitle": "A platform for oncogenomic reporting and interpretation",
+      "articleUrl": "https://www.nature.com/articles/s41467-022-28348-y",
+      "figure": "Fig. 7",
+      "figureUrl": "https://www.nature.com/articles/s41467-022-28348-y/figures/7",
+      "assets": {
+        "original": "assets/cases/nature-28348-fig7/original.png",
+        "overlay": "assets/cases/nature-28348-fig7/overlay.png",
+        "recreated": "assets/cases/nature-28348-fig7/recreated.png",
+        "data": "assets/cases/nature-28348-fig7/data-image-extracted.csv",
+        "report": "assets/cases/nature-28348-fig7/report.json"
+      },
+      "styleSpec": {
+        "renderer": "paper-visible-upset",
+        "rasterEvidenceInteractive": true,
+        "fidelity": "visible_geometry_candidate",
+        "label": "Original-pixel lattice recreation",
+        "note": "交互层复用同尺寸复现底图；命中区域直接来自原图像素 CSV。",
+        "canvas": {
+          "width": 1000,
+          "height": 768
+        },
+        "fontFamily": "Arial, Helvetica, sans-serif"
+      }
+    },
+    {
       "id": "nature-27341-fig1",
       "title": "UpSet 复合图",
       "subtitle": "Mutation intersections across samples",
@@ -1997,6 +2170,10 @@
         {
           "label": "visible sets",
           "value": "19"
+        },
+        {
+          "label": "active membership nodes",
+          "value": "42"
         }
       ],
       "articleUrl": "https://www.nature.com/articles/s41467-021-27341-1",
@@ -2022,26 +2199,43 @@
         },
         "fontFamily": "Arial, Helvetica, sans-serif",
         "layout": {
-          "left": 467,
-          "right": 1607,
-          "barsTop": 129,
-          "barsBottom": 964,
-          "matrixTop": 992,
-          "matrixBottom": 1510,
-          "leftBarsRight": 360,
-          "leftBarsWidth": 330
+          "left": 519,
+          "right": 1803,
+          "barsTop": 148,
+          "barsBottom": 1086,
+          "matrixTop": 1119,
+          "matrixBottom": 1499,
+          "leftBarsRight": 400,
+          "leftBarsWidth": 368,
+          "typeStripX": 1811,
+          "typeStripWidth": 42,
+          "typeTextX": 1877
         },
         "setBarColor": "#59b5e7",
+        "typeColors": {
+          "LCNEC": "#1b9e77",
+          "LUAD": "#d95f02",
+          "LUSC": "#7570b3",
+          "NSCLC-NOS": "#e7298a",
+          "SCLC": "#66a61e"
+        },
         "yTickStep": 300,
-        "barWidth": 28,
-        "activeRadius": 10,
-        "inactiveRadius": 10,
-        "setBarHeight": 22,
+        "leftTicks": [
+          1250,
+          1000,
+          750,
+          500,
+          250,
+          0
+        ],
+        "barWidth": 25,
+        "activeRadius": 8.5,
+        "inactiveRadius": 8.2,
+        "setBarHeight": 11,
         "setFontSize": 20,
-        "totalFontSize": 18,
-        "countFontSize": 22,
+        "countFontSize": 21,
         "yLabel": "number of mutations shared",
-        "yLabelX": 366,
+        "yLabelX": 411,
         "yLabelSize": 27
       },
       "validationDataUrl": "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-021-27341-1/MediaObjects/41467_2021_27341_MOESM10_ESM.xlsx"

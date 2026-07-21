@@ -15,6 +15,8 @@ def base_spec():
         "source": {
             "media_kind": "raster",
             "coordinate_space": "pixel",
+            "measurement_space": "original_raster_pixels",
+            "resampling_applied": False,
             "width": 640,
             "height": 480,
             "sha256": "0" * 64,
@@ -97,6 +99,11 @@ class FigureSpecTests(unittest.TestCase):
         spec["panels"][0]["confirmations"]["x_axis"] = "proposed"
         errors = validate_figure_spec(spec)
         self.assertTrue(any("x_axis" in error and "must be verified" in error for error in errors))
+
+    def test_rejects_resampled_raster_measurement_contract(self):
+        spec = base_spec()
+        spec["source"]["resampling_applied"] = True
+        self.assertTrue(any("resampling_applied" in error for error in validate_figure_spec(spec)))
 
 
 if __name__ == "__main__":

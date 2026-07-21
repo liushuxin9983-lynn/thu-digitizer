@@ -1,0 +1,619 @@
+{
+  "schema_version": 1,
+  "status": "partial_visible",
+  "numeric_output_authorized": true,
+  "numeric_authorization_scope": "18 explicitly visible percentage labels only",
+  "algorithm": "case_local_visible_label_donut_geometry",
+  "algorithm_version": "0.1.0",
+  "deterministic_run_id": "1f97c466f4e464e3",
+  "input": {
+    "file": "figure1-original.png",
+    "sha256": "4dd50564058d2823dfe740ec3df49d6f451088cebd402b51d9890fdfc3282e46",
+    "width": 2050,
+    "height": 1399,
+    "coordinate_space": "original_raster_pixels",
+    "resampled_for_measurement": false,
+    "official_url": "https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41467-023-40822-9/MediaObjects/41467_2023_40822_Fig1_HTML.png"
+  },
+  "panel": {
+    "id": "Fig.1f",
+    "bounds_original_px": [
+      1000,
+      420,
+      2025,
+      635
+    ],
+    "verified": true
+  },
+  "preflight": {
+    "route_id": "unsupported_coordinate_route",
+    "maturity": "not_implemented_or_case_only",
+    "registered_automated_extraction": false,
+    "preflight_numeric_authorized": false
+  },
+  "recoverable_representation": {
+    "primary": "visible percentage labels keyed by donut group and visibly mapped sector colour",
+    "validation_only": "normalized annular colour-sector geometry",
+    "not_recoverable": [
+      "individual-sample CIBERSORTx proportions",
+      "an unlabeled absolute percentage for a sector not visibly printed",
+      "the aggregation statistic used to form the donut labels",
+      "raw cells or counts underlying the proportions"
+    ]
+  },
+  "visible_label_extraction": {
+    "method": "manual double transcription from official full-size raster, checked against official PDF page 3 rendering",
+    "requested_label_count": 18,
+    "recovered_label_count": 18,
+    "coverage": 1.0,
+    "per_group_counts": {
+      "Normal": 4,
+      "AK": 5,
+      "Primary": 4,
+      "MET": 5
+    },
+    "group_label_sums_percent": {
+      "Normal": 97.5,
+      "AK": 90.60000000000001,
+      "Primary": 70.30000000000001,
+      "MET": 73.6
+    },
+    "important_semantics": "The printed values do not all sum to 100; rendered sector angles are proportional to the within-donut sum rather than interpreted as omitted percentages."
+  },
+  "sector_geometry_validation": {
+    "numeric_output_authorized": false,
+    "role": "case-local validation only; not a registered pie/donut extractor",
+    "parameters": {
+      "panel_box_original_px": [
+        1000,
+        420,
+        2025,
+        635
+      ],
+      "donuts": {
+        "Normal": {
+          "center": [
+            1169,
+            535
+          ],
+          "radial_band": [
+            52,
+            65
+          ]
+        },
+        "AK": {
+          "center": [
+            1405,
+            536
+          ],
+          "radial_band": [
+            52,
+            65
+          ]
+        },
+        "Primary": {
+          "center": [
+            1645,
+            535
+          ],
+          "radial_band": [
+            52,
+            65
+          ]
+        },
+        "MET": {
+          "center": [
+            1860,
+            535
+          ],
+          "radial_band": [
+            52,
+            65
+          ]
+        }
+      },
+      "palette": {
+        "TSK": {
+          "rgb": [
+            239,
+            102,
+            51
+          ],
+          "hex": "#ef6633",
+          "pdf_hex": "#ee6632"
+        },
+        "Tumor_KC_Diff": {
+          "rgb": [
+            121,
+            154,
+            185
+          ],
+          "hex": "#799ab9",
+          "pdf_hex": "#7899b8"
+        },
+        "Tumor_KC_Basal": {
+          "rgb": [
+            84,
+            202,
+            245
+          ],
+          "hex": "#54caf5",
+          "pdf_hex": "#58caf5"
+        },
+        "Tumor_KC_Cyc": {
+          "rgb": [
+            157,
+            204,
+            128
+          ],
+          "hex": "#9dcc80",
+          "pdf_hex": "#9cca7f"
+        },
+        "Normal_KC_Cyc": {
+          "rgb": [
+            207,
+            223,
+            231
+          ],
+          "hex": "#cfdfe7",
+          "pdf_hex": "#cddde6"
+        },
+        "Normal_KC_Basal": {
+          "rgb": [
+            241,
+            169,
+            62
+          ],
+          "hex": "#f1a93e",
+          "pdf_hex": "#f0a83f"
+        },
+        "Normal_KC_Diff": {
+          "rgb": [
+            246,
+            199,
+            79
+          ],
+          "hex": "#f6c74f",
+          "pdf_hex": "#f5c64f"
+        }
+      },
+      "angle_samples": 7200,
+      "rgb_tolerance": 20.0,
+      "minimum_sector_share_percent": 0.5
+    },
+    "results": {
+      "Normal": {
+        "center": [
+          1169,
+          535
+        ],
+        "radial_band": [
+          52,
+          65
+        ],
+        "angle_samples": 7200,
+        "tolerance_rgb_euclidean": 20.0,
+        "minimum_sector_share_percent": 0.5,
+        "initial_classified_coverage": 0.9698611111111111,
+        "accepted_classified_coverage": 0.9698611111111111,
+        "sectors": [
+          {
+            "cell_type": "TSK",
+            "color_hex": "#ef6633",
+            "classified_angle_count": 138,
+            "geometry_share_percent": 1.9762279822425892,
+            "mid_angle_deg_image": 44.12500000000001,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Tumor_KC_Basal",
+            "color_hex": "#54caf5",
+            "classified_angle_count": 1323,
+            "geometry_share_percent": 18.946011742803954,
+            "mid_angle_deg_image": 5.300000000000011,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Tumor_KC_Cyc",
+            "color_hex": "#9dcc80",
+            "classified_angle_count": 1128,
+            "geometry_share_percent": 16.153515680939424,
+            "mid_angle_deg_image": -58.725,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Normal_KC_Diff",
+            "color_hex": "#f6c74f",
+            "classified_angle_count": 4394,
+            "geometry_share_percent": 62.924244594014034,
+            "mid_angle_deg_image": 159.72500000000002,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          }
+        ],
+        "rejected_support": [],
+        "status": "geometry_measured_validation_only"
+      },
+      "AK": {
+        "center": [
+          1405,
+          536
+        ],
+        "radial_band": [
+          52,
+          65
+        ],
+        "angle_samples": 7200,
+        "tolerance_rgb_euclidean": 20.0,
+        "minimum_sector_share_percent": 0.5,
+        "initial_classified_coverage": 0.9641666666666666,
+        "accepted_classified_coverage": 0.9619444444444445,
+        "sectors": [
+          {
+            "cell_type": "TSK",
+            "color_hex": "#ef6633",
+            "classified_angle_count": 523,
+            "geometry_share_percent": 7.551256136298007,
+            "mid_angle_deg_image": 62.45000000000001,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Tumor_KC_Diff",
+            "color_hex": "#799ab9",
+            "classified_angle_count": 669,
+            "geometry_share_percent": 9.659254981230147,
+            "mid_angle_deg_image": -71.95,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Tumor_KC_Basal",
+            "color_hex": "#54caf5",
+            "classified_angle_count": 1726,
+            "geometry_share_percent": 24.92058908460872,
+            "mid_angle_deg_image": 3.675000000000011,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Tumor_KC_Cyc",
+            "color_hex": "#9dcc80",
+            "classified_angle_count": 213,
+            "geometry_share_percent": 3.0753681778804505,
+            "mid_angle_deg_image": -47.09999999999999,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Normal_KC_Diff",
+            "color_hex": "#f6c74f",
+            "classified_angle_count": 3795,
+            "geometry_share_percent": 54.79353161998267,
+            "mid_angle_deg_image": 172.9,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          }
+        ],
+        "rejected_support": [
+          {
+            "cell_type": "Normal_KC_Cyc",
+            "angle_count": 16,
+            "full_circle_share_percent": 0.2222222222222222,
+            "reason": "below_minimum_sector_share"
+          }
+        ],
+        "status": "geometry_measured_validation_only"
+      },
+      "Primary": {
+        "center": [
+          1645,
+          535
+        ],
+        "radial_band": [
+          52,
+          65
+        ],
+        "angle_samples": 7200,
+        "tolerance_rgb_euclidean": 20.0,
+        "minimum_sector_share_percent": 0.5,
+        "initial_classified_coverage": 0.9720833333333333,
+        "accepted_classified_coverage": 0.9701388888888889,
+        "sectors": [
+          {
+            "cell_type": "TSK",
+            "color_hex": "#ef6633",
+            "classified_angle_count": 1641,
+            "geometry_share_percent": 23.493199713672155,
+            "mid_angle_deg_image": 175.10000000000002,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Tumor_KC_Diff",
+            "color_hex": "#799ab9",
+            "classified_angle_count": 2596,
+            "geometry_share_percent": 37.16535433070866,
+            "mid_angle_deg_image": -23.77499999999999,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Tumor_KC_Basal",
+            "color_hex": "#54caf5",
+            "classified_angle_count": 1763,
+            "geometry_share_percent": 25.239799570508232,
+            "mid_angle_deg_image": 87.75000000000001,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Normal_KC_Diff",
+            "color_hex": "#f6c74f",
+            "classified_angle_count": 985,
+            "geometry_share_percent": 14.101646385110952,
+            "mid_angle_deg_image": -116.85000000000001,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          }
+        ],
+        "rejected_support": [
+          {
+            "cell_type": "Normal_KC_Cyc",
+            "angle_count": 14,
+            "full_circle_share_percent": 0.19444444444444445,
+            "reason": "below_minimum_sector_share"
+          }
+        ],
+        "status": "geometry_measured_validation_only"
+      },
+      "MET": {
+        "center": [
+          1860,
+          535
+        ],
+        "radial_band": [
+          52,
+          65
+        ],
+        "angle_samples": 7200,
+        "tolerance_rgb_euclidean": 20.0,
+        "minimum_sector_share_percent": 0.5,
+        "initial_classified_coverage": 0.9747222222222223,
+        "accepted_classified_coverage": 0.9722222222222222,
+        "sectors": [
+          {
+            "cell_type": "TSK",
+            "color_hex": "#ef6633",
+            "classified_angle_count": 3703,
+            "geometry_share_percent": 52.9,
+            "mid_angle_deg_image": 135.00000000000003,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Tumor_KC_Diff",
+            "color_hex": "#799ab9",
+            "classified_angle_count": 657,
+            "geometry_share_percent": 9.385714285714286,
+            "mid_angle_deg_image": -73.14999999999999,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Tumor_KC_Basal",
+            "color_hex": "#54caf5",
+            "classified_angle_count": 1907,
+            "geometry_share_percent": 27.242857142857144,
+            "mid_angle_deg_image": -7.049999999999992,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Normal_KC_Basal",
+            "color_hex": "#f1a93e",
+            "classified_angle_count": 129,
+            "geometry_share_percent": 1.8428571428571427,
+            "mid_angle_deg_image": -95.44999999999999,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          },
+          {
+            "cell_type": "Normal_KC_Diff",
+            "color_hex": "#f6c74f",
+            "classified_angle_count": 604,
+            "geometry_share_percent": 8.628571428571428,
+            "mid_angle_deg_image": -115.62499999999999,
+            "component_count": 1,
+            "status": "validation_only_case_local_candidate"
+          }
+        ],
+        "rejected_support": [
+          {
+            "cell_type": "Normal_KC_Cyc",
+            "angle_count": 18,
+            "full_circle_share_percent": 0.25,
+            "reason": "below_minimum_sector_share"
+          }
+        ],
+        "status": "geometry_measured_validation_only"
+      }
+    },
+    "comparison_to_normalized_visible_labels": [
+      {
+        "chart_group": "Normal",
+        "cell_type": "Normal_KC_Diff",
+        "normalized_visible_label_share_percent": 61.025641,
+        "geometry_share_percent": 62.924245,
+        "absolute_percentage_point_error": 1.8986039999999988
+      },
+      {
+        "chart_group": "Normal",
+        "cell_type": "Tumor_KC_Cyc",
+        "normalized_visible_label_share_percent": 17.025641,
+        "geometry_share_percent": 16.153516,
+        "absolute_percentage_point_error": 0.8721250000000005
+      },
+      {
+        "chart_group": "Normal",
+        "cell_type": "Tumor_KC_Basal",
+        "normalized_visible_label_share_percent": 19.384615,
+        "geometry_share_percent": 18.946012,
+        "absolute_percentage_point_error": 0.4386030000000005
+      },
+      {
+        "chart_group": "Normal",
+        "cell_type": "TSK",
+        "normalized_visible_label_share_percent": 2.564103,
+        "geometry_share_percent": 1.976228,
+        "absolute_percentage_point_error": 0.5878749999999997
+      },
+      {
+        "chart_group": "AK",
+        "cell_type": "Normal_KC_Diff",
+        "normalized_visible_label_share_percent": 53.752759,
+        "geometry_share_percent": 54.793532,
+        "absolute_percentage_point_error": 1.0407730000000015
+      },
+      {
+        "chart_group": "AK",
+        "cell_type": "Tumor_KC_Diff",
+        "normalized_visible_label_share_percent": 10.154525,
+        "geometry_share_percent": 9.659255,
+        "absolute_percentage_point_error": 0.49526999999999965
+      },
+      {
+        "chart_group": "AK",
+        "cell_type": "Tumor_KC_Cyc",
+        "normalized_visible_label_share_percent": 3.642384,
+        "geometry_share_percent": 3.075368,
+        "absolute_percentage_point_error": 0.5670159999999997
+      },
+      {
+        "chart_group": "AK",
+        "cell_type": "Tumor_KC_Basal",
+        "normalized_visible_label_share_percent": 24.503311,
+        "geometry_share_percent": 24.920589,
+        "absolute_percentage_point_error": 0.4172779999999996
+      },
+      {
+        "chart_group": "AK",
+        "cell_type": "TSK",
+        "normalized_visible_label_share_percent": 7.94702,
+        "geometry_share_percent": 7.551256,
+        "absolute_percentage_point_error": 0.3957639999999998
+      },
+      {
+        "chart_group": "Primary",
+        "cell_type": "Normal_KC_Diff",
+        "normalized_visible_label_share_percent": 14.651494,
+        "geometry_share_percent": 14.101646,
+        "absolute_percentage_point_error": 0.549847999999999
+      },
+      {
+        "chart_group": "Primary",
+        "cell_type": "Tumor_KC_Diff",
+        "normalized_visible_label_share_percent": 36.842105,
+        "geometry_share_percent": 37.165354,
+        "absolute_percentage_point_error": 0.3232490000000041
+      },
+      {
+        "chart_group": "Primary",
+        "cell_type": "Tumor_KC_Basal",
+        "normalized_visible_label_share_percent": 24.893314,
+        "geometry_share_percent": 25.2398,
+        "absolute_percentage_point_error": 0.34648599999999874
+      },
+      {
+        "chart_group": "Primary",
+        "cell_type": "TSK",
+        "normalized_visible_label_share_percent": 23.613087,
+        "geometry_share_percent": 23.4932,
+        "absolute_percentage_point_error": 0.11988699999999852
+      },
+      {
+        "chart_group": "MET",
+        "cell_type": "Normal_KC_Diff",
+        "normalized_visible_label_share_percent": 8.967391,
+        "geometry_share_percent": 8.628571,
+        "absolute_percentage_point_error": 0.33881999999999834
+      },
+      {
+        "chart_group": "MET",
+        "cell_type": "Normal_KC_Basal",
+        "normalized_visible_label_share_percent": 2.445652,
+        "geometry_share_percent": 1.842857,
+        "absolute_percentage_point_error": 0.602795
+      },
+      {
+        "chart_group": "MET",
+        "cell_type": "Tumor_KC_Diff",
+        "normalized_visible_label_share_percent": 9.782609,
+        "geometry_share_percent": 9.385714,
+        "absolute_percentage_point_error": 0.39689500000000066
+      },
+      {
+        "chart_group": "MET",
+        "cell_type": "Tumor_KC_Basal",
+        "normalized_visible_label_share_percent": 26.630435,
+        "geometry_share_percent": 27.242857,
+        "absolute_percentage_point_error": 0.6124220000000022
+      },
+      {
+        "chart_group": "MET",
+        "cell_type": "TSK",
+        "normalized_visible_label_share_percent": 52.173913,
+        "geometry_share_percent": 52.9,
+        "absolute_percentage_point_error": 0.7260869999999997
+      }
+    ],
+    "mean_absolute_percentage_point_error": 0.5960998333333334,
+    "maximum_absolute_percentage_point_error": 1.8986039999999988
+  },
+  "official_source_validation": {
+    "status": "not_comparable",
+    "article_caption_evidence": "The Figure 1 caption states that Source Data are provided for panels b and e; it does not include panel f.",
+    "supplementary_data_file_6_role": "related input table retained only; no verified group/statistic mapping to the 18 donut labels",
+    "source_values_used_to_fill_primary_csv": false
+  },
+  "sources": {
+    "retrieved_date": "2026-07-21",
+    "article": "https://www.nature.com/articles/s41467-023-40822-9",
+    "figure_page": "https://www.nature.com/articles/s41467-023-40822-9/figures/1",
+    "article_pdf": "https://www.nature.com/articles/s41467-023-40822-9.pdf",
+    "supplementary_data_file_6": "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-023-40822-9/MediaObjects/41467_2023_40822_MOESM9_ESM.xlsx",
+    "source_data_file": "https://static-content.springer.com/esm/art%3A10.1038%2Fs41467-023-40822-9/MediaObjects/41467_2023_40822_MOESM22_ESM.xlsx",
+    "retained_file_identities": {
+      "article.pdf": {
+        "sha256": "9253c6a06c4ac9180851e90fbe2646a7da4d66a433b09aab66095c64e5ded037",
+        "size_bytes": 7740782
+      },
+      "supplementary-data-file-6.xlsx": {
+        "sha256": "998358c15e6bb9197f96bd20e1f02be8f43c9c557507a73d25687315b6124ce6",
+        "size_bytes": 31159
+      },
+      "source-data.xlsx": {
+        "sha256": "1f4d7aa0058cf2b4bdf3da18e73c8449d0c3b0269e9aeeea72069a68c7891d4c",
+        "size_bytes": 111644
+      }
+    }
+  },
+  "license": {
+    "article_license": "Creative Commons Attribution 4.0 International",
+    "url": "http://creativecommons.org/licenses/by/4.0/",
+    "third_party_material_caveat": "The article license notice requires checking credit lines for material excluded from the article's Creative Commons licence."
+  },
+  "evidence_files": [
+    "data.csv",
+    "sector-geometry.csv",
+    "panel-original.png",
+    "overlay.png",
+    "recreated.png",
+    "preflight-report.json",
+    "figure-spec.json",
+    "pdf-page3-vector-inspection.json"
+  ]
+}
