@@ -2295,16 +2295,20 @@
       "title": "分组柱形图",
       "subtitle": "三面板柱、误差与可见点",
       "status": "visible_geometry_candidate",
-      "statusLabel": "候选 · 可见柱形几何",
-      "description": "Fig. 8e??????????????????????????????????",
+      "statusLabel": "候选 · 原图像素复核",
+      "description": "Fig. 8e 三个病原菌面板的百分比存活率：保留 36 个散点候选、6 个柱形均值和与样本标准差一致的可见区间。",
       "metrics": [
         {
           "label": "bars",
           "value": "6"
         },
         {
-          "label": "visible points",
-          "value": "42"
+          "label": "point candidates",
+          "value": "36"
+        },
+        {
+          "label": "clean markers",
+          "value": "17"
         }
       ],
       "articleUrl": "https://www.nature.com/articles/s41467-023-37200-w",
@@ -2322,87 +2326,13 @@
       "styleSpec": {
         "renderer": "paper-native-geometry",
         "fidelity": "visible_geometry_candidate",
-        "label": "可见柱形 · 交互重绘",
-        "note": "???????????????????????????????????????",
+        "label": "36 个候选散点 · 原图像素重绘",
+        "note": "每组保留 6 个原图像素候选点；17 个无结构冲突，其余点保留柱框、误差线或融合簇审查状态。柱高和区间由候选点均值 ± 样本 SD 重建并与原图几何核对，不宣称作者的误差定义或精确 p 值。",
         "canvas": {
           "width": 1700,
           "height": 581
         },
         "fontFamily": "Arial, Helvetica, sans-serif",
-        "lines": [
-          {
-            "x1": 95,
-            "y1": 184,
-            "x2": 95,
-            "y2": 468,
-            "width": 2
-          },
-          {
-            "x1": 95,
-            "y1": 468,
-            "x2": 283,
-            "y2": 468,
-            "width": 2
-          },
-          {
-            "x1": 470,
-            "y1": 184,
-            "x2": 470,
-            "y2": 468,
-            "width": 2
-          },
-          {
-            "x1": 470,
-            "y1": 468,
-            "x2": 660,
-            "y2": 468,
-            "width": 2
-          },
-          {
-            "x1": 850,
-            "y1": 184,
-            "x2": 850,
-            "y2": 468,
-            "width": 2
-          },
-          {
-            "x1": 850,
-            "y1": 468,
-            "x2": 1070,
-            "y2": 468,
-            "width": 2
-          }
-        ],
-        "annotations": [
-          {
-            "text": "e",
-            "x": 8,
-            "y": 18,
-            "size": 25,
-            "bold": true
-          },
-          {
-            "text": "E. coli B36",
-            "x": 189,
-            "y": 42,
-            "size": 18,
-            "anchor": "middle"
-          },
-          {
-            "text": "S. aureus BPH2900",
-            "x": 565,
-            "y": 42,
-            "size": 18,
-            "anchor": "middle"
-          },
-          {
-            "text": "S. pyogenes HKU419",
-            "x": 960,
-            "y": 42,
-            "size": 18,
-            "anchor": "middle"
-          }
-        ],
         "rasterEvidenceInteractive": true
       }
     },
