@@ -1,6 +1,6 @@
 ---
 name: thu-digitizer
-description: Extract and validate numeric data from chart images, PDF figures, and official source-data files locally and reproducibly, with calibrated axes, deterministic compact-scatter recovery including partially touching filled markers, original-pixel aligned lattice composites such as UpSet plots, PDF vector inspection, line tracing, histograms, boxplots, error bars, CSV/JSON evidence, source-data cross-validation, and regression evaluation. Use when a user asks to recover or recreate chart data, extract scatter points or aligned memberships, check a PDF chart, assess digitization accuracy, validate against source data, or improve a chart-digitization workflow from corrected examples.
+description: Extract and validate numeric data from chart images, PDF figures, and official source-data files locally and reproducibly, with calibrated axes, compact-scatter recovery plus residual audits, grouped/stacked bars, visible-label pie/donut validation, original-pixel aligned lattice composites such as UpSet plots, PDF vector inspection, line tracing, histograms, boxplots, error bars, CSV/JSON evidence, source-data cross-validation, and regression evaluation. Use when a user asks to recover or recreate chart data, extract scatter points, bars, printed pie/donut labels, or aligned memberships, check a PDF chart, assess digitization accuracy, validate against source data, or improve a chart-digitization workflow from corrected examples.
 ---
 
 # THU Digitizer
@@ -22,9 +22,13 @@ If the chart type is unknown, omit `--chart-type`; the router must return `needs
 
 The registry in `scripts/extractor_registry.py` is the single machine-readable map from chart types and input composition to stable, candidate, assisted, unsupported, and refusal routes. Registry presence is not proof of support. Never send an unknown, non-Cartesian, raster-only, or incompatible chart to a convenient XY/PDF extractor merely because it is available.
 
-## Model-independent execution contract
+## Evidence-bound adaptive execution
 
-Treat registered bundled scripts as normative implementations. When a compatible implementation exists, run it; do not replace it with model-written thresholding, visual point counting, or a new connected-component script. A model may propose a chart type, plot bounds, calibration anchors, marker polarity/colour, and verified exclusions, but only the registered implementation may emit candidate numeric values. Preserve its input hash, algorithm version, deterministic run ID, parameters, report, CSV, and overlay. If the script returns `low_confidence` or `numeric_output_authorized: false`, do not override it from visual reasoning.
+Keep source identity, original-pixel measurement, calibrated coordinates, non-invention, ambiguity labels, and review evidence as hard requirements. Treat registered scripts as the default deterministic strategy, not as the only strategy that may emit candidate values. Read [references/adaptive-execution.md](references/adaptive-execution.md) before selecting the execution freedom.
+
+Treat GPT-5.6 Sol and Terra as strong-model profiles when the runtime identifies the current model by either name. A strong profile may produce a separate `model_assisted_candidate` when a registered implementation is incompatible with the visible grammar, unstable under reasonable verified bounds, contradicted by its overlay, or returns `low_confidence`/`numeric_output_authorized: false`. Preserve every deterministic report unchanged; never rewrite a failed script result as successful. For weak or unidentified profiles, retain the registered deterministic or hybrid workflow.
+
+For a weak or unidentified model, or after any missed/extra-mark correction, read [references/weak-model-execution.md](references/weak-model-execution.md). Enforce the inventory, locked-exclusion, registered-detector, family-completeness, and original-resolution review loop. Do not let model narration substitute for the coverage ledger or residual audit.
 
 ## Original-raster coordinate invariant
 
@@ -105,10 +109,11 @@ This route remains candidate until additional marker styles, linear/log axis var
 1. Run `scripts/thu_digitizer.py inspect` to record input composition and create a FigureSpec template. An unverified route proposal never authorizes values.
 2. Confirm the panel, chart grammar, coordinate model, and recoverable representation. Refuse unknown or unsupported transforms.
 3. Locate plot bounds and the required axis anchors. Use OCR only to propose labels; verify selected ticks against pixels or PDF geometry.
-4. Prefer verified direct vector centres for visible vector marks; otherwise dispatch the registered family-specific raster extractor. Never reimplement an available extractor inside the task.
+4. Select deterministic, hybrid, or strong-model-assisted execution using [references/adaptive-execution.md](references/adaptive-execution.md). Prefer verified direct vector centres and compatible registered extractors; do not force an incompatible family extractor or tune it toward an expected answer.
 5. Treat points, curves, rectangles, boxes, colour cells, error bars, legends, and annotations as separate visible grammars before assembling chart semantics.
-6. Deliver the immutable CSV, JSON report, overlay, and (when requested) a recreation. State whether positions/curves are direct, traced, refitted, low-confidence, or unmeasured.
-7. If official source data, ground truth, or user corrections are available, verify the semantic mapping and run a separate validation report. Never overwrite the original extraction with source-normalized values.
+6. Run the family completeness check: require a clear residual audit for compact scatter, a declared-slot coverage ledger with standard reason codes for bars and visible labels, or complete active/inactive/ambiguous Cartesian-cell classification for aligned lattices. A completeness pass may block authorization; it must never add values.
+7. Deliver the immutable CSV, JSON report, overlay, and (when requested) a recreation. State whether positions/curves are direct, traced, refitted, low-confidence, or unmeasured.
+8. If official source data, ground truth, or user corrections are available, verify the semantic mapping and run a separate validation report. Never overwrite the original extraction with source-normalized values.
 
 ## Calibrated histogram extraction
 
@@ -222,7 +227,7 @@ For a Cartesian raster scatter panel with compact filled markers, read [referenc
   --output-csv points.csv --report scatter-report.json --overlay scatter-overlay.png
 ```
 
-Open the overlay at original resolution. Accept candidate values only when the report says `numeric_output_authorized: true`, every ring is centred on a visible marker, multi-peak components are plausible touching markers, and suppressed peaks are reviewed. If the panel prints Pearson's `R`, pass `--annotated-pearson-r`; use it only as a validation gate, never as a target for adding or removing points. Do not pass an expected point count. Hollow markers, bubbles, dense swarms, and perfectly coincident or fully occluded points are outside this route.
+Open the overlay at original resolution. Accept candidate values only when the report says `numeric_output_authorized: true`, `residual_audit.status` is `clear`, every ring is centred on a visible marker, multi-peak components are plausible touching markers, and suppressed peaks are reviewed. A magenta residual box blocks authorization and is never promoted into the CSV; correct only visibly wrong configuration/exclusions and rerun. Treat script authorization as candidate-level evidence, not final acceptance: if the overlay contradicts the report or reasonable verified bounds produce an unstable point set, preserve that run as failed deterministic evidence and use the adaptive fallback policy. If the panel prints Pearson's `R`, pass `--annotated-pearson-r`; use it only as a validation gate, never as a target for adding or removing points. Do not pass an expected point count. Hollow markers, bubbles, dense swarms, and perfectly coincident or fully occluded points are outside this route.
 
 ## Aligned lattice composites (candidate, low freedom)
 
@@ -249,10 +254,30 @@ The Nature Communications Fig. 2b regression case can be rebuilt with `scripts/b
 The bar candidate also bridges one- to two-pixel value-axis gaps caused by
 anti-aliasing or gridlines, prefers the uniquely baseline-connected rectangle
 when a legend swatch shares a fill colour, and labels a bar whose baseline is
-covered by an in-plot overlay as `occluded_by_overlay`. These diagnostics are
-evidence for review, not permission to claim hidden bar geometry or error-bar
-semantics. Keep dark error bars separate when their colour is shared with axes
-or text.
+covered by an in-plot overlay as `occluded_by_overlay`. When a verified
+separately coloured error/interval stroke cuts through a pale bar, the route may
+use cross-axis-dilated error-colour evidence to reconnect topology across the
+stroke. This does not add fill or change the outer measured endpoints; require
+`verified_occluder_bridging.occluder_role` to remain
+`topology_only_not_numeric_fill`.
+
+For a percent stack, retain each visible segment span without normalization.
+An expected-total shortfall is separator-consistent only when the measured
+internal pixel/value gaps account for it and no gap exceeds the configured
+stack-gap tolerance. Keep `values_normalized_or_completed: false`; a large gap,
+top shortfall, missing segment, or unexplained total mismatch remains
+`low_confidence`.
+
+## Visible-label pie and donut extraction (assisted candidate)
+
+For a pie/donut whose numeric values are explicitly printed and visibly mapped
+to distinct sector colours, read [references/labelled-pie-donut-extraction.md](references/labelled-pie-donut-extraction.md) and run `scripts/candidate_digitize_labelled_donut.py`. Supply the original-raster contract, panel bounds, group centres, annular bands, named palette, label anchors, and two transcriptions of every declared visible label.
+
+Authorize only matching transcriptions that pass independent annular-geometry
+validation. Preserve the printed value and printed group sum even when they do
+not equal 100. Geometry is validation-only and must never supply or normalize a
+primary label. Unlabeled sectors, angle-only estimates, source observations,
+exploded/3D pies, gradients, and overlapping sectors remain unsupported.
 
 ## Scatter overlays on pastel bars
 
@@ -280,6 +305,8 @@ Treat a colour template, a local-shape test, and bar geometry as complementary e
 - Treat a value as missing when no color evidence is found. Never interpolate merely to make a CSV look complete.
 - For scatter points over bars, expose the unresolved-candidate layer rather than converting edge conflicts or fused blobs into accepted points.
 - For an aligned lattice, classify every Cartesian cell and refuse numeric output when any cell is ambiguous. Never tune geometry from supplied semantic labels, printed totals, or expected counts.
+- Require standard `reason_code` values and a declared-slot `coverage_ledger` for bar and visible-label extractors. Use the lattice route's complete Cartesian-cell classification as its equivalent completeness evidence. Do not use an external expected data count to make either structure complete.
+- For labelled pie/donut output, require matching duplicate transcriptions and validation-only sector geometry; never force displayed values to total 100.
 - Reject any raster measurement whose input hash or dimensions differ from its original-pixel source contract.
 - Treat error bars as separate geometry. Report their endpoints in both pixels and data units.
 - Generate a recreation or overlay for visual review. Image similarity alone never proves numeric correctness.
@@ -293,7 +320,7 @@ Run `scripts/run_synthetic_benchmark.py --output-dir D:\Scratch\thu-digitizer-be
 - Trace a color-distinct line with local evidence, the legacy continuity method,
   and the shared `raster_core_continuity` candidate (soft colour evidence,
   path continuity, and explicit gaps).
-- Recover separable coloured scatter points from connected-component centroids, and benchmark compact/touching filled markers separately with `scripts/run_scatter_benchmark.py`.
+- Recover separable coloured scatter points from connected-component centroids, and benchmark compact/touching filled markers plus the low-contrast residual-refusal case separately with `scripts/run_scatter_benchmark.py`.
 - Recover grouped bars from component bounds.
 - Recover stacked bars from each segment's run height, never from its top edge alone.
 
@@ -305,7 +332,7 @@ The grouped/stacked-bar routes in this synthetic runner are benchmarks, not dedi
 
 Use the R Graph Gallery as a public taxonomy and rendering-pattern reference, not as a source of truth data. Read [references/r-graph-gallery-benchmark.md](references/r-graph-gallery-benchmark.md) before adding its representative families. Generate fresh local data and renderings; retain only page URLs and family metadata unless the user separately approves keeping downloaded site assets or source code.
 
-Begin with exact-value families (line/scatter, bars, histogram, area, heatmap, box plot). For density/violin, pie/donut, polar, treemap, maps, networks, Sankey, word clouds, and animation, state the recoverable representation explicitly; a raster cannot generally recover the original raw observations or hidden graph structure.
+Begin with exact-value families (line/scatter, bars, histogram, area, heatmap, box plot). For density/violin, unlabeled pie/donut, general polar, treemap, maps, networks, Sankey, word clouds, and animation, state the recoverable representation explicitly; a raster cannot generally recover the original raw observations or hidden graph structure. Use the assisted labelled pie/donut route only for explicitly printed values with independent visible-sector validation.
 
 ## Controlled evolution
 
@@ -313,4 +340,4 @@ Keep the stable skill code unchanged during normal extraction. Record a candidat
 
 ## Limits of v0.1
 
-The bundled executables support calibrated colour-distinct lines plus pale error bars, a continuity-aware raster line candidate, a candidate compact filled-scatter route with distance-peak splitting, a candidate original-pixel aligned-lattice route, calibrated histograms, colour-distinct vertical or horizontal boxplots, and PDF vector inspection. The compact-scatter route is not a universal point detector: hollow markers, bubbles, dense swarms, perfect coincidences, and occluded marks remain unsupported or `not_extracted`. The lattice route does not cover irregular matrices, merged or occluded cells, or unverified semantic text. Direct PDF marker recovery and source-data validation are assisted workflows. Histogram output is limited to visible bin edges/heights and boxplot output to visible summaries/outliers. For bars, OCR-heavy images, nonlinear or unsupported coordinates, overlapping series, or unverified vector paths, retain the same evidence/refusal gates and do not claim automation without dedicated held-out evidence.
+The bundled executables support calibrated colour-distinct lines plus pale error bars, a continuity-aware raster line candidate, a candidate compact filled-scatter route with distance-peak splitting and a blocking residual audit, a candidate original-pixel aligned-lattice route, grouped/stacked bar candidates with verified-occluder topology bridging, an assisted visible-label pie/donut candidate, calibrated histograms, colour-distinct vertical or horizontal boxplots, and PDF vector inspection. The compact-scatter route is not a universal point detector: hollow markers, bubbles, dense swarms, perfect coincidences, and occluded marks remain unsupported or `not_extracted`. The pie/donut route does not discover OCR labels or infer unlabeled sectors. The lattice route does not cover irregular matrices, merged or occluded cells, or unverified semantic text. Direct PDF marker recovery and source-data validation are assisted workflows. Histogram output is limited to visible bin edges/heights and boxplot output to visible summaries/outliers. For bars, OCR-heavy images, nonlinear or unsupported coordinates, overlapping series, or unverified vector paths, retain the same evidence/refusal gates and do not claim stable automation without dedicated held-out evidence.

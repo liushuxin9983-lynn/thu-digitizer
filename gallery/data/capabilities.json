@@ -1182,9 +1182,9 @@
         "饼图",
         "甜甜圈图"
       ],
-      "engineStatus": "coordinate_specific",
-      "demoStatus": "partial_visible",
-      "recoverableRepresentation": "可见百分比标签；扇区角度仅作案例级验证",
+      "engineStatus": "candidate",
+      "demoStatus": "visible_geometry",
+      "recoverableRepresentation": "双遍转录一致的可见百分比标签；扇区角度仅作独立验证",
       "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
       "caseId": "nature-40822-fig1f",
       "thumbnailKey": "donut",
@@ -2184,11 +2184,11 @@
       "articleUrl": "https://www.nature.com/articles/s41467-023-40822-9",
       "figureUrl": "https://www.nature.com/articles/s41467-023-40822-9/figures/1",
       "original": "assets/cases/nature-40822-fig1f/original.png",
-      "evidenceStatus": "partial_visible",
+      "evidenceStatus": "candidate",
       "coverage": [
         "donut",
         "visible percentage labels",
-        "case-local sector geometry"
+        "shared annular geometry validation"
       ],
       "report": "assets/cases/nature-40822-fig1f/report.json",
       "license": "CC BY 4.0",

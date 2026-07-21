@@ -5,11 +5,12 @@
 Keep these artefacts together for every extraction:
 
 - Input-file hash and raster dimensions.
-- Registered implementation name, algorithm version, deterministic run ID, and complete parameters.
+- Execution strategy. For deterministic runs, keep the registered implementation name, algorithm version, run ID, and complete parameters. For model-assisted runs, keep the runtime model name/profile, strategy reason, per-mark evidence/status, and references to preserved deterministic comparison reports.
 - Plot bounds and two calibration anchors per linear axis.
 - CSV values, JSON report, and an overlay or reproduction.
 - Per-series sample coverage and confidence.
 - Error-bar pixel endpoints, values, and status (`extracted` or `not_extracted`).
+- The applicable completeness evidence: a declared-slot coverage ledger with standard reason codes, a compact-scatter residual audit, or an explicit reason that neither applies.
 
 Do not call an estimate an extraction when it lacks pixel evidence. `not_extracted` is a valid and preferred result.
 

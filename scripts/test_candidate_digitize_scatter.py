@@ -90,6 +90,35 @@ class CandidateScatterExtractorTests(unittest.TestCase):
         self.assertFalse(report["numeric_output_authorized"])
         self.assertEqual(report["points"], [])
 
+    def test_relaxed_residual_audit_blocks_a_low_contrast_marker_without_adding_it(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            image_path, truth = _fixture(Path(temporary) / "scatter.png")
+            with Image.open(image_path) as source:
+                image = source.convert("RGB")
+            draw = ImageDraw.Draw(image)
+            draw.ellipse((172, 37, 182, 47), fill="#777777")
+            image.save(image_path)
+            report = extract_scatter_points(
+                image_path,
+                plot_bounds=(20, 18, 190, 128),
+                x_anchors=[(20.0, 0.0), (190.0, 10.0)],
+                y_anchors=[(18.0, 10.0), (128.0, 0.0)],
+                marker_mode="dark",
+                dark_threshold=105,
+                min_radius=3.0,
+                max_radius=8.0,
+            )
+
+        self.assertEqual(len(report["points"]), len(truth))
+        self.assertEqual(report["status"], "low_confidence")
+        self.assertFalse(report["numeric_output_authorized"])
+        self.assertEqual(report["residual_audit"]["status"], "review_required")
+        self.assertEqual(report["residual_audit"]["residual_candidate_count"], 1)
+        self.assertEqual(
+            report["residual_audit"]["candidates"][0]["reason_code"],
+            "detector_residual",
+        )
+
     def test_annotated_correlation_is_validation_only_and_blocks_mismatch(self):
         with tempfile.TemporaryDirectory() as temporary:
             image_path, _ = _fixture(Path(temporary) / "scatter.png")

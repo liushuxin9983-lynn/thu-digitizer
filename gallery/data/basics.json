@@ -1419,8 +1419,8 @@
       "id": "pie",
       "title": "环形饼图 / Donut",
       "subtitle": "四组可见百分比标签",
-      "status": "partial_visible",
-      "statusLabel": "部分可见提取 · 18 标签",
+      "status": "candidate",
+      "statusLabel": "可见标签候选 · 18/18",
       "description": "从 Nature Communications Fig. 1f 提取四个 donut 上明确印出的 18 个百分比；原标签和不强制补到 100，扇区角度仅作案例级验证。",
       "metrics": [
         {

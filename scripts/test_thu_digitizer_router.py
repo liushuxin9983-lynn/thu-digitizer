@@ -105,6 +105,27 @@ class UnifiedRouterTests(unittest.TestCase):
         self.assertEqual(selected["primary"]["route_id"], "unknown_refuse")
         self.assertEqual(selected["decision"], "unsupported")
 
+    def test_labelled_donut_routes_to_shared_assisted_candidate(self):
+        selected = select_route(chart_type="donut", media_kind="raster")
+        self.assertEqual(
+            selected["primary"]["route_id"], "raster_labelled_donut_candidate"
+        )
+        self.assertEqual(selected["decision"], "needs_verified_configuration")
+        self.assertEqual(
+            selected["primary"]["implementation"],
+            "scripts/candidate_digitize_labelled_donut.py",
+        )
+
+        pdf = select_route(
+            chart_type="pie",
+            media_kind="pdf",
+            pdf_composition="vector_paths_detected",
+        )
+        self.assertEqual(pdf["primary"]["route_id"], "raster_labelled_donut_candidate")
+        self.assertEqual(
+            pdf["decision"], "needs_rasterization_and_verified_configuration"
+        )
+
     def test_non_cartesian_vector_pdf_never_enters_generic_vector_recovery(self):
         unsupported = next(
             route for route in ROUTES if route.route_id == "unsupported_coordinate_route"

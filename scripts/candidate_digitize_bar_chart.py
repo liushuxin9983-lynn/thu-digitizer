@@ -22,6 +22,11 @@ from typing import Any, Iterable
 import numpy as np
 from PIL import Image, ImageDraw
 
+try:
+    from extraction_contract import build_coverage_ledger
+except ImportError:  # pragma: no cover - package-style invocation
+    from .extraction_contract import build_coverage_ledger
+
 
 VALID_ORIENTATIONS = {"vertical", "horizontal"}
 VALID_LAYOUTS = {"grouped", "stacked", "percent_stacked"}
@@ -114,6 +119,10 @@ def _connected_components(
     *,
     orientation: str,
     bridge_gap: int,
+    verified_occluder_mask: np.ndarray | None = None,
+    verified_occluder_bridge_gap: int = 0,
+    verified_occluder_min_fraction: float = 0.60,
+    bridge_stats: dict[str, float] | None = None,
 ) -> list[np.ndarray]:
     """Return original true pixels, bridging thin cross-axis overlay gaps.
 
@@ -121,12 +130,44 @@ def _connected_components(
     cross-axis jump connects the two remaining fill regions without changing
     the measured outer rectangle.
     """
-    if bridge_gap < 0:
-        raise ValueError("bridge_gap must be non-negative")
+    if bridge_gap < 0 or verified_occluder_bridge_gap < 0:
+        raise ValueError("bridge gaps must be non-negative")
+    if not 0 < verified_occluder_min_fraction <= 1:
+        raise ValueError("verified_occluder_min_fraction must be in (0, 1]")
+    if verified_occluder_mask is not None and verified_occluder_mask.shape != mask.shape:
+        raise ValueError("verified occluder mask must match the bar mask shape")
     rows, columns = mask.shape
     visited = np.zeros_like(mask, dtype=bool)
     result: list[np.ndarray] = []
-    cross_jump = bridge_gap + 1
+    regular_cross_jump = bridge_gap + 1
+    verified_cross_jump = verified_occluder_bridge_gap + 1
+    cross_jump = max(regular_cross_jump, verified_cross_jump)
+
+    def verified_extended_jump(
+        row: int,
+        column: int,
+        row_offset: int,
+        column_offset: int,
+    ) -> tuple[bool, int, float]:
+        if verified_occluder_mask is None:
+            return False, 0, 0.0
+        if orientation == "vertical":
+            if row_offset != 0 or abs(column_offset) <= regular_cross_jump:
+                return False, 0, 0.0
+            start, end = sorted((column, column + column_offset))
+            support = verified_occluder_mask[row, start + 1 : end]
+            intermediate_fill = mask[row, start + 1 : end]
+        else:
+            if column_offset != 0 or abs(row_offset) <= regular_cross_jump:
+                return False, 0, 0.0
+            start, end = sorted((row, row + row_offset))
+            support = verified_occluder_mask[start + 1 : end, column]
+            intermediate_fill = mask[start + 1 : end, column]
+        gap = int(len(support))
+        if not gap or gap > verified_occluder_bridge_gap or np.any(intermediate_fill):
+            return False, gap, 0.0
+        fraction = float(np.mean(support))
+        return fraction >= verified_occluder_min_fraction, gap, fraction
 
     for start_row, start_column in zip(*np.where(mask)):
         if visited[start_row, start_column]:
@@ -157,6 +198,29 @@ def _connected_components(
                         and mask[neighbor_row, neighbor_column]
                         and not visited[neighbor_row, neighbor_column]
                     ):
+                        cross_offset = (
+                            abs(column_offset)
+                            if orientation == "vertical"
+                            else abs(row_offset)
+                        )
+                        if cross_offset > regular_cross_jump:
+                            allowed, gap, fraction = verified_extended_jump(
+                                row, column, row_offset, column_offset
+                            )
+                            if not allowed:
+                                continue
+                            if bridge_stats is not None:
+                                bridge_stats["verified_bridge_edge_count"] = (
+                                    bridge_stats.get("verified_bridge_edge_count", 0.0) + 1.0
+                                )
+                                bridge_stats["maximum_verified_gap_pixels"] = max(
+                                    bridge_stats.get("maximum_verified_gap_pixels", 0.0),
+                                    float(gap),
+                                )
+                                bridge_stats["minimum_occluder_support_fraction"] = min(
+                                    bridge_stats.get("minimum_occluder_support_fraction", 1.0),
+                                    fraction,
+                                )
                         visited[neighbor_row, neighbor_column] = True
                         queue.append((neighbor_row, neighbor_column))
         result.append(np.asarray(pixels, dtype=float))
@@ -195,6 +259,32 @@ def _bridge_value_gaps(mask: np.ndarray, *, orientation: str, max_gap: int) -> n
             for start, end in zip(true_columns[:-1], true_columns[1:]):
                 if 1 < end - start <= max_gap + 1:
                     result[y, start : end + 1] = True
+    return result
+
+
+def _dilate_cross_axis(
+    mask: np.ndarray, *, orientation: str, radius: int
+) -> np.ndarray:
+    """Expand a verified thin occluder only across bar thickness.
+
+    Anti-alias pixels around a dark interval line may no longer match the
+    sampled interval colour.  Dilation is restricted to the cross axis and is
+    used only as topology evidence between visible fill on both sides.
+    """
+
+    if radius < 0:
+        raise ValueError("cross-axis dilation radius must be non-negative")
+    if radius == 0:
+        return mask.copy()
+    result = mask.copy()
+    if orientation == "vertical":
+        for offset in range(1, radius + 1):
+            result[:, offset:] |= mask[:, :-offset]
+            result[:, :-offset] |= mask[:, offset:]
+    else:
+        for offset in range(1, radius + 1):
+            result[offset:, :] |= mask[:-offset, :]
+            result[:-offset, :] |= mask[offset:, :]
     return result
 
 
@@ -420,6 +510,8 @@ def _stack_diagnostics(
             for mark in marks
             if mark["category"] == category_name and mark["status"] == "extracted"
         ]
+        gap_value_by_sign: dict[str, float] = {}
+        gap_pixels_by_sign: dict[str, float] = {}
         for sign, sign_marks in (
             ("positive", [mark for mark in visible if mark["value"] > 0]),
             ("negative", [mark for mark in visible if mark["value"] < 0]),
@@ -429,9 +521,16 @@ def _stack_diagnostics(
                 key=lambda mark: abs(mark["start_value"] - baseline_value),
             )
             previous_end_pixel: float | None = None
+            previous_end_value: float | None = None
+            visible_gap_value = 0.0
+            visible_gap_pixels = 0.0
             for index, mark in enumerate(ordered):
                 expected_start_pixel = mark["baseline_pixel"] if index == 0 else previous_end_pixel
+                expected_start_value = baseline_value if index == 0 else previous_end_value
                 gap = abs(mark["start_pixel"] - expected_start_pixel)
+                gap_value = abs(mark["start_value"] - expected_start_value)
+                visible_gap_pixels += float(gap)
+                visible_gap_value += float(gap_value)
                 if gap > stack_gap_tolerance_px:
                     diagnostics.append(
                         {
@@ -443,9 +542,26 @@ def _stack_diagnostics(
                         }
                     )
                 previous_end_pixel = mark["end_pixel"]
+                previous_end_value = mark["end_value"]
+            gap_value_by_sign[sign] = visible_gap_value
+            gap_pixels_by_sign[sign] = visible_gap_pixels
         if expected_stack_total is not None:
             positive_total = sum(mark["value"] for mark in visible if mark["value"] > 0)
             difference = positive_total - expected_stack_total
+            positive_gap_value = gap_value_by_sign.get("positive", 0.0)
+            positive_gap_pixels = gap_pixels_by_sign.get("positive", 0.0)
+            separator_consistent = bool(
+                difference < 0
+                and positive_gap_value > 0
+                and abs(abs(difference) - positive_gap_value) <= stack_total_tolerance
+                and not any(
+                    diagnostic["kind"] == "stack_gap"
+                    and diagnostic["category"] == category_name
+                    and diagnostic["sign"] == "positive"
+                    for diagnostic in diagnostics
+                )
+            )
+            within_tolerance = abs(difference) <= stack_total_tolerance
             diagnostics.append(
                 {
                     "kind": "stack_total",
@@ -453,7 +569,18 @@ def _stack_diagnostics(
                     "expected": float(expected_stack_total),
                     "observed_positive_total": float(positive_total),
                     "difference": float(difference),
-                    "within_tolerance": abs(difference) <= stack_total_tolerance,
+                    "within_tolerance": within_tolerance,
+                    "visible_internal_gap_value_total": float(positive_gap_value),
+                    "visible_internal_gap_pixels_total": float(positive_gap_pixels),
+                    "separator_consistent": separator_consistent,
+                    "validation_status": (
+                        "within_numeric_tolerance"
+                        if within_tolerance
+                        else "visible_separator_shortfall"
+                        if separator_consistent
+                        else "unresolved_stack_total_mismatch"
+                    ),
+                    "values_normalized_or_completed": False,
                 }
             )
     return diagnostics
@@ -476,6 +603,8 @@ def extract_bar_chart(
     min_bar_length: int = 2,
     min_fill_ratio: float = 0.55,
     bridge_gap: int = 1,
+    verified_occluder_bridge_gap: int = 6,
+    verified_occluder_min_fraction: float = 0.60,
     value_gap: int = 2,
     category_tolerance_px: float | None = None,
     baseline_tolerance_px: float = 3.0,
@@ -531,6 +660,11 @@ def extract_bar_chart(
             _rgb_from_hex(color)
         except ValueError as error:
             raise ValueError(f"invalid colour for series {name!r}: {error}") from error
+    if error_color is not None:
+        try:
+            _rgb_from_hex(error_color)
+        except ValueError as error:
+            raise ValueError(f"invalid error colour: {error}") from error
 
     assignment_tolerance = (
         float(category_tolerance_px)
@@ -544,13 +678,45 @@ def extract_bar_chart(
     }
     rejected_components: list[dict[str, Any]] = []
     excluded_components: list[dict[str, Any]] = []
+    verified_bridge_stats: dict[str, float] = {
+        "verified_bridge_edge_count": 0.0,
+        "maximum_verified_gap_pixels": 0.0,
+        "minimum_occluder_support_fraction": 1.0,
+    }
+    error_mask = (
+        _color_mask(image, error_color, error_tolerance)
+        if error_color is not None
+        else None
+    )
+    raw_error_view = (
+        error_mask[top : bottom + 1, left : right + 1]
+        if error_mask is not None
+        else None
+    )
+    error_view = (
+        _dilate_cross_axis(
+            raw_error_view,
+            orientation=orientation,
+            radius=verified_occluder_bridge_gap,
+        )
+        if raw_error_view is not None
+        else None
+    )
 
     for series_name, color in series_colors.items():
         full_mask = _color_mask(image, color, tolerance)
         view = full_mask[top : bottom + 1, left : right + 1]
         view = _bridge_value_gaps(view, orientation=orientation, max_gap=value_gap)
         for pixels in _connected_components(
-            view, orientation=orientation, bridge_gap=bridge_gap
+            view,
+            orientation=orientation,
+            bridge_gap=bridge_gap,
+            verified_occluder_mask=error_view,
+            verified_occluder_bridge_gap=(
+                verified_occluder_bridge_gap if error_view is not None else 0
+            ),
+            verified_occluder_min_fraction=verified_occluder_min_fraction,
+            bridge_stats=verified_bridge_stats,
         ):
             component = _component_record(
                 pixels, left=left, top=top, orientation=orientation
@@ -617,6 +783,7 @@ def extract_bar_chart(
                     {
                         **base,
                         "status": "not_extracted",
+                        "reason_code": "no_supported_geometry",
                         "reason": "no supported rectangle for this series/category",
                     }
                 )
@@ -650,6 +817,7 @@ def extract_bar_chart(
                     {
                         **base,
                         "status": "low_confidence",
+                        "reason_code": "ambiguous_geometry",
                         "reason": "multiple supported rectangles map to this series/category",
                         "candidate_count": len(candidates),
                         "candidates": candidates,
@@ -678,6 +846,7 @@ def extract_bar_chart(
                     {
                         **base,
                         "status": "low_confidence",
+                        "reason_code": "calibration_geometry_conflict",
                         "reason": reason,
                         "component": component,
                     }
@@ -693,6 +862,7 @@ def extract_bar_chart(
                 {
                     **base,
                     "status": "extracted",
+                    "reason_code": "visible_geometry_supported",
                     "confidence": round(float(confidence), 3),
                     "component_category_pixel": component["category_pixel"],
                     "component": component,
@@ -715,12 +885,13 @@ def extract_bar_chart(
             or (
                 diagnostic["kind"] == "stack_total"
                 and not diagnostic["within_tolerance"]
+                and not diagnostic["separator_consistent"]
             )
             for diagnostic in stack_diagnostics
         )
 
     if error_color is not None:
-        error_mask = _color_mask(image, error_color, error_tolerance)
+        assert error_mask is not None
         for mark in marks:
             if mark["status"] == "extracted":
                 mark["error_bar"] = _extract_error_interval(
@@ -741,16 +912,54 @@ def extract_bar_chart(
     if extracted_count == 0:
         status = "low_confidence" if ambiguity_count else "not_extracted"
     elif ambiguity_count:
-        status = "low_confidence"
+        status = "partial_visible" if layout == "grouped" else "low_confidence"
     elif missing_count or rejected_components or error_missing_count:
         status = "partial_visible"
     else:
         status = "candidate"
 
+    globally_authorized = status != "low_confidence" and extracted_count > 0
+    invalid_stack_categories = {
+        diagnostic["category"]
+        for diagnostic in stack_diagnostics
+        if diagnostic["kind"] == "stack_gap"
+        or (
+            diagnostic["kind"] == "stack_total"
+            and not diagnostic["within_tolerance"]
+            and not diagnostic["separator_consistent"]
+        )
+    }
+    for mark in marks:
+        mark["numeric_output_authorized"] = bool(
+            mark["status"] == "extracted"
+            and (
+                globally_authorized
+                or (
+                    layout == "grouped"
+                    and mark["reason_code"] == "visible_geometry_supported"
+                )
+            )
+            and mark["category"] not in invalid_stack_categories
+        )
+    coverage_ledger = build_coverage_ledger(
+        marks,
+        slot_fields=("category", "series"),
+    )
+
     return {
         "schema_version": 1,
         "extractor_status": "candidate",
         "status": status,
+        "numeric_output_authorized": bool(
+            coverage_ledger["authorized_slot_count"] > 0
+        ),
+        "numeric_authorization_scope": (
+            "all_declared_slots"
+            if coverage_ledger["authorized_slot_count"] == len(marks)
+            else "authorized_records_only"
+            if coverage_ledger["authorized_slot_count"]
+            else "none"
+        ),
         "input_file": image_path.name,
         "input_sha256": _file_sha256(image_path),
         "image_size": {"width": width, "height": height},
@@ -775,6 +984,11 @@ def extract_bar_chart(
             "min_bar_length": int(min_bar_length),
             "min_fill_ratio": float(min_fill_ratio),
             "bridge_gap": int(bridge_gap),
+            "value_gap": int(value_gap),
+            "verified_occluder_bridge_gap": int(verified_occluder_bridge_gap),
+            "verified_occluder_min_fraction": float(
+                verified_occluder_min_fraction
+            ),
             "category_tolerance_px": float(assignment_tolerance),
             "baseline_tolerance_px": float(baseline_tolerance_px),
             "stack_gap_tolerance_px": float(stack_gap_tolerance_px),
@@ -789,6 +1003,13 @@ def extract_bar_chart(
         "rejected_components": rejected_components,
         "excluded_components": excluded_components,
         "stack_diagnostics": stack_diagnostics,
+        "verified_occluder_bridging": {
+            **verified_bridge_stats,
+            "enabled": error_view is not None and verified_occluder_bridge_gap > 0,
+            "occluder_role": "topology_only_not_numeric_fill",
+            "mask_preparation": "verified_error_colour_cross_axis_dilation",
+        },
+        "coverage_ledger": coverage_ledger,
         "summary": {
             "expected_mark_count": len(categories) * len(series_colors),
             "extracted_mark_count": extracted_count,
@@ -821,6 +1042,8 @@ def extract_bar_chart(
             "Error intervals describe visible endpoints only; SD, SEM, or confidence-interval semantics are unknown.",
             "Facets, insets, photos, 3D projections, gradients, hatching, and overlapping same-colour marks require separate routing.",
             "Every exclusion region must be visually verified as legend or decorative geometry before extraction.",
+            "Verified occluder bridging changes component topology only; values remain calibrated from the outer visible fill endpoints.",
+            "Separator-consistent stack gaps are reported and never normalized or filled.",
         ],
     }
 
@@ -1057,7 +1280,9 @@ def _write_csv(path: Path, report: dict[str, Any]) -> None:
         "category",
         "series",
         "status",
+        "reason_code",
         "reason",
+        "numeric_output_authorized",
         "value",
         "start_value",
         "end_value",
@@ -1081,7 +1306,11 @@ def _write_csv(path: Path, report: dict[str, Any]) -> None:
                     "category": mark["category"],
                     "series": mark["series"],
                     "status": mark["status"],
+                    "reason_code": mark.get("reason_code", ""),
                     "reason": mark.get("reason", ""),
+                    "numeric_output_authorized": mark.get(
+                        "numeric_output_authorized", False
+                    ),
                     "value": mark.get("value", ""),
                     "start_value": mark.get("start_value", ""),
                     "end_value": mark.get("end_value", ""),
@@ -1116,6 +1345,12 @@ def main() -> None:
     parser.add_argument("--min-area", type=int, default=20)
     parser.add_argument("--min-bar-thickness", type=int, default=3)
     parser.add_argument("--min-bar-length", type=int, default=2)
+    parser.add_argument("--bridge-gap", type=int, default=1)
+    parser.add_argument("--value-gap", type=int, default=2)
+    parser.add_argument("--verified-occluder-bridge-gap", type=int, default=6)
+    parser.add_argument(
+        "--verified-occluder-min-fraction", type=float, default=0.60
+    )
     parser.add_argument("--expected-stack-total", type=float)
     parser.add_argument("--error-color")
     parser.add_argument("--error-tolerance", type=float, default=18.0)
@@ -1139,6 +1374,10 @@ def main() -> None:
         min_area=args.min_area,
         min_bar_thickness=args.min_bar_thickness,
         min_bar_length=args.min_bar_length,
+        bridge_gap=args.bridge_gap,
+        value_gap=args.value_gap,
+        verified_occluder_bridge_gap=args.verified_occluder_bridge_gap,
+        verified_occluder_min_fraction=args.verified_occluder_min_fraction,
         expected_stack_total=args.expected_stack_total,
         error_color=args.error_color,
         error_tolerance=args.error_tolerance,

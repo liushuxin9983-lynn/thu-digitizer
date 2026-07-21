@@ -48,6 +48,18 @@ class ScatterBenchmarkTests(unittest.TestCase):
             self.assertFalse(rejected["extraction"]["numeric_output_authorized"])
             self.assertEqual(rejected["extraction"]["points"], [])
 
+            residual = next(
+                variant
+                for variant in report["variants"]
+                if variant["expected_status"] == "low_confidence_residual"
+            )
+            self.assertEqual(residual["status"], "rejected_as_expected")
+            self.assertFalse(residual["extraction"]["numeric_output_authorized"])
+            self.assertEqual(
+                residual["extraction"]["residual_audit"]["residual_candidate_count"],
+                1,
+            )
+
             with (output_dir / "scatter_benchmark_results.csv").open(
                 encoding="utf-8", newline=""
             ) as source:

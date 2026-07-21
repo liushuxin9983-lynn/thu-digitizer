@@ -214,8 +214,8 @@ class GallerySiteTests(unittest.TestCase):
             ],
         )
         self.assertEqual(sum(item["status"] == "validated_local_stable" for item in samples), 3)
-        self.assertEqual(sum(item["status"] == "candidate" for item in samples), 5)
-        self.assertEqual(sum(item["status"] == "partial_visible" for item in samples), 2)
+        self.assertEqual(sum(item["status"] == "candidate" for item in samples), 6)
+        self.assertEqual(sum(item["status"] == "partial_visible" for item in samples), 1)
         self.assertEqual(sum(item["status"] == "low_confidence" for item in samples), 1)
         self.assertEqual(next(item for item in samples if item["id"] == "forest")["status"], "visible_geometry_extracted")
         self.assertFalse(any(item["status"] == "source_mapped" for item in samples))
@@ -342,7 +342,7 @@ class GallerySiteTests(unittest.TestCase):
             sample["figureUrl"],
             "https://www.nature.com/articles/s41467-023-40822-9/figures/1",
         )
-        self.assertEqual(sample["status"], "partial_visible")
+        self.assertEqual(sample["status"], "candidate")
         self.assertTrue(sample["styleSpec"]["rasterEvidenceInteractive"])
         self.assertEqual(sample["styleSpec"]["canvas"], {"width": 1025, "height": 215})
         root = (GALLERY / sample["assets"]["report"]).parent
@@ -358,10 +358,11 @@ class GallerySiteTests(unittest.TestCase):
         }
         self.assertEqual(sums, {"Normal": 97.5, "AK": 90.6, "Primary": 70.3, "MET": 73.6})
         report = json.loads((root / "report.json").read_text(encoding="utf-8"))
-        self.assertEqual(report["status"], "partial_visible")
+        self.assertEqual(report["status"], "candidate")
         self.assertEqual(report["visible_label_extraction"]["recovered_label_count"], 18)
         self.assertFalse(report["normalization_applied_to_primary_values"])
-        self.assertEqual(report["shared_pie_route"], "unsupported_coordinate_route")
+        self.assertEqual(report["shared_pie_route"], "raster_labelled_donut_candidate")
+        self.assertTrue((root / "labelled-donut-config.json").is_file())
         self.assertEqual(report["source_data_role"], "independent_validation_only")
         for name in ["preflight-report.json", "figure-spec.json", "sector-geometry.csv", "candidate-report.json", "SOURCES.md"]:
             self.assertTrue((root / name).is_file(), name)

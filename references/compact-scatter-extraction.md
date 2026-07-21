@@ -10,8 +10,9 @@ Use this low-freedom route only for Cartesian raster panels whose data marks are
 4. Choose exactly one marker mode: `dark` for dark filled points on a lighter field, `light` for light filled points on a darker field, or `color` plus `--marker-color` for a distinct fill colour.
 5. Run `scripts/candidate_digitize_scatter.py` once per panel. Do not write a replacement detector and do not pass an expected point count.
 6. If Pearson's `R` is visibly printed, pass `--annotated-pearson-r`. The script must use it only after extraction as a validation gate.
-7. Open the overlay at original resolution. Check every accepted ring, every component with `peak_count > 1`, and every suppressed peak.
-8. Accept values only when `numeric_output_authorized` is true and the visual review agrees. Otherwise return the report's `low_confidence`/candidate evidence without claiming a complete extraction.
+7. Require `residual_audit.status: clear`. The relaxed negative-space pass may block authorization but must never add a point. Resolve a residual only by correcting visibly wrong configuration or adding a verified non-data exclusion, then rerun the primary detector.
+8. Open the overlay at original resolution. Check every accepted ring, every component with `peak_count > 1`, every suppressed peak, and every magenta residual box.
+9. Accept values only when `numeric_output_authorized` is true and the visual review agrees. Otherwise return the report's `low_confidence`/candidate evidence without claiming a complete extraction.
 
 ## Command
 
@@ -33,7 +34,8 @@ For a distinct colour, replace `--marker-mode dark` with `--marker-mode color --
 
 - `candidate` plus `numeric_output_authorized: true`: retain CSV/report/overlay and complete the original-resolution review.
 - `low_confidence`: do not override the refusal by visual narration or by changing thresholds until a desired count appears.
+- `residual_audit.status: review_required`: do not promote residual peaks into the CSV. Correct a visibly wrong ROI, colour/polarity, or exclusion and rerun; otherwise retain the refusal.
 - `validation.status: mismatch`: inspect calibration, ROI, marker grammar, multi-peak components, and suppressed peaks; do not tune points to the printed statistic.
 - No printed statistic: accept only as reviewed visible geometry and state that no independent numeric annotation was available.
 
-The report records input hash, algorithm version, deterministic run ID, calibration residuals, mask parameters, accepted/suppressed peaks, component peak counts, uncertainty, and limitations. These fields are the provenance contract; a prose summary is not a substitute.
+The report records input hash, algorithm version, deterministic run ID, calibration residuals, mask parameters, accepted/suppressed peaks, the relaxed residual audit, component peak counts, uncertainty, and limitations. These fields are the provenance contract; a prose summary is not a substitute.
