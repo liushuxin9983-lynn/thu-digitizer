@@ -15,7 +15,12 @@ GALLERY = ROOT / "gallery"
 
 class GallerySiteTests(unittest.TestCase):
     def test_requested_nature_case_json_does_not_expose_local_absolute_paths(self):
-        for case_id in ("nature-70284-fig8a", "nature-36825-fig1b", "nature-40822-fig1f"):
+        for case_id in (
+            "nature-70284-fig8a",
+            "nature-36825-fig1b",
+            "nature-40822-fig1f",
+            "nature-20563-fig6f",
+        ):
             case_root = GALLERY / "assets" / "cases" / case_id
             for path in case_root.glob("*.json"):
                 with self.subTest(case=case_id, file=path.name):
@@ -252,6 +257,7 @@ class GallerySiteTests(unittest.TestCase):
                 "bar-stacked",
                 "bar-percent-stacked",
                 "pie",
+                "nature-20563-fig6f",
                 "histogram",
                 "heatmap",
                 "boxplot",
@@ -273,7 +279,7 @@ class GallerySiteTests(unittest.TestCase):
             ],
         )
         self.assertEqual(sum(item["status"] == "validated_local_stable" for item in samples), 3)
-        self.assertEqual(sum(item["status"] == "candidate" for item in samples), 6)
+        self.assertEqual(sum(item["status"] == "candidate" for item in samples), 7)
         self.assertEqual(sum(item["status"] == "partial_visible" for item in samples), 1)
         self.assertEqual(sum(item["status"] == "low_confidence" for item in samples), 1)
         self.assertEqual(next(item for item in samples if item["id"] == "forest")["status"], "visible_geometry_extracted")
@@ -516,6 +522,7 @@ class GallerySiteTests(unittest.TestCase):
                 "bar-horizontal",
                 "bar-stacked",
                 "pie",
+                "nature-20563-fig6f",
             },
         )
         renderers = {sample["styleSpec"]["renderer"] for sample in style_samples}
@@ -531,6 +538,7 @@ class GallerySiteTests(unittest.TestCase):
                 "paper-visible-upset",
                 "paper-native-trace-line",
                 "paper-native-geometry",
+                "paper-polar-histogram",
             },
         )
         for sample in style_samples:

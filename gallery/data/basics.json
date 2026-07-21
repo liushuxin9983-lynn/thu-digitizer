@@ -1461,6 +1461,82 @@
       }
     },
     {
+      "id": "nature-20563-fig6f",
+      "title": "Nature Communications Fig. 6f — force orientation",
+      "subtitle": "三个半圆极坐标直方图",
+      "status": "candidate",
+      "statusLabel": "候选 · 30/30 可见扇区",
+      "description": "从 Nature Communications Fig. 6f 的三个半圆极坐标直方图提取 30 个 18° 扇区的可见外缘；保留各面板独立椭圆径向校准和像素不确定度，不恢复原始力向量。",
+      "metrics": [
+        {
+          "label": "可见扇区",
+          "value": "30 / 30"
+        },
+        {
+          "label": "方向分组",
+          "value": "3 个面板"
+        }
+      ],
+      "metricNote": "径向轴没有明确单位标签；官方工作簿也没有可核验的 Figure 6f 极坐标分箱表，因此这里报告图像校准值与近似栅格不确定度，不报告源数据误差。",
+      "journal": "Nature Communications",
+      "figure": "Fig. 6f",
+      "articleTitle": "Adhesion-mediated heterogeneous actin organization governs apoptotic cell extrusion",
+      "articleUrl": "https://www.nature.com/articles/s41467-020-20563-9",
+      "figureUrl": "https://www.nature.com/articles/s41467-020-20563-9/figures/6",
+      "validationDataUrl": "assets/cases/nature-20563-fig6f/source-validation.csv",
+      "styleSpec": {
+        "renderer": "paper-polar-histogram",
+        "fidelity": "visible_geometry_candidate",
+        "label": "论文原生画布 · 候选极坐标提取",
+        "note": "交互扇区逐行读取图像提取 CSV；悬停显示角度区间、径向校准值、不确定度和原始像素弦端点。",
+        "canvas": {
+          "width": 1798,
+          "height": 310
+        },
+        "fontFamily": "Arial, sans-serif",
+        "color": "#0b72b9",
+        "gridColor": "#e0e1e2",
+        "textColor": "#303030",
+        "panelLabelY": 298,
+        "panels": {
+          "D30": {
+            "cx": 287.5,
+            "cy": 248.5,
+            "xPxPerUnit": 0.07112249133537989,
+            "yPxPerUnit": 0.05822343942807478,
+            "radialTicks": [1000, 2000],
+            "radialMax": 2500,
+            "label": "D = 30 μm"
+          },
+          "D15": {
+            "cx": 764.5,
+            "cy": 247.5,
+            "xPxPerUnit": 0.14962799648651923,
+            "yPxPerUnit": 0.12219916043670088,
+            "radialTicks": [500, 1000],
+            "radialMax": 1200,
+            "label": "D = 15 μm"
+          },
+          "D10": {
+            "cx": 1211.5,
+            "cy": 248.5,
+            "xPxPerUnit": 0.5077236903918215,
+            "yPxPerUnit": 0.415700084935776,
+            "radialTicks": [100, 200, 300],
+            "radialMax": 350,
+            "label": "D = 10 μm"
+          }
+        }
+      },
+      "assets": {
+        "original": "assets/cases/nature-20563-fig6f/original.png",
+        "overlay": "assets/cases/nature-20563-fig6f/overlay.png",
+        "recreated": "assets/cases/nature-20563-fig6f/recreated.png",
+        "data": "assets/cases/nature-20563-fig6f/data.csv",
+        "report": "assets/cases/nature-20563-fig6f/report.json"
+      }
+    },
+    {
       "id": "histogram",
       "title": "直方图",
       "subtitle": "箱边界与箱高",
