@@ -10,11 +10,9 @@
 
 # THU Digitizer
 
-从科研图表图片和 PDF 中恢复可见数据，并同时交付 CSV、覆盖图和可复核报告。
+THU Digitizer 是一个面向科研图表数字化的本地工具，用于从图表图片和论文 PDF 中恢复图上可见、坐标可校准的数据。它会先确认图表类型、目标面板和坐标体系，再选择相应的提取流程，生成 CSV、提取覆盖图和可复核报告。
 
-[在线画廊](https://rimagination.github.io/thu-digitizer/) · [完整工作流](SKILL.md) · [能力注册表](scripts/extractor_registry.py) · [MIT License](LICENSE)
-
-THU Digitizer 面向论文复核、图表重绘、系统综述和复现研究。它只接受有像素或矢量证据、且坐标可以校准的数值；看不清、被遮挡或无法唯一判断的内容会标记为 `low_confidence` 或 `not_extracted`，不会为了补齐表格而猜值。
+项目强调“有证据地提取”，而不是自动猜值。每项结果都会尽量保留原图坐标、校准信息、运行参数和置信状态；看不清、被遮挡或无法唯一判断的内容会明确标记为 `low_confidence` 或 `not_extracted`。这些结果适合用于论文复核、图表重绘、系统综述和复现研究。
 
 ## 一分钟开始
 
