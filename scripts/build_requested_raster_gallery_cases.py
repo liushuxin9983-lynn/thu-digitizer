@@ -18,6 +18,11 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
+try:
+    from candidate_digitize_scatter import extract_scatter_points, write_overlay as write_scatter_overlay
+except ImportError:  # pragma: no cover - package import
+    from .candidate_digitize_scatter import extract_scatter_points, write_overlay as write_scatter_overlay
+
 
 ROOT = Path(__file__).resolve().parents[1]
 TMP = ROOT / "tmp" / "requested-20260720"
@@ -308,35 +313,188 @@ def scatter_rows(points, panel: str, colour="#222"):
 
 
 def fig4a_scatter() -> None:
+    """Rebuild the gallery's second scatter case from deterministic raster evidence."""
     crop = (120, 0, 1490, 650)
-    points = [(0.09, .425, 284, 61, 14, "#000000"), (.105, .27, 308, 263, 14, "#008080"), (.11, .255, 318, 277, 14, "#ffa500"), (.12, .18, 333, 361, 14, "#0000ff"), (.14, .13, 355, 416, 14, "#800080"), (.145, .25, 365, 282, 14, "#008000"), (.155, .23, 396, 307, 14, "#f263a8"), (.16, .11, 412, 438, 14, "#fff000"), (.185, .06, 439, 490, 14, "#ff0000"), (0, 0, 185, 557, 12, "#bdbdbd")]
-    rows = scatter_rows(points, "model variance")
-    lines = [{"x1": 170, "y1": 25, "x2": 720, "y2": 25, "width": 8}, {"x1": 170, "y1": 25, "x2": 170, "y2": 570, "width": 8}, {"x1": 170, "y1": 570, "x2": 720, "y2": 570, "width": 8}, {"x1": 720, "y1": 25, "x2": 720, "y2": 570, "width": 8}]
+    source = TMP / "fig4-09789.png"
+    root = OUT / "nature-09789-fig4a"
+    root.mkdir(parents=True, exist_ok=True)
+    original_path = root / "original.png"
+    Image.open(source).convert("RGB").crop(crop).save(original_path)
+
+    x_anchors = ((184.5, 0.0), (636.0, 0.4))
+    y_anchors = ((536.5, 0.0), (85.5, 0.4))
+    extraction = extract_scatter_points(
+        original_path,
+        plot_bounds=(172, 28, 711, 551),
+        x_anchors=x_anchors,
+        y_anchors=y_anchors,
+        marker_mode="dark",
+        dark_threshold=245,
+    )
+    if not extraction["numeric_output_authorized"]:
+        raise RuntimeError(f"Fig. 4a scatter extraction refused: {extraction['reason']}")
+
+    # Semantic association happens only after geometry extraction.  These
+    # reviewed native-pixel centres are never passed to the detector.
+    legend = [
+        ("P(Switch)", "#000000", (284.0, 61.0)),
+        ("Goalie Y position", "#800080", (350.0, 388.0)),
+        ("Shooter X position", "#0000ff", (327.6667, 332.3333)),
+        ("Shooter Y position", "#008080", (306.0, 232.0)),
+        ("Goalie Y velocity", "#008000", (362.0, 388.0)),
+        ("Shooter Y velocity", "#00cd00", (325.5, 252.0)),
+        ("Opponent identity", "#ffff00", (376.0, 410.0)),
+        ("Time since last change point", "#ffa500", (313.5, 247.5)),
+        ("Opponent experience", "#ff0000", (394.0, 467.5)),
+        ("Opponent action metric", "#ff69b4", (359.0, 274.0)),
+        ("Permutations of all variables", "#c0c0c0", (185.0, 536.0)),
+    ]
+    if len(extraction["points"]) != len(legend):
+        raise RuntimeError(
+            f"Fig. 4a expected 11 reviewed visible legend markers after extraction; "
+            f"got {len(extraction['points'])}"
+        )
+
+    available = list(extraction["points"])
+    rows = []
+    semantic_mapping = []
+    for label, colour, expected_center in legend:
+        point = min(
+            available,
+            key=lambda item: (item["pixel_x"] - expected_center[0]) ** 2
+            + (item["pixel_y"] - expected_center[1]) ** 2,
+        )
+        residual = float(
+            np.hypot(
+                point["pixel_x"] - expected_center[0],
+                point["pixel_y"] - expected_center[1],
+            )
+        )
+        if residual > 0.75:
+            raise RuntimeError(f"Fig. 4a semantic mapping drift for {label}: {residual:.3f}px")
+        available.remove(point)
+        radius = 10.5 if label == "Permutations of all variables" else 13.5
+        rows.append(
+            {
+                "kind": "point",
+                "series": label,
+                "category": "visible marker",
+                "x": point["x"],
+                "y": point["y"],
+                "value": point["y"],
+                "pixel_x": point["pixel_x"],
+                "pixel_y": point["pixel_y"],
+                "radius": radius,
+                "fill": colour,
+                "x_uncertainty": point["x_uncertainty"],
+                "y_uncertainty": point["y_uncertainty"],
+                "detection_radius_pixels": point["marker_radius_evidence_pixels"],
+                "confidence": point["confidence"],
+                "component_id": point["component_id"],
+                "component_peak_count": point["component_peak_count"],
+                "value_status": point["value_status"],
+            }
+        )
+        semantic_mapping.append(
+            {
+                "series": label,
+                "fill": colour,
+                "point_id": point["point_id"],
+                "reviewed_center": list(expected_center),
+                "association_residual_pixels": residual,
+            }
+        )
+
+    def pixel_from_value(value: float, anchors: tuple[tuple[float, float], tuple[float, float]]) -> float:
+        (pixel_a, value_a), (pixel_b, value_b) = anchors
+        return pixel_a + (value - value_a) * (pixel_b - pixel_a) / (value_b - value_a)
+
+    axis_left, axis_top, axis_right, axis_bottom = 172, 23, 716, 565
+    lines = [
+        {"x1": axis_left, "y1": axis_top, "x2": axis_right, "y2": axis_top, "width": 10, "stroke": "#000000"},
+        {"x1": axis_left, "y1": axis_top, "x2": axis_left, "y2": axis_bottom, "width": 10, "stroke": "#000000"},
+        {"x1": axis_left, "y1": axis_bottom, "x2": axis_right, "y2": axis_bottom, "width": 10, "stroke": "#000000"},
+        {"x1": axis_right, "y1": axis_top, "x2": axis_right, "y2": axis_bottom, "width": 10, "stroke": "#000000"},
+    ]
     for value in (0, .1, .2, .3, .4):
-        px = 170 + value / .45 * 550
-        lines.append({"x1": px, "y1": 570, "x2": px, "y2": 582, "width": 3})
+        px = pixel_from_value(value, x_anchors)
+        lines.append({"x1": px, "y1": axis_bottom, "x2": px, "y2": axis_bottom + 11, "width": 3, "stroke": "#000000"})
     for value in (0, .1, .2, .3, .4):
-        py = 570 - value / .45 * 545
-        lines.append({"x1": 158, "y1": py, "x2": 170, "y2": py, "width": 3})
+        py = pixel_from_value(value, y_anchors)
+        lines.append({"x1": axis_left - 11, "y1": py, "x2": axis_left, "y2": py, "width": 3, "stroke": "#000000"})
     annotations = [{"text": "a", "x": 50, "y": 1, "size": 38, "bold": True}]
-    annotations += [{"text": f"{value:.1f}", "x": 170 + value / .45 * 550, "y": 603, "size": 31, "anchor": "middle"} for value in (0, .1, .2, .3, .4)]
-    annotations += [{"text": f"{value:.1f}", "x": 150, "y": 570 - value / .45 * 545, "size": 31, "anchor": "end"} for value in (0, .1, .2, .3, .4)]
+    annotations += [{"text": f"{value:.1f}", "x": pixel_from_value(value, x_anchors), "y": 598, "size": 31, "anchor": "middle"} for value in (0, .1, .2, .3, .4)]
+    annotations += [{"text": f"{value:.1f}", "x": 154, "y": pixel_from_value(value, y_anchors), "size": 31, "anchor": "end"} for value in (0, .1, .2, .3, .4)]
     annotations += [
         {"text": "Trial-level variance", "x": 445, "y": 636, "size": 30, "anchor": "middle"},
         {"text": "Subject-level variance", "x": 70, "y": 300, "size": 30, "anchor": "middle", "rotate": -90},
     ]
-    legend = [
-        ("P(Switch)", "#000000"), ("Goalie Y position", "#800080"), ("Shooter X position", "#0000ff"),
-        ("Shooter Y position", "#008080"), ("Goalie Y velocity", "#008000"), ("Shooter Y velocity", "#00c000"),
-        ("Opponent identity", "#fff000"), ("Time since last change point", "#ffa500"), ("Opponent experience", "#ff0000"),
-        ("Opponent action metric", "#f263a8"), ("Permutations of all variables", "#bdbdbd"),
-    ]
-    for index, (label, colour) in enumerate(legend):
-        y = 64 + index * 47
+    legend_rows = [64, 110, 157, 203, 249, 295, 341, 387, 433, 479, 526]
+    for (label, colour, _), y in zip(legend, legend_rows):
         lines.append({"x1": 775, "y1": y, "x2": 830, "y2": y, "stroke": colour, "width": 14})
         annotations.append({"text": label, "x": 844, "y": y, "size": 29, "anchor": "start"})
-    geometry = {"lines": lines, "rects": [{"x": 754, "y": 36, "width": 590, "height": 522, "fill": "#fff", "stroke": "#d0d0d0", "strokeWidth": 8}], "polygons": [], "annotations": annotations}
-    save_case("nature-09789-fig4a", "fig4-09789.png", crop, rows, annotations, lines, "Fig. 4a trial- and subject-level variance scatter", geometry)
+    geometry = {
+        "lines": lines,
+        "rects": [{"x": 758, "y": 38, "width": 581, "height": 517, "fill": "#fff", "stroke": "#d0d0d0", "strokeWidth": 8}],
+        "polygons": [],
+        "annotations": annotations,
+        "plotBounds": [172, 28, 711, 551],
+        "xAnchors": [list(anchor) for anchor in x_anchors],
+        "yAnchors": [list(anchor) for anchor in y_anchors],
+    }
+
+    write_csv(root / "data.csv", rows)
+    (root / "geometry.json").write_text(
+        json.dumps(geometry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    recreation = draw_recreation(
+        Image.open(original_path).size,
+        rows,
+        geometry["annotations"],
+        geometry["lines"],
+        geometry["rects"],
+        geometry["polygons"],
+    )
+    recreation.save(root / "recreated.png")
+    write_scatter_overlay(original_path, extraction, root / "overlay.png")
+
+    extraction["input"]["file"] = "original.png"
+    extraction.update(
+        {
+            "case_id": "nature-09789-fig4a",
+            "panel_mapping": "Fig. 4a trial- and subject-level variance scatter",
+            "source_figure": {
+                "file": source.name,
+                "sha256": sha256(source),
+                "crop_original_pixels": list(crop),
+            },
+            "visible_marker_count": len(rows),
+            "semantic_mapping": {
+                "basis": "reviewed legend colour and original-pixel marker-centre association after extraction",
+                "mapping": semantic_mapping,
+            },
+            "overlay_review": {
+                "status": "verified",
+                "accepted_rings": len(rows),
+                "multi_peak_components_reviewed": [
+                    component["component_id"]
+                    for component in extraction["components"]
+                    if component["peak_count"] > 1
+                ],
+                "suppressed_peaks_reviewed": len(extraction["suppressed_peaks"]),
+            },
+            "primary_csv": {
+                "file": "data.csv",
+                "role": "raster-visible extraction only",
+                "rows": len(rows),
+            },
+            "source_data_role": "not_used",
+            "webplotdigitizer_comparison": "not_compared",
+        }
+    )
+    (root / "report.json").write_text(
+        json.dumps(extraction, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def _legacy_fig5e_scatter() -> None:

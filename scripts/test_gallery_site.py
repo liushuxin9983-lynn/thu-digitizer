@@ -471,6 +471,70 @@ class GallerySiteTests(unittest.TestCase):
                 report = json.loads((GALLERY / sample["assets"]["report"]).read_text(encoding="utf-8"))
                 self.assertEqual(report["schema_version"], 1)
 
+    def test_second_scatter_case_uses_reviewed_eleven_point_candidate_evidence(self):
+        sample = next(item for item in self.basics["samples"] if item["id"] == "scatter")
+        case_root = GALLERY / "assets" / "cases" / "nature-09789-fig4a"
+        with (case_root / "data.csv").open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+
+        expected = {
+            "P(Switch)": (0.088, 0.422),
+            "Goalie Y position": (0.147, 0.132),
+            "Shooter X position": (0.127, 0.181),
+            "Shooter Y position": (0.108, 0.270),
+            "Goalie Y velocity": (0.157, 0.132),
+            "Shooter Y velocity": (0.125, 0.252),
+            "Opponent identity": (0.170, 0.112),
+            "Time since last change point": (0.114, 0.256),
+            "Opponent experience": (0.186, 0.061),
+            "Opponent action metric": (0.155, 0.233),
+            "Permutations of all variables": (0.000, 0.000),
+        }
+        self.assertEqual(len(rows), 11)
+        self.assertEqual({row["series"] for row in rows}, set(expected))
+        self.assertTrue(all(row["kind"] == "point" for row in rows))
+        self.assertTrue(all(row["value_status"] == "visible_marker_candidate" for row in rows))
+        for row in rows:
+            expected_x, expected_y = expected[row["series"]]
+            self.assertAlmostEqual(float(row["x"]), expected_x, delta=0.0006)
+            self.assertAlmostEqual(float(row["y"]), expected_y, delta=0.0006)
+            self.assertTrue(row["x_uncertainty"])
+            self.assertTrue(row["y_uncertainty"])
+            self.assertTrue(row["confidence"])
+
+        report = json.loads((case_root / "report.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["case_id"], "nature-09789-fig4a")
+        self.assertEqual(report["extractor"], "candidate_compact_scatter_distance_peaks")
+        self.assertEqual(report["status"], "candidate")
+        self.assertTrue(report["numeric_output_authorized"])
+        self.assertEqual(report["visible_marker_count"], 11)
+        self.assertEqual(report["detection"]["accepted_peak_count"], 11)
+        self.assertEqual(len(report["deterministic_run_id"]), 16)
+        self.assertEqual(report["plot_bounds"], [172, 28, 711, 551])
+        self.assertEqual(
+            sorted(component["peak_count"] for component in report["components"] if component["peak_count"] > 1),
+            [3, 3],
+        )
+        self.assertEqual(report["overlay_review"]["suppressed_peaks_reviewed"], 2)
+        self.assertEqual(report["source_data_role"], "not_used")
+        self.assertEqual(report["webplotdigitizer_comparison"], "not_compared")
+        self.assertEqual(
+            {item["series"] for item in report["semantic_mapping"]["mapping"]},
+            set(expected),
+        )
+        self.assertTrue(
+            all(item["association_residual_pixels"] <= 0.75 for item in report["semantic_mapping"]["mapping"])
+        )
+
+        digest = hashlib.sha256((case_root / "original.png").read_bytes()).hexdigest()
+        self.assertEqual(digest, report["input"]["sha256"])
+        for name in ("original.png", "overlay.png", "recreated.png"):
+            with Image.open(case_root / name) as image:
+                self.assertEqual(image.size, (1370, 650))
+
+        point_metric = next(metric for metric in sample["metrics"] if metric["label"] == "点覆盖")
+        self.assertEqual(point_metric["value"], "11 / 11")
+
     def test_natcom_fig5e_scatter_case_is_data_and_geometry_consistent(self):
         sample = next(
             item for item in self.basics["samples"] if item["id"] == "nature-70099-fig5e"

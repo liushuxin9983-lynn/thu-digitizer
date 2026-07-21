@@ -18,7 +18,7 @@ const dataTable = document.querySelector("#data-table");
 const dataChart = document.querySelector("#data-chart");
 const interactiveChart = document.querySelector("#interactive-chart");
 const chartTooltip = document.querySelector("#chart-tooltip");
-const ASSET_REVISION = "20260721-requested-nature-cases";
+const ASSET_REVISION = "20260721-scatter-11point";
 const interactiveReadout = document.querySelector("#interactive-readout");
 const interactiveNote = document.querySelector("#interactive-note");
 const interactiveTitle = document.querySelector("#interactive-title");
@@ -1681,6 +1681,10 @@ function renderRasterEvidenceInteractive(sample, table) {
       ["error status", row.error_status],
       ["pixel x", row.pixel_x],
       ["pixel y", row.pixel_y],
+      ["x uncertainty", row.x_uncertainty],
+      ["y uncertainty", row.y_uncertainty],
+      ["confidence", row.confidence],
+      ["component peaks", row.component_peak_count],
       ["status", row.value_status || "visible geometry"],
     ]);
     const shared = { fill: "rgba(0,0,0,0.001)", stroke: "transparent", "stroke-width": 0, tabindex: index % 8 === 0 ? 0 : -1 };

@@ -54,16 +54,20 @@
       "title": "散点图",
       "subtitle": "真实论文中的彩色标记散点",
       "status": "visible_geometry_candidate",
-      "statusLabel": "候选 · 可见散点几何",
-      "description": "Nature Communications Fig. 4a：每个可分离彩色标记按原生像素中心保留，坐标值来自已确认的线性坐标框。",
+      "statusLabel": "候选 · 确定性分峰",
+      "description": "Nature Communications Fig. 4a：11 个可见彩色标记由紧凑散点候选提取器在原始像素画布上恢复；两组三点相连组件按距离峰分离，坐标值来自已确认的线性坐标标定。",
       "metrics": [
         {
           "label": "点覆盖",
-          "value": "10 / 10"
+          "value": "11 / 11"
+        },
+        {
+          "label": "接触分峰",
+          "value": "2 组三点组件"
         },
         {
           "label": "证据",
-          "value": "可见像素"
+          "value": "确定性栅格候选"
         }
       ],
       "assets": {
@@ -81,8 +85,8 @@
       "styleSpec": {
         "renderer": "paper-native-geometry",
         "fidelity": "visible_geometry_candidate",
-        "label": "可见散点 · 交互重绘",
-        "note": "悬停每个圆点可读取它的提取坐标；这些是显示层的可见标记，而非潜在模型参数。",
+        "label": "11 个可见散点 · 原像素命中",
+        "note": "悬停每个圆点可读取变量、提取坐标、原始像素中心与不确定度；这些是显示层的可见标记，而非作者的原始观测或潜在模型参数。",
         "canvas": {
           "width": 1370,
           "height": 650
