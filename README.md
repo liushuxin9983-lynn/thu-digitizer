@@ -2,201 +2,119 @@
   <img src="assets/thu-digitizer-hero-handdrawn-white.png" alt="THU Digitizer" width="920">
 </p>
 
-<p align="center">
-  <img alt="Input" src="https://img.shields.io/badge/Input-chart_images_%2B_PDF-6F42A1?style=for-the-badge">
-  <img alt="Output" src="https://img.shields.io/badge/Output-CSV_%2B_JSON_%2B_overlay-25A9E0?style=for-the-badge">
-  <img alt="Workflow" src="https://img.shields.io/badge/Workflow-local_%2B_auditable-39A96B?style=for-the-badge">
-  <img alt="License MIT" src="https://img.shields.io/badge/License-MIT-FF6699?style=for-the-badge">
-</p>
-
-> **真实论文图像验证：** THU Digitizer 已在多篇 *Nature Communications* 论文的真实公开图像上完成测试，覆盖散点图、折线图、柱状图、热图、UpSet 复合图和环形图等类型。画廊同时展示原图、提取覆盖、数据复现、CSV 与置信状态，未通过校验的图元会明确保留为 `not_extracted` 或低置信候选。
->
-> **在线画廊：** [https://rimagination.github.io/thu-digitizer/](https://rimagination.github.io/thu-digitizer/)
-
-### 真实复合图提取示例
-
-以下示例来自 *Nature Communications* 真实 UpSet 复合图案例；原图、提取覆盖和数据复现使用同一像素画布，便于逐项核对。
-
-| 原图 | 提取覆盖 | 数据复现 |
-| --- | --- | --- |
-| [![真实 UpSet 复合图原图](gallery/assets/cases/nature-27341-fig1/original.png)](https://rimagination.github.io/thu-digitizer/#basic-nature-27341-fig1) | [![UpSet 复合图提取覆盖](gallery/assets/cases/nature-27341-fig1/overlay.png)](https://rimagination.github.io/thu-digitizer/#basic-nature-27341-fig1) | [![UpSet 复合图数据复现](gallery/assets/cases/nature-27341-fig1/recreated.png)](https://rimagination.github.io/thu-digitizer/#basic-nature-27341-fig1) |
-
 # THU Digitizer
 
-THU Digitizer 是一个研究优先的科研图表数字化 skill：从图片和 PDF 图中恢复**肉眼可见、坐标可校准、结果可复核**的数值，并把 CSV、JSON 报告、覆盖图、校准参数和来源记录一起保存下来。
+从科研图表图片和 PDF 中恢复可见数据，并同时交付 CSV、覆盖图和可复核报告。
 
-它的核心特点是：
+[在线画廊](https://rimagination.github.io/thu-digitizer/) · [完整工作流](SKILL.md) · [能力注册表](scripts/extractor_registry.py) · [MIT License](LICENSE)
 
-- 先分类再提取：先识别输入类型、图表语法、坐标体系和目标面板，再选择专用路线；未知或不兼容图表不会被强行塞进通用 XY 提取器。
-- 本地确定性执行：已注册的脚本负责真正的数值输出，模型只辅助提出图表类型、绘图区、标定点和颜色等候选信息。
-- 证据随结果交付：除 CSV 外，同时保留输入哈希、FigureSpec、参数、置信度、诊断、JSON 报告和 overlay/recreation，方便逐点检查。
-- 保守拒绝：看不清、被遮挡、无法唯一匹配或校准不充分时，返回 `low_confidence`、`not_extracted` 或拒绝数值输出，而不是补出一个看似完整的表格。
-- 源数据独立验证：论文附带的 XLSX/CSV 用于单独验证可见提取结果，不会反向改写原始 digitization CSV。
+THU Digitizer 面向论文复核、图表重绘、系统综述和复现研究。它只接受有像素或矢量证据、且坐标可以校准的数值；看不清、被遮挡或无法唯一判断的内容会标记为 `low_confidence` 或 `not_extracted`，不会为了补齐表格而猜值。
 
-它的目标不是“一键猜出所有数据”，而是把科研图表数字化变成一条可重复、可审计、知道边界的证据链。
+## 一分钟开始
 
-## 适合什么
+### 使用 Agent
 
-- 从折线图、直方图和填充箱线图中恢复可见数值。
-- 对散点、分组/堆叠柱图、热图、轮廓箱线图等候选路线进行受约束提取与覆盖图复核。
-- 优先检查 PDF 中的矢量路径、标记和文字，再决定直接恢复几何信息还是转入栅格流程。
-- 用论文官方补充表、CSV 或工作簿验证图中可见点、区间或汇总值。
-- 为论文复核、系统综述、复现研究和图表重绘准备带来源与置信度的数据。
-- 通过本地 OA Figure Gallery 查看原图、提取覆盖、CSV、复现图和能力边界。
-
-## 输出内容
-
-一次完整任务通常会生成两层结果：面向使用的数据文件，以及面向复核的证据包。数据文件只包含获得授权的可见提取值；证据包解释这些值从哪里来、如何校准、哪些内容没有被提取。
-
-<details>
-<summary>展开完整输出清单</summary>
-
-常见数据文件：
-
-- `data.csv` 或任务指定的提取 CSV
-- 单独保存的 `source-validation.csv`
-- 从提取值绘制的 `recreated.png`
-
-常见证据文件：
-
-- `preflight-report.json`：输入、候选图表类型与保守路由结果
-- `figure-spec.json`：面板、绘图区、坐标轴、变换、系列和校准确认项
-- `report.json`：输入哈希、算法版本、参数、置信度、诊断与拒绝原因
-- `overlay.png`：把接受或拒绝的图元叠加回原图检查
-- `vector-inspection.json`：PDF 页面中的路径、标记、颜色和几何统计
-- 源数据验证 JSON、identity plot 或对比 overlay
-
-</details>
-
-## 当前能力边界
-
-| 成熟度 | 当前路线 | 使用要求 |
-| --- | --- | --- |
-| 稳定 | 颜色可分离的校准折线、直方图、纵向/横向填充箱线图 | 明确面板、绘图区、坐标标定与颜色；通过本地回归门槛 |
-| 候选 | 紧凑填充散点、简单/分组/堆叠柱图、连续轨迹模式、热图、轮廓箱线图、矢量 PDF 剂量反应图 | 必须检查 overlay、诊断、覆盖率和每类路线的额外确认项 |
-| 辅助 | 通用 PDF 矢量检查、官方源数据验证 | 需要人工确认图元语义、坐标变换与面板映射 |
-| 拒绝 | 未知图表、未实现的非笛卡尔坐标、无法唯一识别或校准的图元 | 只输出路由诊断，不授权数值结果 |
-
-能力索引中的图表类型不等于已经稳定支持。路线成熟度以 [`scripts/extractor_registry.py`](scripts/extractor_registry.py)、[`SKILL.md`](SKILL.md) 和对应基准证据为准。
-
-## 快速使用
-
-### 1. 安装
-
-把下面这句话发给 Agent：
+先把仓库安装为 skill：
 
 ```text
 请帮我安装这个 skill：
 https://github.com/Rimagination/thu-digitizer
 ```
 
-### 2. 提取图表
-
-把图表图片或论文 PDF 发给 Agent，然后说：
+然后发送图表图片或论文 PDF：
 
 ```text
-请用 THU Digitizer 检查这张图，确认图表类型和坐标后提取可见数据，
-并保留 CSV、JSON 报告、overlay、来源记录和拒绝状态。
+请用 THU Digitizer 提取这张图中的可见数据，先确认图表类型、目标面板和坐标，
+并保留 CSV、提取覆盖图、JSON 报告和未提取项。
 ```
 
-如果是 PDF，请同时说明页码和目标面板；如果没有说明，Agent 会先做预检，不会直接猜值。
-
-### 3. 验证与保存
-
-如果论文提供官方源数据，可以继续说：
+如果输入是 PDF，请同时说明页码和目标面板。需要与作者公开的 XLSX/CSV 比较时，可以继续说：
 
 ```text
-请把提取结果与这份官方工作簿做独立验证，不要覆盖原始提取 CSV，
-并把结果保存到：“D:\科研数据\figure-digitization” 里。
+请用官方源数据独立验证提取结果，不要覆盖原始提取 CSV。
 ```
 
-## 命令行预检
+## 结果长什么样
 
-核心 CLI 先列出路由、检查输入并生成待确认的 FigureSpec；它不会把“找到候选路线”等同于“已经可以提取”。
+每个案例都尽量保留同一条证据链：原图 → 提取覆盖 → 数据复现 → CSV/JSON 报告。
 
-```powershell
-python scripts\thu_digitizer.py routes
-
-python scripts\thu_digitizer.py inspect `
-  --input figure.png `
-  --chart-type histogram `
-  --output-report preflight-report.json `
-  --output-spec figure-spec.json
-
-python scripts\thu_digitizer.py validate-spec `
-  --spec figure-spec.json
-```
-
-如果图表类型未知，可以省略 `--chart-type`。预检会返回 `needs_chart_type_confirmation`，等待确认后再进入对应提取器。
-
-## 依赖与环境
-
-核心预检和基础提取使用 Python 3.10+，主要依赖 NumPy、Pillow 和 PyMuPDF：
-
-```powershell
-python -m pip install numpy pillow pymupdf
-```
-
-基准、画廊构建和部分验证脚本还会按需使用 Matplotlib、SciPy、OpenPyXL 和 OpenCV。普通使用不需要先安装所有开发依赖。
-
-| 层级 | 用来做什么 | 主要依赖 |
+| 原图 | 提取覆盖 | 数据复现 |
 | --- | --- | --- |
-| 核心 | 路由预检、栅格标定、基础提取、PDF 矢量检查 | Python、NumPy、Pillow、PyMuPDF |
-| 候选路线 | 散点分割与更复杂的图像几何 | OpenCV、对应路线脚本 |
-| 验证与画廊 | 重绘、统计比较、工作簿读取和证据构建 | Matplotlib、SciPy、OpenPyXL |
-| 开发测试 | 运行完整回归套件 | `unittest` 与上述相关依赖 |
+| [![真实 UpSet 复合图原图](gallery/assets/cases/nature-27341-fig1/original.png)](https://rimagination.github.io/thu-digitizer/#basic-nature-27341-fig1) | [![UpSet 复合图提取覆盖](gallery/assets/cases/nature-27341-fig1/overlay.png)](https://rimagination.github.io/thu-digitizer/#basic-nature-27341-fig1) | [![UpSet 复合图数据复现](gallery/assets/cases/nature-27341-fig1/recreated.png)](https://rimagination.github.io/thu-digitizer/#basic-nature-27341-fig1) |
 
-默认工作流在本地运行。只有用户明确批准时，才可以把图像交给远程 OCR 或视觉模型服务。
+一次任务通常会生成：
 
-## 本地画廊
+| 文件 | 用途 |
+| --- | --- |
+| `data.csv` | 获得授权的可见提取值 |
+| `overlay.png` | 把接受、拒绝或存疑的图元叠加回原图复核 |
+| `recreated.png` | 根据提取值重绘，检查结构与坐标是否一致 |
+| `report.json` | 保存输入哈希、校准、参数、置信度、诊断和拒绝原因 |
 
-仓库自带一个静态 OA Figure Gallery，用来并排查看原图、覆盖图、数据复现、CSV 和能力成熟度：
+根据输入类型，还可能生成 `figure-spec.json`、PDF 矢量检查报告或单独的源数据验证文件。
+
+## 能做什么
+
+| 成熟度 | 图表与任务 |
+| --- | --- |
+| 稳定 | 颜色可分离的校准折线图、直方图、纵向/横向填充箱线图 |
+| 候选 | 紧凑填充散点、简单/分组/堆叠柱图、热图、轮廓箱线图、UpSet 等规则矩阵复合图、部分 PDF 矢量图 |
+| 辅助 | PDF 矢量对象检查、作者官方源数据的独立验证 |
+
+候选路线必须检查覆盖图、诊断和置信状态。画廊中出现某种图表，只代表项目记录了该案例，不等于它已经稳定自动支持；准确状态以[能力注册表](scripts/extractor_registry.py)为准。
+
+THU Digitizer 不用于恢复图中没有显示的原始样本、完全遮挡的图元、作者未公开的拟合参数，或无法校准的坐标。遇到这些情况，它会保留缺失或拒绝数值输出。
+
+## 它如何工作
+
+1. **预检**：确认输入、图表类型、目标面板、坐标轴和可用提取路线。
+2. **确定性提取**：由仓库内已注册的脚本计算数值，保留原始像素坐标和运行参数。
+3. **证据复核**：生成覆盖图、复现图和报告；官方源数据只用于独立验证，不反向改写图像提取结果。
+
+工作流默认在本地运行。只有用户明确批准时，才会把图像交给远程 OCR 或视觉模型服务。
+
+## 开发者使用
+
+```powershell
+git clone https://github.com/Rimagination/thu-digitizer.git
+cd thu-digitizer
+python -m pip install numpy pillow pymupdf
+python scripts/thu_digitizer.py routes
+```
+
+先用统一入口检查图表并生成待确认的 `FigureSpec`：
+
+```powershell
+python scripts/thu_digitizer.py inspect --input figure.png --chart-type histogram --output-report preflight-report.json --output-spec figure-spec.json
+python scripts/thu_digitizer.py validate-spec --spec figure-spec.json
+```
+
+如果图表类型未知，可以省略 `--chart-type`。预检只负责路由和确认，不代表数值已经获得提取授权。不同图表的完整参数与质量门槛见 [`SKILL.md`](SKILL.md)。
+
+运行本地画廊：
 
 ```powershell
 python -m http.server 8793 --bind 127.0.0.1 --directory gallery
 ```
 
-然后打开 <http://127.0.0.1:8793/>。画廊中的类型索引用于路由和研究规划；只有带明确提取证据与成熟度标记的案例才能作为能力证明。
-
-## 图表数字化原则
-
-- 先验证面板、坐标系、轴变换和图例，再接受任何数值。
-- 优先使用 PDF/SVG 中可验证的矢量对象；矢量语义不清时回退到受校准的栅格流程。
-- 只恢复图上可见的点、线、柱、箱体、误差端点或色块，不推断隐藏原始样本和作者拟合参数。
-- 保留空缺和遮挡；不为了表格完整而插值或从官方工作簿回填。
-- 图像提取与源数据验证分开保存，报告配对覆盖率、单位变换和不可比较项。
-- 新路线只有在合成、真实矢量、真实栅格和跨工具比较门槛通过后，才能从候选提升为稳定。
-
-## 相关文件
-
-- [`SKILL.md`](SKILL.md)：Agent 使用 THU Digitizer 时读取的完整工作流和边界。
-- [`scripts/thu_digitizer.py`](scripts/thu_digitizer.py)：统一路由、预检和 FigureSpec 入口。
-- [`scripts/extractor_registry.py`](scripts/extractor_registry.py)：稳定、候选、辅助与拒绝路线的机器可读注册表。
-- [`scripts/figure_spec.py`](scripts/figure_spec.py)：面板、坐标、系列、校准和确认状态契约。
-- [`references/research-quality-baseline.md`](references/research-quality-baseline.md)：研究质量门槛和候选路线提升规则。
-- [`references/official-source-data-validation.md`](references/official-source-data-validation.md)：官方源数据独立验证规范。
-- [`gallery/`](gallery/)：OA 案例、能力地图、CSV、overlay 和交互复现。
-- [`scripts/`](scripts/)：提取器、构建脚本、基准和回归测试。
-
-## 开发测试
-
-在 `scripts/` 目录发现并运行全部 `unittest`：
+运行测试：
 
 ```powershell
 python -m unittest discover -s scripts -p "test_*.py" -v
 ```
 
-大型或一次性基准运行应放在仓库外的临时目录，只把可复现的小型 fixture、清单和必要证据纳入版本控制。
+部分候选提取器、基准和画廊构建还会按需使用 OpenCV、Matplotlib、SciPy 和 OpenPyXL；普通预检不要求一次安装全部开发依赖。
 
-## 致谢
+## 进一步阅读
 
-THU Digitizer 的研究基线和实现受这些工具与生态启发或支持：
+- [`SKILL.md`](SKILL.md)：完整工作流、各图表路线和拒绝条件
+- [`scripts/extractor_registry.py`](scripts/extractor_registry.py)：机器可读的能力成熟度与路由注册表
+- [`references/research-quality-baseline.md`](references/research-quality-baseline.md)：候选路线的研究质量与提升门槛
+- [`references/official-source-data-validation.md`](references/official-source-data-validation.md)：官方源数据独立验证规范
+- [`gallery/ATTRIBUTION.md`](gallery/ATTRIBUTION.md)：画廊案例的来源与许可
 
-- [WebPlotDigitizer](https://automeris.io/)：交互式坐标校准与图表数字化的重要比较基线。
-- [PyMuPDF](https://pymupdf.readthedocs.io/)：PDF 页面与矢量对象检查。
-- [NumPy](https://numpy.org/)、[Pillow](https://python-pillow.org/)、[Matplotlib](https://matplotlib.org/)、[SciPy](https://scipy.org/) 和 [OpenCV](https://opencv.org/)：本地几何处理、统计验证和证据可视化。
-- 画廊中的开放获取论文与作者公开源数据；具体来源、许可和用途记录在各案例及 [`gallery/ATTRIBUTION.md`](gallery/ATTRIBUTION.md) 中。
+## 致谢与许可
 
-## 许可证
+项目使用 [WebPlotDigitizer](https://automeris.io/) 作为重要比较基线，并依赖 PyMuPDF、NumPy、Pillow、Matplotlib、SciPy、OpenCV 等开源工具。画廊中的论文图像与公开源数据按各自来源和许可使用。
 
-本项目使用 [MIT License](LICENSE)。
+代码采用 [MIT License](LICENSE)。
