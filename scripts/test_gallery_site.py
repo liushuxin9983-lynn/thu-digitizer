@@ -276,6 +276,66 @@ class GallerySiteTests(unittest.TestCase):
                 for name in ["preflight-report.json", "figure-spec.json", "source-validation.json", "SOURCES.md"]:
                     self.assertTrue((root / name).is_file(), f"{case_id}:{name}")
 
+    def test_fig8e_uses_the_user_approved_raster_and_reviewed_36_point_case(self):
+        sample = next(
+            item for item in self.basics["samples"] if item["id"] == "nature-37200-fig8e"
+        )
+        self.assertEqual(
+            {metric["label"]: metric["value"] for metric in sample["metrics"]},
+            {"bars": "6", "point candidates": "36", "clean markers": "17"},
+        )
+        self.assertNotIn("?", sample["description"])
+        self.assertNotIn("?", sample["styleSpec"]["note"])
+        self.assertTrue(sample["styleSpec"]["rasterEvidenceInteractive"])
+
+        root = (GALLERY / sample["assets"]["report"]).parent
+        original = root / "original.png"
+        expected_hash = "fcec6e33ba24cd5a8588ebdd04787aca74bf71a3f6955658ee3adcc24ec4e234"
+        self.assertEqual(hashlib.sha256(original.read_bytes()).hexdigest(), expected_hash)
+        for name in ("original.png", "overlay.png", "recreated.png"):
+            with Image.open(root / name) as image:
+                self.assertEqual(image.size, (1700, 581), name)
+
+        with (root / "data.csv").open(newline="", encoding="utf-8") as handle:
+            rows = list(csv.DictReader(handle))
+        self.assertEqual(len(rows), 60)
+        self.assertEqual(Counter(row["kind"] for row in rows), Counter({"point": 36, "line": 18, "rect": 6}))
+        point_rows = [row for row in rows if row["kind"] == "point"]
+        self.assertEqual(
+            Counter((row["series"], row["category"]) for row in point_rows),
+            Counter(
+                {
+                    ("E. coli B36", "-"): 6,
+                    ("E. coli B36", "+"): 6,
+                    ("S. aureus BPH2900", "-"): 6,
+                    ("S. aureus BPH2900", "+"): 6,
+                    ("S. pyogenes HKU419", "-"): 6,
+                    ("S. pyogenes HKU419", "+"): 6,
+                }
+            ),
+        )
+        self.assertEqual(
+            Counter(row["value_status"] for row in point_rows),
+            Counter(
+                {
+                    "visible_marker_candidate": 17,
+                    "error_line_overlap_candidate": 10,
+                    "bar_outline_overlap_candidate": 7,
+                    "merged_cluster_candidate": 2,
+                }
+            ),
+        )
+        self.assertEqual(sum(row["numeric_use_allowed"] == "true" for row in point_rows), 17)
+
+        report = json.loads((root / "report.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["status"], "candidate_with_review_flags")
+        self.assertEqual(report["extraction_strategy"], "hybrid")
+        self.assertEqual(report["input"]["sha256"], expected_hash)
+        self.assertEqual(report["point_candidates"], 36)
+        self.assertEqual(report["primary_csv"]["rows"], 60)
+        self.assertEqual(len(report["summary_consistency"]), 6)
+        self.assertEqual(report["source_data_role"], "not_used")
+
     def test_requested_nature_donut_case_preserves_visible_labels_without_forcing_100(self):
         sample = next(item for item in self.basics["samples"] if item["id"] == "pie")
         self.assertEqual(

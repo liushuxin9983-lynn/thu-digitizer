@@ -129,61 +129,312 @@ def save_case(case_id: str, source_name: str, crop: tuple[int, int, int, int], r
 
 
 def fig8e() -> None:
-    # Retain the full panel header: the old crop clipped the titles and made
-    # the subsequent recreation look like an unrelated generic bar chart.
-    crop = (0, 1920, 1700, 2501)
-    baseline, top = 544, 142
-    rows: list[dict] = []
+    root = OUT / "nature-37200-fig8e"
+    source = root / "original.png"
+    expected_hash = "fcec6e33ba24cd5a8588ebdd04787aca74bf71a3f6955658ee3adcc24ec4e234"
+    if sha256(source) != expected_hash:
+        raise ValueError("nature-37200-fig8e original.png does not match the user-approved source")
+    original = Image.open(source).convert("RGB")
+    if original.size != (1700, 581):
+        raise ValueError(f"unexpected Fig. 8e canvas: {original.size}")
+
     panels = [
-        ("E. coli B36", 134, 399, 80, 208, 325, 30, 49, "**", 153),
-        ("S. aureus BPH2900", 676, 941, 200, 754, 873, 68, 101, "*", 188),
-        ("S. pyogenes HKU419", 1254, 1521, 150, 1334, 1445, 75, 107, "**", 143),
+        {
+            "name": "E. coli B36",
+            "left": 134,
+            "right": 399,
+            "minus_center": 209.2,
+            "plus_center": 323.5,
+            "bracket": (216, 325, 154),
+            "stars": "**",
+            "anchors": [(543, 0), (443, 20), (344, 40), (244, 60), (143, 80)],
+        },
+        {
+            "name": "S. aureus BPH2900",
+            "left": 676,
+            "right": 942,
+            "minus_center": 751.4,
+            "plus_center": 865.5,
+            "bracket": (746, 868, 190),
+            "stars": "*",
+            "anchors": [(543, 0), (443, 50), (344, 100), (244, 150), (143, 200)],
+        },
+        {
+            "name": "S. pyogenes HKU419",
+            "left": 1256,
+            "right": 1521,
+            "minus_center": 1331.0,
+            "plus_center": 1445.5,
+            "bracket": (1331, 1446, 144),
+            "stars": "**",
+            "anchors": [(543, 0), (411, 50), (278, 100), (143, 150)],
+        },
     ]
-    visible_replicates = {
-        "E. coli B36": ([24, 28, 30, 31, 34, 35], [38, 42, 45, 47, 56, 69]),
-        "S. aureus BPH2900": ([50, 57, 64, 68, 76, 89, 104], [79, 85, 89, 94, 100, 119, 150]),
-        "S. pyogenes HKU419": ([56, 64, 68, 73, 78, 82, 91], [91, 95, 100, 108, 112, 128, 136]),
+    points = {
+        ("E. coli B36", "-"): [
+            (35.5423, 221.3333, 365.6667, "error_line_overlap_candidate"),
+            (34.5413, 197.3333, 370.6667, "error_line_overlap_candidate"),
+            (31.0712, 221.0, 388.0, "bar_outline_overlap_candidate"),
+            (31.0712, 197.0, 388.0, "bar_outline_overlap_candidate"),
+            (25.6658, 221.0, 415.0, "error_line_overlap_candidate"),
+            (23.3635, 197.5, 426.5, "visible_marker_candidate"),
+        ],
+        ("E. coli B36", "+"): [
+            (69.2089, 323.5, 197.5, "visible_marker_candidate"),
+            (57.1970, 323.5, 257.5, "error_line_overlap_candidate"),
+            (45.6856, 335.0, 315.0, "visible_marker_candidate"),
+            (43.7837, 311.5, 324.5, "visible_marker_candidate"),
+            (41.1812, 323.5, 337.5, "merged_cluster_candidate"),
+            (38.8789, 323.5, 349.0, "merged_cluster_candidate"),
+        ],
+        ("S. aureus BPH2900", "-"): [
+            (102.7027, 751.5, 338.0, "visible_marker_candidate"),
+            (77.6779, 751.5, 388.0, "error_line_overlap_candidate"),
+            (67.1675, 763.0, 409.0, "bar_outline_overlap_candidate"),
+            (63.6641, 739.5, 416.0, "bar_outline_overlap_candidate"),
+            (56.4903, 751.3333, 430.3333, "error_line_overlap_candidate"),
+            (48.6492, 751.5, 446.0, "error_line_overlap_candidate"),
+        ],
+        ("S. aureus BPH2900", "+"): [
+            (150.4999, 865.5, 242.5, "visible_marker_candidate"),
+            (120.2200, 865.5, 303.0, "error_line_overlap_candidate"),
+            (96.6967, 865.5, 350.0, "bar_outline_overlap_candidate"),
+            (86.9371, 856.0, 369.5, "visible_marker_candidate"),
+            (84.6849, 877.0, 374.0, "visible_marker_candidate"),
+            (79.4297, 856.0, 384.5, "visible_marker_candidate"),
+        ],
+        ("S. pyogenes HKU419", "-"): [
+            (91.7850, 1331.0, 299.0, "visible_marker_candidate"),
+            (76.7816, 1319.0, 339.0, "visible_marker_candidate"),
+            (75.4689, 1343.0, 342.5, "visible_marker_candidate"),
+            (67.0295, 1319.0, 365.0, "bar_outline_overlap_candidate"),
+            (64.0288, 1343.0, 373.0, "visible_marker_candidate"),
+            (55.0268, 1331.0, 397.0, "visible_marker_candidate"),
+        ],
+        ("S. pyogenes HKU419", "+"): [
+            (134.7321, 1445.5, 184.5, "visible_marker_candidate"),
+            (111.6645, 1433.5, 246.0, "visible_marker_candidate"),
+            (111.2894, 1457.5, 247.0, "visible_marker_candidate"),
+            (103.7877, 1445.5, 267.0, "bar_outline_overlap_candidate"),
+            (92.3476, 1457.5, 297.5, "error_line_overlap_candidate"),
+            (91.2224, 1433.5, 300.5, "error_line_overlap_candidate"),
+        ],
     }
-    annotations = [{"text": "E", "x": 0, "y": 42, "size": 31, "bold": True}]
+    summaries = {
+        ("E. coli B36", "-"): (30.2092, 4.8208),
+        ("E. coli B36", "+"): (49.3226, 11.6338),
+        ("S. aureus BPH2900", "-"): (69.3920, 19.0407),
+        ("S. aureus BPH2900", "+"): (103.0780, 27.3550),
+        ("S. pyogenes HKU419", "-"): (71.6868, 12.6656),
+        ("S. pyogenes HKU419", "+"): (107.5073, 16.0102),
+    }
+
+    baseline = 543
+    rows: list[dict] = []
     lines: list[dict] = []
-    for panel, left, right, maximum, control_x, treated_x, control, treated, stars, bracket_y in panels:
-        value_to_y = lambda value: baseline - value / maximum * (baseline - top)
-        annotations.append({"text": panel, "x": (left + right) / 2, "y": 67, "size": 28, "italic": True, "anchor": "middle"})
-        lines.extend([
-            {"x1": left, "y1": top, "x2": left, "y2": baseline, "width": 4},
-            {"x1": left, "y1": baseline, "x2": right, "y2": baseline, "width": 4},
-            {"x1": control_x, "y1": bracket_y + 18, "x2": control_x, "y2": bracket_y, "width": 4},
-            {"x1": control_x, "y1": bracket_y, "x2": treated_x, "y2": bracket_y, "width": 4},
-            {"x1": treated_x, "y1": bracket_y, "x2": treated_x, "y2": bracket_y + 18, "width": 4},
-        ])
-        annotations.append({"text": stars, "x": (control_x + treated_x) / 2, "y": bracket_y - 14, "size": 31, "bold": True, "anchor": "middle"})
-        tick_step = 20 if maximum == 80 else 50
-        for value in range(0, maximum + 1, tick_step):
-            py = value_to_y(value)
-            lines.append({"x1": left - 10, "y1": py, "x2": left, "y2": py, "width": 3})
-            annotations.append({"text": str(value), "x": left - 17, "y": py + 7, "size": 23, "bold": True, "anchor": "end"})
-        annotations.extend([
-            {"text": "-", "x": control_x, "y": baseline + 24, "size": 25, "bold": True, "anchor": "middle"},
-            {"text": "+", "x": treated_x, "y": baseline + 24, "size": 25, "bold": True, "anchor": "middle"},
-            {"text": "Percentage survival", "x": left - 88, "y": (top + baseline) / 2, "size": 31, "bold": True, "anchor": "middle", "rotate": -90},
-        ])
-        for category, center, value in [("-", control_x, control), ("+", treated_x, treated)]:
-            bar_top = value_to_y(value)
-            rows.append({"kind": "rect", "series": panel, "category": category, "x": category, "value": value, "pixel_x": center - 36, "pixel_y": bar_top, "width": 72, "height": baseline - bar_top, "fill": "#ffffff", "stroke": "#050505", "stroke_width": 4, "value_status": "visible_bar_height"})
-            replicate_values = visible_replicates[panel][0 if category == "-" else 1]
-            lower, upper = min(replicate_values), max(replicate_values)
-            # The displayed vertical interval and cap geometry are measured from
-            # the bar panel; they are not a reconstructed standard error.
-            rows.extend([
-                {"kind": "line", "series": panel, "category": category, "x": category, "value": value, "pixel_x": center, "pixel_y": value_to_y(lower), "x2": center, "y2": value_to_y(upper), "stroke": "#222" if category == "-" else "#4c9746", "stroke_width": 2, "value_status": "visible_interval_geometry"},
-                {"kind": "line", "series": panel, "category": category, "x": category, "value": value, "pixel_x": center - 12, "pixel_y": value_to_y(lower), "x2": center + 12, "y2": value_to_y(lower), "stroke": "#222" if category == "-" else "#4c9746", "stroke_width": 2, "value_status": "visible_interval_geometry"},
-                {"kind": "line", "series": panel, "category": category, "x": category, "value": value, "pixel_x": center - 12, "pixel_y": value_to_y(upper), "x2": center + 12, "y2": value_to_y(upper), "stroke": "#222" if category == "-" else "#4c9746", "stroke_width": 2, "value_status": "visible_interval_geometry"},
-            ])
-            offsets = [-13, -7, 0, 7, 13, -3, 4]
-            for index, replicate in enumerate(replicate_values):
-                rows.append({"kind": "point", "series": panel, "category": category, "x": category, "value": replicate, "pixel_x": center + offsets[index], "pixel_y": value_to_y(replicate), "radius": 6, "marker": "square" if category == "+" else "circle", "fill": "#16800f" if category == "+" else "#080808", "value_status": "visible_replicate_marker"})
-    geometry = {"lines": lines, "rects": [], "polygons": [], "annotations": annotations}
-    save_case("nature-37200-fig8e", "fig8-37200.png", crop, rows, annotations, lines, "Fig. 8e percentage survival grouped bars, visible intervals and replicate marks", geometry)
+    annotations = [{"text": "E", "x": 0, "y": 42, "size": 31, "bold": True}]
+    summary_report = []
+    status_counts: dict[str, int] = {}
+    for panel in panels:
+        name = panel["name"]
+        anchors = panel["anchors"]
+        value_to_pixel = np.polyfit([value for _, value in anchors], [pixel for pixel, _ in anchors], 1)
+        pixel_from_value = lambda value: float(np.polyval(value_to_pixel, value))
+        top = min(pixel for pixel, _ in anchors)
+        left, right = panel["left"], panel["right"]
+        bracket_left, bracket_right, bracket_y = panel["bracket"]
+        lines.extend(
+            [
+                {"x1": left, "y1": top, "x2": left, "y2": baseline, "width": 4},
+                {"x1": left, "y1": baseline, "x2": right, "y2": baseline, "width": 4},
+                {"x1": bracket_left, "y1": bracket_y + 22, "x2": bracket_left, "y2": bracket_y, "width": 4},
+                {"x1": bracket_left, "y1": bracket_y, "x2": bracket_right, "y2": bracket_y, "width": 4},
+                {"x1": bracket_right, "y1": bracket_y, "x2": bracket_right, "y2": bracket_y + 22, "width": 4},
+            ]
+        )
+        annotations.extend(
+            [
+                {"text": name, "x": (left + right) / 2, "y": 67, "size": 28, "italic": True, "anchor": "middle"},
+                {"text": panel["stars"], "x": (bracket_left + bracket_right) / 2, "y": bracket_y - 14, "size": 31, "bold": True, "anchor": "middle"},
+                {"text": "-", "x": panel["minus_center"], "y": baseline + 25, "size": 25, "bold": True, "anchor": "middle"},
+                {"text": "+", "x": panel["plus_center"], "y": baseline + 25, "size": 25, "bold": True, "anchor": "middle"},
+                {"text": "Percentage survival", "x": left - 88, "y": (top + baseline) / 2, "size": 31, "bold": True, "anchor": "middle", "rotate": -90},
+            ]
+        )
+        for pixel, value in anchors:
+            lines.append({"x1": left - 10, "y1": pixel, "x2": left, "y2": pixel, "width": 3})
+            annotations.append({"text": str(value), "x": left - 17, "y": pixel + 7, "size": 23, "bold": True, "anchor": "end"})
+
+        for category, center in (("-", panel["minus_center"]), ("+", panel["plus_center"])):
+            mean, sample_sd = summaries[(name, category)]
+            lower, upper = mean - sample_sd, mean + sample_sd
+            bar_top = pixel_from_value(mean)
+            interval_top, interval_bottom = pixel_from_value(upper), pixel_from_value(lower)
+            colour = "#222222" if category == "-" else "#4c9746"
+            rows.append(
+                {
+                    "kind": "rect",
+                    "series": name,
+                    "category": category,
+                    "x": category,
+                    "value": mean,
+                    "error_lower": lower,
+                    "error_upper": upper,
+                    "pixel_x": center - 37,
+                    "pixel_y": bar_top,
+                    "width": 74,
+                    "height": baseline - bar_top,
+                    "fill": "#ffffff",
+                    "stroke": "#050505",
+                    "stroke_width": 4,
+                    "value_status": "derived_candidate_mean_matches_visible_bar",
+                    "numeric_use_allowed": "false",
+                }
+            )
+            for x1, y1, x2, y2 in (
+                (center, interval_top, center, interval_bottom),
+                (center - 20, interval_top, center + 20, interval_top),
+                (center - 20, interval_bottom, center + 20, interval_bottom),
+            ):
+                rows.append(
+                    {
+                        "kind": "line",
+                        "series": name,
+                        "category": category,
+                        "x": category,
+                        "value": mean,
+                        "error_lower": lower,
+                        "error_upper": upper,
+                        "pixel_x": x1,
+                        "pixel_y": y1,
+                        "x2": x2,
+                        "y2": y2,
+                        "stroke": colour,
+                        "stroke_width": 2,
+                        "value_status": "derived_sample_sd_matches_visible_interval",
+                        "numeric_use_allowed": "false",
+                    }
+                )
+            for value, pixel_x, pixel_y, status in points[(name, category)]:
+                status_counts[status] = status_counts.get(status, 0) + 1
+                rows.append(
+                    {
+                        "kind": "point",
+                        "series": name,
+                        "category": category,
+                        "x": category,
+                        "value": value,
+                        "pixel_x": pixel_x,
+                        "pixel_y": pixel_y,
+                        "radius": 6,
+                        "marker": "square" if category == "+" else "circle",
+                        "fill": "#16800f" if category == "+" else "#080808",
+                        "value_status": status,
+                        "numeric_use_allowed": "true" if status == "visible_marker_candidate" else "false",
+                        "pixel_uncertainty": 0.75 if status == "visible_marker_candidate" else 1.5,
+                    }
+                )
+            summary_report.append(
+                {
+                    "panel": name,
+                    "category": category,
+                    "n_candidates": len(points[(name, category)]),
+                    "mean": mean,
+                    "sample_sd": sample_sd,
+                    "mean_minus_sd": round(lower, 4),
+                    "mean_plus_sd": round(upper, 4),
+                }
+            )
+
+    geometry = {
+        "lines": lines,
+        "rects": [],
+        "polygons": [],
+        "annotations": annotations,
+        "sourceSha256": expected_hash,
+        "measurementSpace": "original_raster_pixels",
+    }
+    write_csv(root / "data.csv", rows)
+    (root / "geometry.json").write_text(
+        json.dumps(geometry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
+    recreation = draw_recreation(
+        original.size,
+        rows,
+        geometry["annotations"],
+        geometry["lines"],
+    )
+    recreation.save(root / "recreated.png")
+
+    overlay = original.copy()
+    overlay_draw = ImageDraw.Draw(overlay)
+    review_colours = {
+        "visible_marker_candidate": "#00b464",
+        "bar_outline_overlap_candidate": "#ff9600",
+        "error_line_overlap_candidate": "#ff9600",
+        "merged_cluster_candidate": "#dc2828",
+    }
+    for row in rows:
+        if row["kind"] != "point":
+            continue
+        x, y = float(row["pixel_x"]), float(row["pixel_y"])
+        colour = review_colours[row["value_status"]]
+        overlay_draw.ellipse((x - 8, y - 8, x + 8, y + 8), outline=colour, width=2)
+    overlay.save(root / "overlay.png")
+
+    report = {
+        "schema_version": 1,
+        "case_id": "nature-37200-fig8e",
+        "status": "candidate_with_review_flags",
+        "route": "hybrid_compact_scatter_with_original_pixel_review",
+        "extraction_strategy": "hybrid",
+        "panel_mapping": "Fig. 8e percentage survival bars, visible intervals, and scatter overlays",
+        "input": {
+            "file": "original.png",
+            "sha256": expected_hash,
+            "width": original.width,
+            "height": original.height,
+            "crop": [0, 0, original.width, original.height],
+            "measurement_space": "original_raster_pixels",
+        },
+        "point_candidates": len([row for row in rows if row["kind"] == "point"]),
+        "point_status_counts": status_counts,
+        "numeric_point_rows_allowed": status_counts.get("visible_marker_candidate", 0),
+        "review_layer_point_rows": sum(
+            count for status, count in status_counts.items() if status != "visible_marker_candidate"
+        ),
+        "bar_rows": len([row for row in rows if row["kind"] == "rect"]),
+        "interval_geometry_rows": len([row for row in rows if row["kind"] == "line"]),
+        "summary_consistency": summary_report,
+        "interval_interpretation": "Candidate point mean plus/minus sample SD matches the visible interval geometry; the figure does not independently label the interval statistic.",
+        "significance_annotations": {
+            "E. coli B36": "**",
+            "S. aureus BPH2900": "*",
+            "S. pyogenes HKU419": "**",
+            "exact_p_values": "not_recoverable_from_image",
+        },
+        "primary_csv": {
+            "file": "data.csv",
+            "rows": len(rows),
+            "role": "image-visible candidates, review layers, and candidate-derived summaries",
+        },
+        "overlay": {
+            "file": "overlay.png",
+            "green": "visible_marker_candidate",
+            "orange": "bar or error-line overlap review",
+            "red": "merged_cluster_candidate",
+        },
+        "source_data_role": "not_used",
+        "webplotdigitizer_comparison": "not_compared",
+        "limitations": [
+            "Review-layer points remain candidates and are not silently promoted to accepted raw observations.",
+            "Candidate-derived mean and sample SD are retained separately from visible mark coordinates.",
+            "Printed stars are transcribed, but exact p-values and author interval semantics are not recoverable from the raster.",
+        ],
+    }
+    (root / "report.json").write_text(
+        json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
+    )
 
 
 def heatmap_rows(image: Image.Image, bounds: tuple[int, int, int, int], rows_count: int, columns_count: int) -> list[dict]:
