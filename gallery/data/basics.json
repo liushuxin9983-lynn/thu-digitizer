@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-21",
+  "generated": "2026-07-23",
   "title": "thu-digitizer Basic Extraction Gallery",
   "columnLabels": [
     "原图",
@@ -1244,72 +1244,130 @@
     },
     {
       "id": "bar",
-      "title": "纵向分组柱",
-      "subtitle": "论文中的双系列分类计数",
-      "status": "candidate",
-      "statusLabel": "候选 · 论文矢量核验",
-      "description": "从 Nature Communications Fig. 2b 恢复 CER 与 TCX 的 32 个可见柱端值，并排除绘图区内同色图例。",
+      "title": "双轴柱形折线图",
+      "subtitle": "年度传输价值与批发电价",
+      "status": "partial_visible",
+      "statusLabel": "可见几何 · PDF 向量",
+      "description": "从 Nature Communications Fig. 3 的矢量 PDF 直接恢复两个面板中 2012–2022 年的 22 个柱端值与 22 个折线标记；不反推逐小时或链路级原始数据。",
       "metrics": [
         {
-          "label": "柱覆盖",
-          "value": "32 / 32"
+          "label": "可见柱",
+          "value": "22 / 22"
         },
         {
-          "label": "矢量核验 MAE",
-          "value": "21.8"
+          "label": "折线标记",
+          "value": "22 / 22"
         }
       ],
-      "articleUrl": "https://www.nature.com/articles/s41467-026-68864-9",
+      "metricNote": "公开 CSV 仅含图中可见年度汇总及 PDF 坐标；文章未提供可核验的 Fig. 3 Source Data 文件。",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-63143-5",
       "assets": {
-        "original": "assets/cases/nature-oatman-grouped-bar/original.png",
-        "overlay": "assets/cases/nature-oatman-grouped-bar/overlay.png",
-        "recreated": "assets/cases/nature-oatman-grouped-bar/recreated.png",
-        "data": "assets/cases/nature-oatman-grouped-bar/data.csv",
-        "report": "assets/cases/nature-oatman-grouped-bar/report.json"
+        "original": "assets/cases/nature-63143-fig3/original.png",
+        "overlay": "assets/cases/nature-63143-fig3/overlay.png",
+        "recreated": "assets/cases/nature-63143-fig3/recreated.png",
+        "data": "assets/cases/nature-63143-fig3/data.csv",
+        "report": "assets/cases/nature-63143-fig3/report.json"
       },
       "journal": "Nature Communications",
-      "articleTitle": "Integrative epigenomic landscape of Alzheimer’s Disease brains reveals oligodendrocyte molecular perturbations associated with tau",
-      "figure": "Fig. 2b",
-      "figureUrl": "https://www.nature.com/articles/s41467-026-68864-9/figures/2",
+      "articleTitle": "Electric transmission value and its drivers in United States power markets",
+      "figure": "Fig. 3",
+      "figureUrl": "https://www.nature.com/articles/s41467-025-63143-5/figures/3",
       "styleSpec": {
-        "renderer": "paper-grouped-bar",
-        "fidelity": "evidence_backed_style_reconstruction",
-        "label": "风格复现 · 像素几何",
-        "note": "柱体边界与配色来自原图栅格，数值经独立 PDF 矢量几何核验；坐标文字与图例排版为浏览器近似。",
+        "renderer": "paper-dual-axis-bar-line",
+        "fidelity": "visible_geometry_candidate",
+        "label": "论文原生画布 · PDF 向量几何",
+        "note": "柱体与折线标记逐行来自公开主 CSV；悬停任一数据标记可读取生成它的完整行字段。",
         "canvas": {
-          "width": 922,
-          "height": 665
+          "width": 1756,
+          "height": 828
         },
         "fontFamily": "Arial, Helvetica, sans-serif",
-        "plot": {
-          "left": 86,
-          "right": 891,
-          "top": 20,
-          "bottom": 506,
-          "baseline": 485
+        "crop": {
+          "x": 88.0,
+          "y": 45.0,
+          "scale": 4.0
         },
-        "axes": {
-          "yDomain": [
-            0,
-            35000
-          ],
-          "yTicks": [
-            0,
-            10000,
-            20000,
-            30000
-          ],
-          "xLabel": "Chromatin State",
-          "yLabel": "rCpGm Count"
-        },
-        "series": {
-          "CER": {
-            "color": "#8968cd"
+        "barWidthPt": 12.296,
+        "barColor": "#759adc",
+        "lineColor": "#7f7f7f",
+        "markerFill": "#bacdee",
+        "markerStroke": "#3f3f3f",
+        "panels": [
+          {
+            "id": "median_left",
+            "label": "Median",
+            "statistic": "median",
+            "plotBoundsPt": [
+              96.904,
+              51.201,
+              270.581,
+              224.8521
+            ],
+            "barDomain": [
+              0,
+              25
+            ],
+            "barTicks": [
+              0,
+              5,
+              10,
+              15,
+              20,
+              25
+            ],
+            "lineDomain": [
+              0,
+              70
+            ],
+            "lineTicks": [
+              0,
+              10,
+              20,
+              30,
+              40,
+              50,
+              60,
+              70
+            ]
           },
-          "TCX": {
-            "color": "#00c5cd"
+          {
+            "id": "mean_right",
+            "label": "Mean",
+            "statistic": "mean",
+            "plotBoundsPt": [
+              337.584,
+              51.201,
+              511.261,
+              224.8521
+            ],
+            "barDomain": [
+              0,
+              25
+            ],
+            "barTicks": [
+              0,
+              5,
+              10,
+              15,
+              20,
+              25
+            ],
+            "lineDomain": [
+              0,
+              70
+            ],
+            "lineTicks": [
+              0,
+              10,
+              20,
+              30,
+              40,
+              50,
+              60,
+              70
+            ]
           }
-        }
+        ]
       }
     },
     {
