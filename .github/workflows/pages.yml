@@ -31,6 +31,14 @@ jobs:
       - name: Configure GitHub Pages
         uses: actions/configure-pages@v5
 
+      - name: Remove non-public capability catalog
+        shell: bash
+        run: |
+          rm -f gallery/capabilities.html
+          rm -f gallery/app.js
+          rm -f gallery/styles.css
+          rm -f gallery/data/capabilities.json
+
       - name: Upload static gallery
         uses: actions/upload-pages-artifact@v4
         with:

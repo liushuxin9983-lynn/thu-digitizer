@@ -9,12 +9,11 @@
 
 两种模式都把悬停/键盘焦点绑定到 CSV 的真实记录。作者拟合曲线、箱线图的五数概括、热力图的截尾端点等不可从图像确定的内容，会在案例说明中单独标注。
 
-这个静态画廊现在有三层：
+这个静态画廊现在包含：
 
 - 首页类型目录：采用紧凑白色卡片矩阵，直接展示 12 种可提取图形。点击原图卡片后进入案例详情，可切换原图、提取覆盖和静态数据复现，查看核验指标、可双向拖动的完整数据表并下载 CSV。
 - 交互数据视图：直接从同一份 CSV 构建本地 SVG 图，鼠标或键盘聚焦数据标记时显示精确值。它单独标为“交互数据视图”，不声称逐像素复现论文原图样式。
 - 真实论文：保留 Nature Portfolio OA 文章的题名、图号、原文链接和证据口径。
-- 二级能力目录：以 WebPlotDigitizer 的 7 种校准体系为底座，增加结构解析与科研复合图路由，组织为 13 个提取类别、77 种常见/科研图表类型。
 
 R Graph Gallery 只用于补充图表词汇，不是画廊的顶层分类。
 
@@ -32,7 +31,6 @@ python -m http.server 8793 --bind 127.0.0.1 --directory gallery
 
 - `data/basics.json`：首页基础单图和精选论文案例；由 `scripts/build_basic_gallery.py` 生成。
 - `data/cases.json`：完整论文案例清单；由 `scripts/build_gallery_evidence.py` 生成。
-- `data/capabilities.json`：校准路线、图表类型、成熟度与真实 OA 代表案例；由 `scripts/build_gallery_atlas.py` 生成。
 - `assets/cases/<case-id>/original.*`：OA 论文原图。
 - `assets/basics/<type>/`：确定性基础单图的原图、覆盖层、复现图、CSV 与报告。
 - `assets/cases/<case-id>/atlas-*.jpg`：只用于类型路由的代表面板裁剪，不是数值提取结果。
@@ -46,7 +44,6 @@ python -m http.server 8793 --bind 127.0.0.1 --directory gallery
 
 ```powershell
 python scripts\build_gallery_evidence.py
-python scripts\build_gallery_atlas.py
 python scripts\build_basic_gallery.py
 ```
 
