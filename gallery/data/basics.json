@@ -2568,39 +2568,39 @@
         "label": "可见堆叠段 · 交互重绘",
         "note": "相邻色段在数据表中保持独立，避免把它们误读为一个总柱。",
         "canvas": {
-          "width": 860,
-          "height": 500
+          "width": 1050,
+          "height": 650
         },
         "fontFamily": "Arial, Helvetica, sans-serif",
         "lines": [
           {
-            "x1": 102,
-            "y1": 43,
-            "x2": 102,
-            "y2": 358,
-            "width": 2
+            "x1": 230,
+            "y1": 57,
+            "x2": 230,
+            "y2": 520,
+            "width": 3
           },
           {
-            "x1": 102,
-            "y1": 358,
-            "x2": 602,
-            "y2": 358,
-            "width": 2
+            "x1": 230,
+            "y1": 520,
+            "x2": 920,
+            "y2": 520,
+            "width": 3
           }
         ],
         "annotations": [
           {
             "text": "c",
-            "x": 5,
-            "y": 25,
-            "size": 26,
+            "x": 70,
+            "y": 20,
+            "size": 34,
             "bold": true
           },
           {
             "text": "Number of differentially expressed genes",
-            "x": 360,
-            "y": 420,
-            "size": 16,
+            "x": 575,
+            "y": 585,
+            "size": 24,
             "anchor": "middle"
           }
         ],

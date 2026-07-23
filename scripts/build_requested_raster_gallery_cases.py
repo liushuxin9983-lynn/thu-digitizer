@@ -864,17 +864,144 @@ def fig5e_scatter() -> None:
 
 
 def fig4c_stacked() -> None:
-    crop = (740, 0, 1600, 500)
+    source = TMP / "fig4-60895.png"
+    expected_source_hash = "d2b557ea683dd6d89125d59c066c45eee681c6b974ae3f9e816d780990772599"
+    if sha256(source) != expected_source_hash:
+        raise ValueError("Fig. 4 source does not match the 2050 x 2448 Nature raster")
+    source_image = Image.open(source).convert("RGB")
+    if source_image.size != (2050, 2448):
+        raise ValueError(f"unexpected Fig. 4 source canvas: {source_image.size}")
+
+    crop = (970, 0, 2020, 650)
+    original = source_image.crop(crop)
     labels = ["NSC", "Neuroblast", "Astrocyte", "TAP", "Ependymal", "Neuron", "OPC", "Endothelia", "Oligodendrocyte", "Pericyte", "Microglia"]
     totals = [(225, 260), (102, 165), (140, 125), (63, 66), (87, 40), (20, 50), (20, 15), (14, 20), (13, 10), (10, 8), (8, 4)]
+    red_geometry = [
+        (233, 76, 307, 18),
+        (233, 117, 136, 17),
+        (233, 157, 189, 18),
+        (233, 198, 82, 17),
+        (233, 238, 116, 18),
+        (233, 279, 22, 18),
+        (233, 320, 29, 18),
+        (233, 361, 12, 18),
+        (233, 401, 4, 18),
+        (233, 443, 2, 17),
+        (233, 483, 7, 17),
+    ]
+    blue_geometry = [
+        (545, 75, 325, 20),
+        (374, 116, 223, 19),
+        (428, 156, 168, 20),
+        (320, 197, 87, 19),
+        (355, 238, 50, 19),
+        (260, 279, 61, 19),
+        (268, 320, 11, 19),
+        (251, 360, 20, 19),
+        (243, 401, 15, 19),
+        (241, 442, 8, 19),
+        # The final downregulated segment is narrower than the black separator
+        # stroke in the published raster.  Retain the previously reviewed
+        # candidate, but describe its registered border-occluded footprint.
+        (241, 483, 7, 18),
+    ]
     rows = []
     for index, (label, (up, down)) in enumerate(zip(labels, totals)):
-        y = 52 + index * 28
-        rows.append({"kind": "rect", "series": "Upregulated", "category": label, "x": label, "value": up, "pixel_x": 102, "pixel_y": y, "width": up, "height": 20, "fill": "#ff3a1c", "stroke": "#222", "stroke_width": 2, "value_status": "visible_stacked_segment_candidate"})
-        rows.append({"kind": "rect", "series": "Downregulated", "category": label, "x": label, "value": down, "pixel_x": 102 + up, "pixel_y": y, "width": down, "height": 20, "fill": "#1597e5", "stroke": "#222", "stroke_width": 2, "value_status": "visible_stacked_segment_candidate"})
-    annotations = [{"text": "c", "x": 5, "y": 25, "size": 26, "bold": True}, {"text": "Number of differentially expressed genes", "x": 360, "y": 420, "size": 16, "anchor": "ma"}, *[{"text": label, "x": 95, "y": 67 + i * 28, "size": 13, "anchor": "ra"} for i, label in enumerate(labels)]]
-    lines = [{"x1": 102, "y1": 43, "x2": 102, "y2": 358, "width": 2}, {"x1": 102, "y1": 358, "x2": 602, "y2": 358, "width": 2}]
-    save_case("nature-60895-fig4c", "fig4-60895.png", crop, rows, annotations, lines, "Fig. 4c stacked horizontal differential-expression bars")
+        red_x, red_y, red_width, red_height = red_geometry[index]
+        blue_x, blue_y, blue_width, blue_height = blue_geometry[index]
+        rows.append({"kind": "rect", "series": "Upregulated", "category": label, "x": label, "value": up, "pixel_x": red_x, "pixel_y": red_y, "width": red_width, "height": red_height, "fill": "#ff2600", "stroke": "#222", "stroke_width": 2, "value_status": "visible_stacked_segment_candidate"})
+        rows.append({
+            "kind": "rect",
+            "series": "Downregulated",
+            "category": label,
+            "x": label,
+            "value": down,
+            "pixel_x": blue_x,
+            "pixel_y": blue_y,
+            "width": blue_width,
+            "height": blue_height,
+            "fill": "#0095fe",
+            "stroke": "#222",
+            "stroke_width": 2,
+            "value_status": "border_occluded_stacked_segment_candidate" if label == "Microglia" else "visible_stacked_segment_candidate",
+        })
+
+    annotations = [
+        {"text": "c", "x": 70, "y": 20, "size": 34, "bold": True},
+        {"text": "Number of differentially expressed genes", "x": 575, "y": 585, "size": 24, "anchor": "middle"},
+        *[{"text": label, "x": 220, "y": 85 + i * 41, "size": 22, "anchor": "end"} for i, label in enumerate(labels)],
+        *[{"text": str(value), "x": 230 + index * 138, "y": 545, "size": 20, "anchor": "middle"} for index, value in enumerate(range(0, 501, 100))],
+        {"text": "Downregulated", "x": 840, "y": 242, "size": 22},
+        {"text": "Upregulated", "x": 840, "y": 300, "size": 22},
+    ]
+    lines = [
+        {"x1": 230, "y1": 57, "x2": 230, "y2": 520, "width": 3},
+        {"x1": 230, "y1": 520, "x2": 920, "y2": 520, "width": 3},
+        *[{"x1": 230 + index * 138, "y1": 520, "x2": 230 + index * 138, "y2": 529, "width": 2} for index in range(6)],
+    ]
+    recreation = draw_recreation(original.size, rows, annotations, lines)
+    recreation_draw = ImageDraw.Draw(recreation)
+    recreation_draw.rectangle((800, 229, 824, 253), fill="#0095fe", outline="#222", width=3)
+    recreation_draw.rectangle((800, 287, 824, 311), fill="#ff2600", outline="#222", width=3)
+
+    root = OUT / "nature-60895-fig4c"
+    root.mkdir(parents=True, exist_ok=True)
+    original.save(root / "original.png")
+    recreation.save(root / "recreated.png")
+
+    overlay = original.convert("RGBA")
+    evidence = Image.new("RGBA", overlay.size, (0, 0, 0, 0))
+    evidence_draw = ImageDraw.Draw(evidence)
+    for row in rows:
+        x = int(row["pixel_x"])
+        y = int(row["pixel_y"])
+        width = int(row["width"])
+        height = int(row["height"])
+        colour = (0, 184, 148, 235) if row["series"] == "Upregulated" else (176, 72, 255, 235)
+        bounds = (x - 2, y - 2, x + width + 1, y + height + 1)
+        if row["value_status"].startswith("border_occluded"):
+            for offset in range(0, max(width, height) + 6, 6):
+                evidence_draw.line((bounds[0] + offset, bounds[1], min(bounds[0] + offset + 3, bounds[2]), bounds[1]), fill=colour, width=2)
+                evidence_draw.line((bounds[0] + offset, bounds[3], min(bounds[0] + offset + 3, bounds[2]), bounds[3]), fill=colour, width=2)
+            evidence_draw.line((bounds[0], bounds[1], bounds[0], bounds[3]), fill=colour, width=2)
+            evidence_draw.line((bounds[2], bounds[1], bounds[2], bounds[3]), fill=colour, width=2)
+        else:
+            evidence_draw.rectangle(bounds, outline=colour, width=2)
+    Image.alpha_composite(overlay, evidence).convert("RGB").save(root / "overlay.png")
+
+    write_csv(root / "data.csv", rows)
+    report = {
+        "schema_version": 1,
+        "case_id": "nature-60895-fig4c",
+        "status": "visible_geometry_candidate",
+        "route": "calibrated_raster_candidate",
+        "panel_mapping": "Fig. 4c stacked horizontal differential-expression bars",
+        "input": {
+            "file": source.name,
+            "sha256": expected_source_hash,
+            "source_url": "https://media.springernature.com/full/springer-static/image/art%3A10.1038%2Fs41467-025-60895-y/MediaObjects/41467_2025_60895_Fig4_HTML.png",
+            "dimensions": list(source_image.size),
+            "crop": list(crop),
+        },
+        "rows": len(rows),
+        "pixel_extraction": "manually reviewed saturated-fill components in cropped original-raster pixels",
+        "coverage": {
+            "visible_coloured_segments": 21,
+            "border_occluded_segment_candidates": 1,
+        },
+        "overlay_registration": {
+            "coordinate_space": "cropped original raster pixels",
+            "original_canvas": list(original.size),
+            "overlay_canvas": list(overlay.size),
+            "max_registration_error_px": 1,
+            "review_status": "passed",
+        },
+        "limitations": [
+            "Values remain display-level geometric candidates, not author raw observations.",
+            "The Microglia downregulated candidate is narrower than the visible separator stroke and is marked as border-occluded.",
+        ],
+    }
+    (root / "report.json").write_text(json.dumps(report, ensure_ascii=False, indent=2), encoding="utf-8")
 
 
 def main() -> None:
