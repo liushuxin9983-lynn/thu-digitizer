@@ -18,7 +18,7 @@ const dataTable = document.querySelector("#data-table");
 const dataChart = document.querySelector("#data-chart");
 const interactiveChart = document.querySelector("#interactive-chart");
 const chartTooltip = document.querySelector("#chart-tooltip");
-const ASSET_REVISION = "20260721-marker-line-v02";
+const ASSET_REVISION = "20260723-transmission-fig3-v01";
 const interactiveReadout = document.querySelector("#interactive-readout");
 const interactiveNote = document.querySelector("#interactive-note");
 const interactiveTitle = document.querySelector("#interactive-title");
@@ -91,7 +91,7 @@ const typeNameById = {
   line: "\u65f6\u95f4\u5e8f\u5217\u56fe",
   scatter: "散点图",
   "dose-response": "剂量—反应曲线",
-  bar: "分组柱状图",
+  bar: "双轴柱形折线图",
   "grouped-bar-dot": "柱状图与散点",
   "bar-horizontal": "水平柱状图",
   "bar-stacked": "堆叠柱状图",
@@ -1426,6 +1426,149 @@ function renderPaperGroupedBar(sample, table) {
   interactiveNote.textContent = `${spec.note} 悬停柱体可读取未四舍五入的校准值、置信度与原图矩形边界。`;
 }
 
+function renderPaperDualAxisBarLine(sample, table) {
+  const spec = sample.styleSpec;
+  const { crop, panels } = spec;
+  const scale = number(crop.scale) || 1;
+  const toCanvas = (xPt, yPt) => ({
+    x: (number(xPt) - number(crop.x)) * scale,
+    y: (number(yPt) - number(crop.y)) * scale,
+  });
+  const rowTooltip = (row) => exactTooltip(table.headers.map((field) => [field, row[field]]));
+
+  setChartCanvas(spec.canvas.width, spec.canvas.height, spec.fontFamily);
+  appendSvg("rect", {
+    x: 0,
+    y: 0,
+    width: spec.canvas.width,
+    height: spec.canvas.height,
+    fill: "#fff",
+    "pointer-events": "none",
+  });
+
+  panels.forEach((panel) => {
+    const [leftPt, topPt, rightPt, bottomPt] = panel.plotBoundsPt;
+    const topLeft = toCanvas(leftPt, topPt);
+    const bottomRight = toCanvas(rightPt, bottomPt);
+    const left = topLeft.x;
+    const top = topLeft.y;
+    const right = bottomRight.x;
+    const bottom = bottomRight.y;
+    const panelRows = table.rows
+      .filter((row) => row.panel_id === panel.id)
+      .sort((a, b) => number(a.year) - number(b.year));
+
+    panel.barTicks.forEach((tick) => {
+      const y = bottom - ((tick - panel.barDomain[0]) / (panel.barDomain[1] - panel.barDomain[0])) * (bottom - top);
+      paperLine(left, y, right, y, {
+        stroke: "#ececec",
+        "stroke-width": 2,
+        "pointer-events": "none",
+      });
+      paperText(String(tick), left - 18, y + 9, {
+        "font-size": 27,
+        "text-anchor": "end",
+        fill: "#444",
+        "pointer-events": "none",
+      });
+    });
+    panel.lineTicks.forEach((tick) => {
+      const y = bottom - ((tick - panel.lineDomain[0]) / (panel.lineDomain[1] - panel.lineDomain[0])) * (bottom - top);
+      paperText(String(tick), right + 18, y + 9, {
+        "font-size": 27,
+        "text-anchor": "start",
+        fill: "#444",
+        "pointer-events": "none",
+      });
+    });
+
+    appendSvg("rect", {
+      x: left,
+      y: top,
+      width: right - left,
+      height: bottom - top,
+      fill: "none",
+      stroke: "#353535",
+      "stroke-width": 3,
+      "vector-effect": "non-scaling-stroke",
+      "pointer-events": "none",
+    });
+
+    panelRows.forEach((row) => {
+      const center = toCanvas(row.bar_x_center_pt, row.bar_top_y_pt);
+      const baseline = toCanvas(row.bar_x_center_pt, row.bar_bottom_y_pt);
+      const width = number(spec.barWidthPt) * scale;
+      makeMark(
+        "rect",
+        {
+          x: center.x - width / 2,
+          y: center.y,
+          width,
+          height: Math.max(1, baseline.y - center.y),
+          fill: spec.barColor,
+          tabindex: 0,
+        },
+        rowTooltip(row),
+      );
+    });
+
+    const markerPoints = panelRows.map((row) => {
+      const position = toCanvas(row.line_marker_x_pt, row.line_marker_y_pt);
+      return { row, ...position };
+    });
+    appendSvg("path", {
+      d: markerPoints.map((point, index) => `${index ? "L" : "M"}${point.x},${point.y}`).join(" "),
+      fill: "none",
+      stroke: spec.lineColor,
+      "stroke-width": 9,
+      "stroke-linejoin": "round",
+      "stroke-linecap": "round",
+      "vector-effect": "non-scaling-stroke",
+      "pointer-events": "none",
+    });
+    markerPoints.forEach((point) => {
+      makeMark(
+        "circle",
+        {
+          cx: point.x,
+          cy: point.y,
+          r: 13,
+          fill: spec.markerFill,
+          stroke: spec.markerStroke,
+          "stroke-width": 5,
+          "vector-effect": "non-scaling-stroke",
+          tabindex: 0,
+        },
+        rowTooltip(point.row),
+      );
+      paperText(point.row.year, point.x, bottom + 84, {
+        "font-size": 27,
+        "text-anchor": "middle",
+        transform: `rotate(-90 ${point.x} ${bottom + 84})`,
+        fill: "#333",
+        "pointer-events": "none",
+      });
+    });
+
+    const axisY = (top + bottom) / 2;
+    paperText(`Bars: ${panel.statistic} link's mean RT transmission market value ($/MWh)`, left - 86, axisY, {
+      "font-size": 29,
+      "text-anchor": "middle",
+      transform: `rotate(-90 ${left - 86} ${axisY})`,
+      fill: "#222",
+      "pointer-events": "none",
+    });
+    paperText(`Lines: ${panel.statistic} wholesale electricity RT price ($/MWh)`, right + 91, axisY, {
+      "font-size": 29,
+      "text-anchor": "middle",
+      transform: `rotate(-90 ${right + 91} ${axisY})`,
+      fill: "#222",
+      "pointer-events": "none",
+    });
+  });
+  interactiveNote.textContent = `${spec.note} 折线路径、坐标轴和文字均为装饰层，不拦截数据标记的悬停。`;
+}
+
 function renderPaperBarDot(sample, table) {
   const spec = sample.styleSpec;
   const { plot, axes, series } = spec;
@@ -1975,6 +2118,7 @@ function renderInteractiveChart(sample, table, layers = {}) {
     "paper-boxplot": () => renderPaperBoxplot(sample, table),
     "paper-multifacet-boxplot": () => renderPaperMultiPanelBoxplot(sample, table),
     "paper-grouped-bar": () => renderPaperGroupedBar(sample, table),
+    "paper-dual-axis-bar-line": () => renderPaperDualAxisBarLine(sample, table),
     "paper-bar-dot": () => renderPaperBarDot(sample, table),
     "paper-source-line": () => renderPaperSourceLine(sample, table),
     "paper-native-trace-line": () => renderNativeTraceLine(sample, table),
