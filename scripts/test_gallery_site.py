@@ -6,7 +6,7 @@ import unittest
 from collections import Counter
 from pathlib import Path
 
-from PIL import Image
+from PIL import Image, ImageChops
 
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -397,6 +397,63 @@ class GallerySiteTests(unittest.TestCase):
         self.assertEqual(report["primary_csv"]["rows"], 60)
         self.assertEqual(len(report["summary_consistency"]), 6)
         self.assertEqual(report["source_data_role"], "not_used")
+
+    def test_fig4c_overlay_is_registered_to_the_cropped_original_pixels(self):
+        sample = next(
+            item for item in self.basics["samples"] if item["id"] == "nature-60895-fig4c"
+        )
+        root = (GALLERY / sample["assets"]["report"]).parent
+        original_path = root / "original.png"
+        self.assertEqual(
+            hashlib.sha256(original_path.read_bytes()).hexdigest(),
+            "128779e655ef28a2ff2e6a5ae4239976a8a2ea8df01315b19b09ced9e759f3fc",
+        )
+
+        with Image.open(original_path) as original, Image.open(root / "overlay.png") as overlay, Image.open(root / "recreated.png") as recreated:
+            self.assertEqual(original.size, (1050, 650))
+            self.assertEqual(overlay.size, original.size)
+            self.assertEqual(recreated.size, original.size)
+            self.assertIsNotNone(ImageChops.difference(original.convert("RGB"), overlay.convert("RGB")).getbbox())
+
+            with (root / "data.csv").open(newline="", encoding="utf-8") as handle:
+                rows = list(csv.DictReader(handle))
+            self.assertEqual(len(rows), 22)
+            self.assertEqual(
+                Counter(row["value_status"] for row in rows),
+                Counter({"visible_stacked_segment_candidate": 21, "border_occluded_stacked_segment_candidate": 1}),
+            )
+            for row in rows:
+                x = int(row["pixel_x"])
+                y = int(row["pixel_y"])
+                width = int(row["width"])
+                height = int(row["height"])
+                bounds = (x, y, x + width, y + height)
+                pixels = list(original.crop(bounds).get_flattened_data())
+                if row["value_status"].startswith("border_occluded"):
+                    self.assertEqual((row["series"], row["category"]), ("Downregulated", "Microglia"))
+                elif row["series"] == "Upregulated":
+                    support = sum(red > 220 and green < 100 and blue < 80 for red, green, blue in pixels)
+                    self.assertGreaterEqual(support / len(pixels), 0.95, row["category"])
+                else:
+                    support = sum(blue > 180 and green > 100 and red < 80 for red, green, blue in pixels)
+                    self.assertGreaterEqual(support / len(pixels), 0.95, row["category"])
+
+                review_bounds = (max(0, x - 3), max(0, y - 3), min(original.width, x + width + 3), min(original.height, y + height + 3))
+                self.assertIsNotNone(
+                    ImageChops.difference(
+                        original.crop(review_bounds).convert("RGB"),
+                        overlay.crop(review_bounds).convert("RGB"),
+                    ).getbbox(),
+                    f"{row['series']}:{row['category']}",
+                )
+
+        report = json.loads((root / "report.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["input"]["crop"], [970, 0, 2020, 650])
+        self.assertEqual(report["input"]["dimensions"], [2050, 2448])
+        self.assertEqual(report["overlay_registration"]["coordinate_space"], "cropped original raster pixels")
+        self.assertEqual(report["overlay_registration"]["max_registration_error_px"], 1)
+        self.assertEqual(report["overlay_registration"]["review_status"], "passed")
+        self.assertEqual(sample["styleSpec"]["canvas"], {"width": 1050, "height": 650})
 
     def test_requested_nature_donut_case_preserves_visible_labels_without_forcing_100(self):
         sample = next(item for item in self.basics["samples"] if item["id"] == "pie")
