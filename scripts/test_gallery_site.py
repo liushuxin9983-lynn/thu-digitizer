@@ -24,7 +24,6 @@ class GallerySiteTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.manifest = json.loads((GALLERY / "data" / "cases.json").read_text(encoding="utf-8"))
-        cls.atlas = json.loads((GALLERY / "data" / "capabilities.json").read_text(encoding="utf-8"))
         cls.basics = json.loads((GALLERY / "data" / "basics.json").read_text(encoding="utf-8"))
 
     def test_static_entrypoints_exist(self):
@@ -32,13 +31,17 @@ class GallerySiteTests(unittest.TestCase):
             "index.html",
             "home.css",
             "home.js",
-            "capabilities.html",
-            "styles.css",
-            "app.js",
             "README.md",
             "ATTRIBUTION.md",
         ]:
             self.assertTrue((GALLERY / relative).is_file(), relative)
+        for relative in [
+            "capabilities.html",
+            "styles.css",
+            "app.js",
+            "data/capabilities.json",
+        ]:
+            self.assertFalse((GALLERY / relative).exists(), relative)
 
     def test_every_recreated_image_uses_the_original_canvas_dimensions(self):
         for sample in self.basics["samples"]:
@@ -286,7 +289,7 @@ class GallerySiteTests(unittest.TestCase):
         self.assertNotIn('class="hero"', html)
         self.assertNotIn("FIGURE → DATA", html)
         self.assertNotIn('id="hero-title"', html)
-        self.assertIn('href="capabilities.html"', html)
+        self.assertNotIn("capabilities.html", html)
         self.assertIn('fetch("data/basics.json")', script)
         for label in ["原图", "提取覆盖", "复现"]:
             self.assertIn(label, script)
@@ -943,86 +946,6 @@ class GallerySiteTests(unittest.TestCase):
         self.assertEqual(report["panel_a_visible_rows"], 50)
         self.assertEqual(report["panel_a_out_of_range_rows"], 21)
         self.assertEqual(sum(row["panel_a_visible"] == "True" for row in rows), 50)
-
-    def test_html_exposes_auditable_views_and_claim_warning(self):
-        html = (GALLERY / "capabilities.html").read_text(encoding="utf-8")
-        script = (GALLERY / "app.js").read_text(encoding="utf-8")
-        for label in ["论文原图", "提取覆盖层", "数据复现图"]:
-            self.assertIn(label, script)
-        self.assertIn("WebPlotDigitizer：尚未进行同条件比较", html)
-        self.assertIn("不照搬 R Graph Gallery 的七类", html)
-        self.assertIn('fetch("data/capabilities.json")', script)
-        self.assertIn('fetch("data/cases.json")', script)
-        for view in ["original", "overlay", "recreated"]:
-            self.assertIn(f"{view}:", script)
-
-    def test_digitization_taxonomy_is_not_r_graph_gallery_seven_groups(self):
-        self.assertEqual(self.atlas["taxonomySource"]["model"], "digitization-layered-taxonomy")
-        self.assertEqual(self.atlas["counts"]["groups"], 13)
-        self.assertEqual(self.atlas["counts"]["types"], 77)
-        self.assertGreaterEqual(self.atlas["counts"]["oaRepresentatives"], 50)
-        self.assertEqual(len(self.atlas["groups"]), 13)
-        self.assertNotEqual(
-            {group["id"] for group in self.atlas["groups"]},
-            {"distribution", "correlation", "ranking", "part", "evolution", "map", "flow"},
-        )
-
-    def test_wpd_calibration_families_and_thu_extensions_are_explicit(self):
-        routes = self.atlas["calibrationFamilies"]
-        wpd = {item["id"] for item in routes if item["origin"] == "WebPlotDigitizer"}
-        extensions = {item["id"] for item in routes if item["origin"] == "thu-digitizer extension"}
-        self.assertEqual(
-            wpd,
-            {"xy", "bar", "polar", "ternary", "map_scale", "image_pixel", "circular_recorder"},
-        )
-        self.assertEqual(extensions, {"structure", "semantic_router"})
-
-    def test_every_group_and_route_has_capabilities(self):
-        capabilities = self.atlas["capabilities"]
-        group_ids = {group["id"] for group in self.atlas["groups"]}
-        route_ids = {route["id"] for route in self.atlas["calibrationFamilies"]}
-        self.assertEqual({item["group"] for item in capabilities}, group_ids)
-        self.assertEqual({item["calibrationFamily"] for item in capabilities}, route_ids)
-        for group_id in group_ids:
-            self.assertGreater(sum(item["group"] == group_id for item in capabilities), 0)
-
-    def test_capability_statuses_and_references_are_valid(self):
-        engine_statuses = set(self.atlas["statusDefinitions"]["engine"])
-        demo_statuses = set(self.atlas["statusDefinitions"]["demo"])
-        cases = {case["id"]: case for case in self.atlas["referenceCases"]}
-        self.assertEqual(len(cases), self.atlas["counts"]["referenceFigures"])
-
-        for item in self.atlas["capabilities"]:
-            with self.subTest(capability=item["id"]):
-                self.assertIn(item["engineStatus"], engine_statuses)
-                self.assertIn(item["demoStatus"], demo_statuses)
-                self.assertTrue(item["recoverableRepresentation"])
-                self.assertTrue(item["nonRecoverable"])
-                if item["caseId"]:
-                    self.assertIn(item["caseId"], cases)
-                    self.assertIsNotNone(item["thumbnail"])
-                    self.assertTrue((GALLERY / item["thumbnail"]).is_file())
-                else:
-                    self.assertEqual(item["demoStatus"], "no_case")
-
-    def test_reference_figures_have_oa_provenance_and_reports(self):
-        for case in self.atlas["referenceCases"]:
-            with self.subTest(case=case["id"]):
-                self.assertEqual(case["license"], "CC BY 4.0")
-                self.assertTrue(case["articleUrl"].startswith("https://www.nature.com/articles/"))
-                self.assertTrue(case["figureUrl"].startswith(case["articleUrl"] + "/figures/"))
-                self.assertEqual(len(case["originalSha256"]), 64)
-                original = GALLERY / case["original"]
-                report_path = GALLERY / case["report"]
-                self.assertTrue(original.is_file())
-                self.assertTrue(report_path.is_file())
-                with Image.open(original) as image:
-                    self.assertGreater(image.width, 500)
-                    self.assertGreater(image.height, 200)
-                report = json.loads(report_path.read_text(encoding="utf-8"))
-                if case["evidenceStatus"] == "oa_reference":
-                    self.assertEqual(report["status"], "oa_reference_identified")
-                    self.assertIn("no numeric values", report["scope"])
 
     def test_challenge_queue_assets_exist(self):
         self.assertGreater(len(self.manifest["challengeQueue"]), 0)
