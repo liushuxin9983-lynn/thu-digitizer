@@ -516,6 +516,15 @@ def build_forest_plot() -> dict:
     }
 
 
+def build_china_mining_contour() -> dict | None:
+    """Publish the local, visible-only raster contour evidence when available."""
+    from build_china_mining_contour_gallery_case import DEFAULT_EVIDENCE, DEFAULT_OUTPUT, build
+
+    if not DEFAULT_EVIDENCE.is_dir():
+        return None
+    return build(DEFAULT_EVIDENCE, DEFAULT_OUTPUT)
+
+
 def assets(case_id: str) -> dict:
     root = f"assets/basics/{case_id}"
     return {
@@ -715,6 +724,9 @@ def main() -> None:
         build_horizontal_boxplot(boxplot_dir),
         build_forest_plot(),
     ]
+    china_mining_contour = build_china_mining_contour()
+    if china_mining_contour is not None:
+        samples.append(china_mining_contour)
     normalize_recreated_canvases(samples)
     build_manifest(samples)
     print(f"BASIC_GALLERY={GALLERY / 'data' / 'basics.json'}")

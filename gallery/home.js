@@ -18,7 +18,7 @@ const dataTable = document.querySelector("#data-table");
 const dataChart = document.querySelector("#data-chart");
 const interactiveChart = document.querySelector("#interactive-chart");
 const chartTooltip = document.querySelector("#chart-tooltip");
-const ASSET_REVISION = "20260723-fig4c-alignment-v02";
+const ASSET_REVISION = "20260728-china-mining-contour-v01";
 const interactiveReadout = document.querySelector("#interactive-readout");
 const interactiveNote = document.querySelector("#interactive-note");
 const interactiveTitle = document.querySelector("#interactive-title");
@@ -71,9 +71,12 @@ const familyById = {
   "nature-31408-fig2d": "matrix",
   "nature-06199-fig1": "matrix",
   "nature-60895-fig4c": "bar",
+  "nature-20563-fig6f": "distribution",
+  "nature-51329-fig5a": "spatial",
 };
 
 const familyLabels = {
+  spatial: "\u7a7a\u95f4\u70b9\u4f4d\u56fe",
   scatter: "\u6563\u70b9\u56fe",
   bar: "\u67f1\u72b6\u56fe",
   distribution: "\u5206\u5e03\u56fe",
@@ -81,9 +84,11 @@ const familyLabels = {
   other: "\u5176\u4ed6",
 };
 
-const familyOrder = ["scatter", "bar", "distribution", "matrix", "other"];
+const familyOrder = ["scatter", "spatial", "map", "bar", "distribution", "matrix", "other"];
 
 familyById["nature-56055-fig3c"] = "scatter";
+familyById["china-mining-gakedaban-dt-300m"] = "map";
+familyLabels.map = "\u7a7a\u95f4\u573a / \u7b49\u503c\u56fe";
 
 // The gallery is an index of extraction grammars, not an article bibliography.
 // Paper title/figure provenance stays directly beneath the original image.
@@ -118,6 +123,7 @@ const typeNameById = {
   "nature-31408-fig2d": "\u70ed\u529b\u56fe",
   "nature-06199-fig1": "\u70ed\u529b\u56fe",
   "nature-60895-fig4c": "\u5806\u53e0\u67f1\u72b6\u56fe",
+  "nature-20563-fig6f": "极坐标直方图",
 };
 
 Object.assign(typeNameById, {
@@ -125,6 +131,7 @@ Object.assign(typeNameById, {
   "nature-00142-fig3a": "\u6563\u70b9\u6298\u7ebf\u56fe",
   "nature-02571-fig1d": "\u591a\u5e8f\u5217\u6563\u70b9\u6298\u7ebf\u56fe",
   "nature-56055-fig3c": "\u591a\u9762\u677f\u6563\u70b9\u6298\u7ebf\u56fe",
+  "china-mining-gakedaban-dt-300m": "\u586b\u8272\u7b49\u503c\u7ebf\u5730\u56fe",
 });
 
 const seriesColors = {
@@ -317,9 +324,9 @@ async function openCase(sample, updateHash = true) {
         </div>`,
     )
     .join("");
-  metricNote.textContent = sample.articleUrl
+  metricNote.textContent = sample.metricNote || (sample.articleUrl
     ? "精度只在已完成官方源数据或独立矢量几何映射的对应点上报告。"
-    : "精度来自确定性合成真值；它不等同于真实论文图上的泛化精度。";
+    : "精度来自确定性合成真值；它不等同于真实论文图上的泛化精度。");
   detailLinks.innerHTML = [
     detailLink("完整报告 ↗", sample.assets.report),
     sample.articleUrl ? detailLink("论文原文 ↗", sample.articleUrl) : "",
@@ -399,15 +406,16 @@ function closeCase(updateHash = true) {
 }
 
 function parseCsv(text) {
+  const source = text.startsWith("\uFEFF") ? text.slice(1) : text;
   const matrix = [];
   let row = [];
   let field = "";
   let quoted = false;
 
-  for (let index = 0; index < text.length; index += 1) {
-    const char = text[index];
+  for (let index = 0; index < source.length; index += 1) {
+    const char = source[index];
     if (quoted) {
-      if (char === '"' && text[index + 1] === '"') {
+      if (char === '"' && source[index + 1] === '"') {
         field += '"';
         index += 1;
       } else if (char === '"') {
@@ -2104,6 +2112,107 @@ function renderPaperSourceUpset(sample, table) {
   interactiveNote.textContent = spec.note;
 }
 
+function renderPaperPolarHistogram(sample, table) {
+  const spec = sample.styleSpec;
+  const color = spec.color || "#0b72b9";
+  const gridColor = spec.gridColor || "#e0e1e2";
+  const textColor = spec.textColor || "#303030";
+  const panelEntries = Object.entries(spec.panels || {});
+  setChartCanvas(spec.canvas.width, spec.canvas.height, spec.fontFamily);
+  appendSvg("rect", { x: 0, y: 0, width: spec.canvas.width, height: spec.canvas.height, fill: "#fff" });
+  paperText("f", 0, 31, { "font-size": 34, "font-weight": 700, fill: textColor });
+  paperText("Orientation of the force w.r.t extrusion site (angle θ)", spec.canvas.width / 2, 34, {
+    "font-size": 35,
+    "text-anchor": "middle",
+    fill: textColor,
+  });
+
+  const point = (panel, value, angle) => {
+    const radians = (angle * Math.PI) / 180;
+    return [
+      panel.cx + panel.xPxPerUnit * value * Math.cos(radians),
+      panel.cy - panel.yPxPerUnit * value * Math.sin(radians),
+    ];
+  };
+  const arcPath = (panel, value) => {
+    const points = Array.from({ length: 61 }, (_, index) => point(panel, value, index * 3));
+    return points.map(([x, y], index) => `${index ? "L" : "M"}${x.toFixed(2)},${y.toFixed(2)}`).join(" ");
+  };
+
+  panelEntries.forEach(([panelId, panel]) => {
+    [...panel.radialTicks, panel.radialMax].forEach((tick) => {
+      appendSvg("path", {
+        d: arcPath(panel, tick),
+        fill: "none",
+        stroke: gridColor,
+        "stroke-width": 2,
+        "vector-effect": "non-scaling-stroke",
+        "pointer-events": "none",
+      });
+    });
+    for (let angle = 0; angle <= 180; angle += 30) {
+      const [x, y] = point(panel, panel.radialMax, angle);
+      paperLine(panel.cx, panel.cy, x, y, { stroke: gridColor, "stroke-width": 2, "pointer-events": "none" });
+      const radians = (angle * Math.PI) / 180;
+      const labelX = panel.cx + (panel.xPxPerUnit * panel.radialMax + 24) * Math.cos(radians);
+      const labelY = panel.cy - (panel.yPxPerUnit * panel.radialMax + 20) * Math.sin(radians);
+      paperText(String(angle), labelX, labelY + 5, {
+        "font-size": 18,
+        "text-anchor": "middle",
+        fill: "#4c4c4c",
+        "pointer-events": "none",
+      });
+    }
+    paperText("0", panel.cx, panel.cy + 24, { "font-size": 18, "text-anchor": "middle", fill: "#4c4c4c", "pointer-events": "none" });
+    panel.radialTicks.forEach((tick) => {
+      paperText(String(tick), panel.cx + panel.xPxPerUnit * tick, panel.cy + 24, {
+        "font-size": 18,
+        "text-anchor": "middle",
+        fill: "#4c4c4c",
+        "pointer-events": "none",
+      });
+    });
+
+    table.rows.filter((row) => row.panel_id === panelId).forEach((row, index) => {
+      const value = number(row.radial_value);
+      const start = number(row.theta_start_deg);
+      const end = number(row.theta_end_deg);
+      if (value === null || start === null || end === null) return;
+      const [x1, y1] = point(panel, value, start);
+      const [x2, y2] = point(panel, value, end);
+      const tooltip = exactTooltip([
+        ["panel", row.panel_id],
+        ["patch diameter (μm)", row.patch_diameter_um],
+        ["theta interval (deg)", `${row.theta_start_deg}–${row.theta_end_deg}`],
+        ["theta midpoint (deg)", row.theta_mid_deg],
+        ["direction", row.direction_class],
+        ["radial value", row.radial_value],
+        ["approx uncertainty", row.radial_uncertainty_approx],
+        ["radial unit", row.radial_unit],
+        ["chord p1 original px", `${row.chord_x1_px}, ${row.chord_y1_px}`],
+        ["chord p2 original px", `${row.chord_x2_px}, ${row.chord_y2_px}`],
+        ["support pixels", row.support_pixels],
+        ["status", row.reason_code],
+      ]);
+      makeMark("path", {
+        d: `M${panel.cx},${panel.cy} L${x1},${y1} L${x2},${y2} Z`,
+        fill: "rgba(11, 114, 185, 0.035)",
+        stroke: color,
+        "stroke-width": 3,
+        "vector-effect": "non-scaling-stroke",
+        tabindex: index % 2 === 0 ? 0 : -1,
+      }, tooltip);
+    });
+    paperText(panel.label, panel.cx, spec.panelLabelY || 298, {
+      "font-size": 26,
+      "text-anchor": "middle",
+      fill: textColor,
+      "pointer-events": "none",
+    });
+  });
+  interactiveNote.textContent = spec.note;
+}
+
 function renderInteractiveChart(sample, table, layers = {}) {
   clearChart();
     dataChart.setAttribute("aria-label", `${displayType(sample)}的交互式图`);
@@ -2129,6 +2238,7 @@ function renderInteractiveChart(sample, table, layers = {}) {
     "paper-bubble-matrix": () => renderPaperBubbleMatrix(sample, table),
     "paper-upset": () => renderPaperUpset(sample, table),
     "paper-visible-upset": () => renderPaperSourceUpset(sample, table),
+    "paper-polar-histogram": () => renderPaperPolarHistogram(sample, table),
   };
   const styleRenderer = styleRenderers[sample.styleSpec?.renderer];
   if (styleRenderer) {
