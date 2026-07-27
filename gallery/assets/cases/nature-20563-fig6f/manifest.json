@@ -1,0 +1,26 @@
+{
+  "schema_version": 1,
+  "case_id": "nature-20563-fig6f",
+  "status": "candidate",
+  "primary_csv": "data.csv",
+  "row_count": 30,
+  "canvas": [
+    1798,
+    310
+  ],
+  "assets": {
+    "data.csv": "304cbe20c3a6ca02f0e4a12c49ed3d67a83acf095fc9e5da25b62178ebed193c",
+    "derived-direction-summary.csv": "bc6dd7d892f41c8fb38caaae1a8fef52e1d78c422c574b24f9c9a3f9648d1bed",
+    "figure-spec.json": "499fef687bbaf409ab6e26629ac35e3ae6d98daaa7b28f1cc04449f97fd7f843",
+    "measurement-source.png": "4ed78ae7114310da1e3ca9178048a7fdcee96482076c06bd9d610960d384f16b",
+    "original.png": "5c8ca7ecce14cb2a571413601a7cab4d29c483f8dfcc8c34743cf9c211add031",
+    "overlay.png": "4846edcc07bf4f18da728419178042ae12c84965566ccc85530a350f310920bb",
+    "preflight-report.json": "d9b909ccd7277f6eb0d77425ba1bbc54c7a9c7cc97a537ef90b5f0749794dad7",
+    "README.md": "9ad5794bafedaba96084ff149cf75cdf88044640dc9143e11322c0ef9f575f57",
+    "recreated.png": "8069926c4372ff10baa58c4cb24c4c4d1b29e55edc1c9478f3f77fa4432d49c1",
+    "report.json": "eceda7a2d9aab3b0063a3e4678a6361672b0d3d77c3f09e5ae9d73ac125cae38",
+    "source-validation-report.json": "ace71cbc29968240c87afcb6faeb5d16e039ecf22068aef49f63cd135037247c",
+    "source-validation.csv": "58ee626bc6be73d1d20be1871d6774e049a7d6c22e5c82826fb8ae24f9067afd",
+    "SOURCES.md": "1a9843b445b5aa36c82c5675ae2a4c9e063d5db5748bb0dbdfb4b05bcd9479ba"
+  }
+}

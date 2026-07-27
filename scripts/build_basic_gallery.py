@@ -410,33 +410,9 @@ def build_bar_variant(
 
 def build_bar(bar_dir: Path) -> dict:
     del bar_dir
-    case_root = GALLERY / "assets" / "cases" / "nature-oatman-grouped-bar"
-    report = json.loads((case_root / "report.json").read_text(encoding="utf-8"))
-    extraction = report["candidate_extraction"]
-    validation = report["vector_validation"]
-    return {
-        "id": "bar",
-        "title": "纵向分组柱",
-        "subtitle": "论文中的双系列分类计数",
-        "status": "candidate",
-        "statusLabel": "候选 · 论文矢量核验",
-        "description": "从 Nature Communications Fig. 2b 恢复 CER 与 TCX 的 32 个可见柱端值，并排除绘图区内同色图例。",
-        "metrics": [
-            {
-                "label": "柱覆盖",
-                "value": f"{validation['matched_bars']} / {extraction['summary']['expected_mark_count']}",
-            },
-            {"label": "矢量核验 MAE", "value": f"{validation['mae']:.1f}"},
-        ],
-        "articleUrl": "https://www.nature.com/articles/s41467-026-68864-9",
-        "assets": {
-            "original": "assets/cases/nature-oatman-grouped-bar/original.png",
-            "overlay": "assets/cases/nature-oatman-grouped-bar/overlay.png",
-            "recreated": "assets/cases/nature-oatman-grouped-bar/recreated.png",
-            "data": "assets/cases/nature-oatman-grouped-bar/data.csv",
-            "report": "assets/cases/nature-oatman-grouped-bar/report.json",
-        },
-    }
+    from build_natcom_transmission_fig3_gallery_case import gallery_sample
+
+    return gallery_sample()
 
 
 def build_horizontal_bar(bar_dir: Path) -> dict:
@@ -538,6 +514,15 @@ def build_forest_plot() -> dict:
             "report": "assets/cases/nature-blood-forest/report.json",
         },
     }
+
+
+def build_china_mining_contour() -> dict | None:
+    """Publish the local, visible-only raster contour evidence when available."""
+    from build_china_mining_contour_gallery_case import DEFAULT_EVIDENCE, DEFAULT_OUTPUT, build
+
+    if not DEFAULT_EVIDENCE.is_dir():
+        return None
+    return build(DEFAULT_EVIDENCE, DEFAULT_OUTPUT)
 
 
 def assets(case_id: str) -> dict:
@@ -667,21 +652,20 @@ def main() -> None:
     run_script("run_histogram_benchmark.py", histogram_dir)
     run_script("run_boxplot_benchmark.py", boxplot_dir)
     run_script("run_bar_benchmark.py", bar_dir)
-    natcom_bar_case = GALLERY / "assets" / "cases" / "nature-oatman-grouped-bar"
-    subprocess.run(
-        [
-            sys.executable,
-            str(SCRIPTS / "build_natcom_grouped_bar_case.py"),
-            "--input",
-            str(natcom_bar_case / "source-figure.png"),
-            "--vector-reference",
-            str(natcom_bar_case / "vector-reference.json"),
-            "--output-dir",
-            str(natcom_bar_case),
-        ],
-        cwd=ROOT,
-        check=True,
-    )
+    transmission_source = ROOT / "artifacts" / "nature_fig3_s41467-025-63143-5"
+    if transmission_source.is_dir():
+        subprocess.run(
+            [
+                sys.executable,
+                str(SCRIPTS / "build_natcom_transmission_fig3_gallery_case.py"),
+                "--source-dir",
+                str(transmission_source),
+                "--target-dir",
+                str(GALLERY / "assets" / "cases" / "nature-63143-fig3"),
+            ],
+            cwd=ROOT,
+            check=True,
+        )
     natmed_case = GALLERY / "assets" / "cases" / "nature-protaide-boxplot"
     subprocess.run(
         [
@@ -740,6 +724,9 @@ def main() -> None:
         build_horizontal_boxplot(boxplot_dir),
         build_forest_plot(),
     ]
+    china_mining_contour = build_china_mining_contour()
+    if china_mining_contour is not None:
+        samples.append(china_mining_contour)
     normalize_recreated_canvases(samples)
     build_manifest(samples)
     print(f"BASIC_GALLERY={GALLERY / 'data' / 'basics.json'}")

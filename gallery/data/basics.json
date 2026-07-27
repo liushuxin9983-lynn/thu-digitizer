@@ -1,6 +1,6 @@
 {
   "schemaVersion": 1,
-  "generated": "2026-07-21",
+  "generated": "2026-07-23",
   "title": "thu-digitizer Basic Extraction Gallery",
   "columnLabels": [
     "原图",
@@ -1244,72 +1244,130 @@
     },
     {
       "id": "bar",
-      "title": "纵向分组柱",
-      "subtitle": "论文中的双系列分类计数",
-      "status": "candidate",
-      "statusLabel": "候选 · 论文矢量核验",
-      "description": "从 Nature Communications Fig. 2b 恢复 CER 与 TCX 的 32 个可见柱端值，并排除绘图区内同色图例。",
+      "title": "双轴柱形折线图",
+      "subtitle": "年度传输价值与批发电价",
+      "status": "partial_visible",
+      "statusLabel": "可见几何 · PDF 向量",
+      "description": "从 Nature Communications Fig. 3 的矢量 PDF 直接恢复两个面板中 2012–2022 年的 22 个柱端值与 22 个折线标记；不反推逐小时或链路级原始数据。",
       "metrics": [
         {
-          "label": "柱覆盖",
-          "value": "32 / 32"
+          "label": "可见柱",
+          "value": "22 / 22"
         },
         {
-          "label": "矢量核验 MAE",
-          "value": "21.8"
+          "label": "折线标记",
+          "value": "22 / 22"
         }
       ],
-      "articleUrl": "https://www.nature.com/articles/s41467-026-68864-9",
+      "metricNote": "公开 CSV 仅含图中可见年度汇总及 PDF 坐标；文章未提供可核验的 Fig. 3 Source Data 文件。",
+      "articleUrl": "https://www.nature.com/articles/s41467-025-63143-5",
       "assets": {
-        "original": "assets/cases/nature-oatman-grouped-bar/original.png",
-        "overlay": "assets/cases/nature-oatman-grouped-bar/overlay.png",
-        "recreated": "assets/cases/nature-oatman-grouped-bar/recreated.png",
-        "data": "assets/cases/nature-oatman-grouped-bar/data.csv",
-        "report": "assets/cases/nature-oatman-grouped-bar/report.json"
+        "original": "assets/cases/nature-63143-fig3/original.png",
+        "overlay": "assets/cases/nature-63143-fig3/overlay.png",
+        "recreated": "assets/cases/nature-63143-fig3/recreated.png",
+        "data": "assets/cases/nature-63143-fig3/data.csv",
+        "report": "assets/cases/nature-63143-fig3/report.json"
       },
       "journal": "Nature Communications",
-      "articleTitle": "Integrative epigenomic landscape of Alzheimer’s Disease brains reveals oligodendrocyte molecular perturbations associated with tau",
-      "figure": "Fig. 2b",
-      "figureUrl": "https://www.nature.com/articles/s41467-026-68864-9/figures/2",
+      "articleTitle": "Electric transmission value and its drivers in United States power markets",
+      "figure": "Fig. 3",
+      "figureUrl": "https://www.nature.com/articles/s41467-025-63143-5/figures/3",
       "styleSpec": {
-        "renderer": "paper-grouped-bar",
-        "fidelity": "evidence_backed_style_reconstruction",
-        "label": "风格复现 · 像素几何",
-        "note": "柱体边界与配色来自原图栅格，数值经独立 PDF 矢量几何核验；坐标文字与图例排版为浏览器近似。",
+        "renderer": "paper-dual-axis-bar-line",
+        "fidelity": "visible_geometry_candidate",
+        "label": "论文原生画布 · PDF 向量几何",
+        "note": "柱体与折线标记逐行来自公开主 CSV；悬停任一数据标记可读取生成它的完整行字段。",
         "canvas": {
-          "width": 922,
-          "height": 665
+          "width": 1756,
+          "height": 828
         },
         "fontFamily": "Arial, Helvetica, sans-serif",
-        "plot": {
-          "left": 86,
-          "right": 891,
-          "top": 20,
-          "bottom": 506,
-          "baseline": 485
+        "crop": {
+          "x": 88.0,
+          "y": 45.0,
+          "scale": 4.0
         },
-        "axes": {
-          "yDomain": [
-            0,
-            35000
-          ],
-          "yTicks": [
-            0,
-            10000,
-            20000,
-            30000
-          ],
-          "xLabel": "Chromatin State",
-          "yLabel": "rCpGm Count"
-        },
-        "series": {
-          "CER": {
-            "color": "#8968cd"
+        "barWidthPt": 12.296,
+        "barColor": "#759adc",
+        "lineColor": "#7f7f7f",
+        "markerFill": "#bacdee",
+        "markerStroke": "#3f3f3f",
+        "panels": [
+          {
+            "id": "median_left",
+            "label": "Median",
+            "statistic": "median",
+            "plotBoundsPt": [
+              96.904,
+              51.201,
+              270.581,
+              224.8521
+            ],
+            "barDomain": [
+              0,
+              25
+            ],
+            "barTicks": [
+              0,
+              5,
+              10,
+              15,
+              20,
+              25
+            ],
+            "lineDomain": [
+              0,
+              70
+            ],
+            "lineTicks": [
+              0,
+              10,
+              20,
+              30,
+              40,
+              50,
+              60,
+              70
+            ]
           },
-          "TCX": {
-            "color": "#00c5cd"
+          {
+            "id": "mean_right",
+            "label": "Mean",
+            "statistic": "mean",
+            "plotBoundsPt": [
+              337.584,
+              51.201,
+              511.261,
+              224.8521
+            ],
+            "barDomain": [
+              0,
+              25
+            ],
+            "barTicks": [
+              0,
+              5,
+              10,
+              15,
+              20,
+              25
+            ],
+            "lineDomain": [
+              0,
+              70
+            ],
+            "lineTicks": [
+              0,
+              10,
+              20,
+              30,
+              40,
+              50,
+              60,
+              70
+            ]
           }
-        }
+        ]
       }
     },
     {
@@ -1458,6 +1516,92 @@
         "recreated": "assets/cases/nature-40822-fig1f/recreated.png",
         "data": "assets/cases/nature-40822-fig1f/data.csv",
         "report": "assets/cases/nature-40822-fig1f/report.json"
+      }
+    },
+    {
+      "id": "nature-20563-fig6f",
+      "title": "Nature Communications Fig. 6f — force orientation",
+      "subtitle": "三个半圆极坐标直方图",
+      "status": "candidate",
+      "statusLabel": "候选 · 30/30 可见扇区",
+      "description": "从 Nature Communications Fig. 6f 的三个半圆极坐标直方图提取 30 个 18° 扇区的可见外缘；保留各面板独立椭圆径向校准和像素不确定度，不恢复原始力向量。",
+      "metrics": [
+        {
+          "label": "可见扇区",
+          "value": "30 / 30"
+        },
+        {
+          "label": "方向分组",
+          "value": "3 个面板"
+        }
+      ],
+      "metricNote": "径向轴没有明确单位标签；官方工作簿也没有可核验的 Figure 6f 极坐标分箱表，因此这里报告图像校准值与近似栅格不确定度，不报告源数据误差。",
+      "journal": "Nature Communications",
+      "figure": "Fig. 6f",
+      "articleTitle": "Adhesion-mediated heterogeneous actin organization governs apoptotic cell extrusion",
+      "articleUrl": "https://www.nature.com/articles/s41467-020-20563-9",
+      "figureUrl": "https://www.nature.com/articles/s41467-020-20563-9/figures/6",
+      "validationDataUrl": "assets/cases/nature-20563-fig6f/source-validation.csv",
+      "styleSpec": {
+        "renderer": "paper-polar-histogram",
+        "fidelity": "visible_geometry_candidate",
+        "label": "论文原生画布 · 候选极坐标提取",
+        "note": "交互扇区逐行读取图像提取 CSV；悬停显示角度区间、径向校准值、不确定度和原始像素弦端点。",
+        "canvas": {
+          "width": 1798,
+          "height": 310
+        },
+        "fontFamily": "Arial, sans-serif",
+        "color": "#0b72b9",
+        "gridColor": "#e0e1e2",
+        "textColor": "#303030",
+        "panelLabelY": 298,
+        "panels": {
+          "D30": {
+            "cx": 287.5,
+            "cy": 248.5,
+            "xPxPerUnit": 0.07112249133537989,
+            "yPxPerUnit": 0.05822343942807478,
+            "radialTicks": [
+              1000,
+              2000
+            ],
+            "radialMax": 2500,
+            "label": "D = 30 μm"
+          },
+          "D15": {
+            "cx": 764.5,
+            "cy": 247.5,
+            "xPxPerUnit": 0.14962799648651923,
+            "yPxPerUnit": 0.12219916043670088,
+            "radialTicks": [
+              500,
+              1000
+            ],
+            "radialMax": 1200,
+            "label": "D = 15 μm"
+          },
+          "D10": {
+            "cx": 1211.5,
+            "cy": 248.5,
+            "xPxPerUnit": 0.5077236903918215,
+            "yPxPerUnit": 0.415700084935776,
+            "radialTicks": [
+              100,
+              200,
+              300
+            ],
+            "radialMax": 350,
+            "label": "D = 10 μm"
+          }
+        }
+      },
+      "assets": {
+        "original": "assets/cases/nature-20563-fig6f/original.png",
+        "overlay": "assets/cases/nature-20563-fig6f/overlay.png",
+        "recreated": "assets/cases/nature-20563-fig6f/recreated.png",
+        "data": "assets/cases/nature-20563-fig6f/data.csv",
+        "report": "assets/cases/nature-20563-fig6f/report.json"
       }
     },
     {
@@ -2547,6 +2691,88 @@
           }
         ],
         "rasterEvidenceInteractive": true
+      }
+    },
+    {
+      "id": "nature-51329-fig5a",
+      "title": "空间点位图",
+      "subtitle": "PDAC 区域分类与细胞概率点位",
+      "status": "partial_visible",
+      "statusLabel": "候选 · PDF 矢量点位",
+      "description": "Figure 5a 的空间点位图：从论文 PDF 直接恢复左侧 426 个分类区域点位，以及右侧 8 个细胞类型图中的 3,424 个着色点位。右图 value 仅是按图面色条反推的显示近似，不是作者原始概率或物理空间坐标。",
+      "metrics": [
+        {
+          "label": "区域点位",
+          "value": "426"
+        },
+        {
+          "label": "色彩图点位",
+          "value": "3,424"
+        },
+        {
+          "label": "地图面板",
+          "value": "1 + 8"
+        }
+      ],
+      "metricNote": "点位中心、尺寸与颜色来自 Figure 5a 可见的 PDF 矢量标记。右侧色彩图的 value 为对印刷色条的最近 CIELAB 匹配；图中没有物理坐标轴，不能据此推断细胞 ID、原始空间坐标或未渲染的概率值。",
+      "articleUrl": "https://www.nature.com/articles/s41467-024-51329-2",
+      "journal": "Nature Communications",
+      "articleTitle": "Deciphering cell–cell communication at single-cell resolution for spatial transcriptomics with subgraph-based graph attention network",
+      "figure": "Fig. 5a",
+      "figureUrl": "https://www.nature.com/articles/s41467-024-51329-2/figures/5",
+      "assets": {
+        "original": "assets/cases/nature-51329-fig5a/original.png",
+        "overlay": "assets/cases/nature-51329-fig5a/overlay.png",
+        "recreated": "assets/cases/nature-51329-fig5a/recreated.png",
+        "data": "assets/cases/nature-51329-fig5a/data.csv",
+        "report": "assets/cases/nature-51329-fig5a/report.json"
+      },
+      "styleSpec": {
+        "renderer": "paper-native-geometry",
+        "fidelity": "visible_geometry_candidate",
+        "label": "3,850 个可见 PDF 矢量点位 · 同画布命中层",
+        "note": "交互底图与数据复刻图完全同尺寸；悬停仅返回下载 CSV 中直接恢复的点位字段。分类区域点没有数值，色彩图数值仅为显示色条近似。",
+        "canvas": {
+          "width": 1834,
+          "height": 550
+        },
+        "fontFamily": "Arial, Helvetica, sans-serif",
+        "rasterEvidenceInteractive": true
+      }
+    },
+    {
+      "id": "china-mining-gakedaban-dt-300m",
+      "title": "填色等值线地图",
+      "subtitle": "高精度磁测 ΔT 上延 300 m",
+      "status": "partial_visible",
+      "statusLabel": "候选 · 可见色带与等值线",
+      "description": "从《中国矿业》补图的栅格图像恢复不规则 L 形图域、25 个可见色带、图中等值线/文字墨线层，以及 10 个经纬度分格锚点。右侧图例每隔一个色带印有数值；未印刷的中间 20 nT 级别在表中单列为规则色带推导值，不冒充原始磁测数据。",
+      "metrics": [
+        {
+          "label": "可见色带",
+          "value": "25"
+        },
+        {
+          "label": "直接图例值",
+          "value": "13"
+        },
+        {
+          "label": "格网锚点",
+          "value": "10"
+        }
+      ],
+      "metricNote": "下载 CSV 是可见图例色带的摘要；完整逐像素分类网格以 NPZ 证据资产保留。图像不能恢复原始磁测站点、作者栅格、插值/上延参数、任意位置 ΔT 值或坐标基准。",
+      "articleUrl": "http://www.chinaminingmagazine.com/en/article/doi/10.12075/j.issn.1004-4051.20240624",
+      "journal": "China Mining Magazine",
+      "articleTitle": "Study on the anomaly characteristics of high-precision magnetic survey in the Gakedaban Area of the western section of East Kunlun",
+      "figure": "Supplement — Isogram plan of extending 300 m above ΔT polarization",
+      "figureUrl": "http://www.chinaminingmagazine.com/en/supplement/d54a6c83-9a62-493c-a673-b34c60773e73",
+      "assets": {
+        "original": "assets/cases/china-mining-gakedaban-dt-300m/original.jpg",
+        "overlay": "assets/cases/china-mining-gakedaban-dt-300m/overlay.png",
+        "recreated": "assets/cases/china-mining-gakedaban-dt-300m/recreated.png",
+        "data": "assets/cases/china-mining-gakedaban-dt-300m/data.csv",
+        "report": "assets/cases/china-mining-gakedaban-dt-300m/report.json"
       }
     }
   ],

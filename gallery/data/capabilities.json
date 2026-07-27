@@ -19,9 +19,9 @@
     "stableTypes": 6,
     "wpdCalibrationFamilies": 7,
     "extensionRoutes": 2,
-    "oaRepresentatives": 51,
-    "validatedDemos": 9,
-    "referenceFigures": 18
+    "oaRepresentatives": 52,
+    "validatedDemos": 10,
+    "referenceFigures": 19
   },
   "groups": [
     {
@@ -912,15 +912,15 @@
         "极坐标直方图"
       ],
       "engineStatus": "coordinate_specific",
-      "demoStatus": "no_case",
-      "recoverableRepresentation": "角度 bin、径向长度和堆叠分段",
-      "nonRecoverable": "隐藏的作者原始数据与不可见统计过程",
-      "caseId": null,
-      "thumbnailKey": null,
+      "demoStatus": "visible_geometry",
+      "recoverableRepresentation": "可见 18° 角度 bin、椭圆径向校准后的外缘值和原始像素弦端点",
+      "nonRecoverable": "原始力向量、未标注的径向单位和精确作者分箱计数",
+      "caseId": "nature-20563-fig6f",
+      "thumbnailKey": "polar_histogram",
       "calibrationFamily": "polar",
-      "thumbnail": null,
-      "articleUrl": null,
-      "figure": null
+      "thumbnail": "assets/cases/nature-20563-fig6f/original.png",
+      "articleUrl": "https://www.nature.com/articles/s41467-020-20563-9",
+      "figure": "Fig. 6f"
     },
     {
       "id": "circular-bar",
@@ -2196,6 +2196,33 @@
       "originalSha256": "93f61668886166f8cc23fd15abdd1aa5033c441dd35b4fa2a43c47c5af62c30d",
       "thumbnails": {
         "donut": "assets/cases/nature-40822-fig1f/atlas-donut.jpg"
+      }
+    },
+    {
+      "id": "nature-20563-fig6f",
+      "title": "三种黏附斑尺度下的半圆极坐标直方图",
+      "articleTitle": "Adhesion-mediated heterogeneous actin organization governs apoptotic cell extrusion",
+      "authors": "Le et al.",
+      "journal": "Nature Communications",
+      "year": 2021,
+      "figure": "Fig. 6f",
+      "doi": "10.1038/s41467-020-20563-9",
+      "articleUrl": "https://www.nature.com/articles/s41467-020-20563-9",
+      "figureUrl": "https://www.nature.com/articles/s41467-020-20563-9/figures/6",
+      "original": "assets/cases/nature-20563-fig6f/original.png",
+      "evidenceStatus": "candidate",
+      "coverage": [
+        "polar histogram",
+        "three semicircular panels",
+        "visible 18-degree bin chords",
+        "elliptical radial calibration"
+      ],
+      "report": "assets/cases/nature-20563-fig6f/report.json",
+      "license": "CC BY 4.0",
+      "licenseUrl": "https://creativecommons.org/licenses/by/4.0/",
+      "originalSha256": "5c8ca7ecce14cb2a571413601a7cab4d29c483f8dfcc8c34743cf9c211add031",
+      "thumbnails": {
+        "polar_histogram": "assets/cases/nature-20563-fig6f/original.png"
       }
     }
   ],

@@ -15,7 +15,12 @@ GALLERY = ROOT / "gallery"
 
 class GallerySiteTests(unittest.TestCase):
     def test_requested_nature_case_json_does_not_expose_local_absolute_paths(self):
-        for case_id in ("nature-70284-fig8a", "nature-36825-fig1b", "nature-40822-fig1f"):
+        for case_id in (
+            "nature-70284-fig8a",
+            "nature-36825-fig1b",
+            "nature-40822-fig1f",
+            "nature-20563-fig6f",
+        ):
             case_root = GALLERY / "assets" / "cases" / case_id
             for path in case_root.glob("*.json"):
                 with self.subTest(case=case_id, file=path.name):
@@ -252,6 +257,7 @@ class GallerySiteTests(unittest.TestCase):
                 "bar-stacked",
                 "bar-percent-stacked",
                 "pie",
+                "nature-20563-fig6f",
                 "histogram",
                 "heatmap",
                 "boxplot",
@@ -270,11 +276,13 @@ class GallerySiteTests(unittest.TestCase):
                 "nature-31408-fig2d",
                 "nature-06199-fig1",
                 "nature-60895-fig4c",
+                "nature-51329-fig5a",
+                "china-mining-gakedaban-dt-300m",
             ],
         )
         self.assertEqual(sum(item["status"] == "validated_local_stable" for item in samples), 3)
         self.assertEqual(sum(item["status"] == "candidate" for item in samples), 6)
-        self.assertEqual(sum(item["status"] == "partial_visible" for item in samples), 1)
+        self.assertEqual(sum(item["status"] == "partial_visible" for item in samples), 4)
         self.assertEqual(sum(item["status"] == "low_confidence" for item in samples), 1)
         self.assertEqual(next(item for item in samples if item["id"] == "forest")["status"], "visible_geometry_extracted")
         self.assertFalse(any(item["status"] == "source_mapped" for item in samples))
@@ -516,6 +524,8 @@ class GallerySiteTests(unittest.TestCase):
                 "bar-horizontal",
                 "bar-stacked",
                 "pie",
+                "nature-20563-fig6f",
+                "nature-51329-fig5a",
             },
         )
         renderers = {sample["styleSpec"]["renderer"] for sample in style_samples}
@@ -523,7 +533,7 @@ class GallerySiteTests(unittest.TestCase):
             renderers,
             {
                 "paper-dose-response",
-                "paper-grouped-bar",
+                "paper-dual-axis-bar-line",
                 "paper-heatmap",
                 "paper-boxplot",
                 "paper-bubble-matrix",
@@ -531,6 +541,7 @@ class GallerySiteTests(unittest.TestCase):
                 "paper-visible-upset",
                 "paper-native-trace-line",
                 "paper-native-geometry",
+                "paper-polar-histogram",
             },
         )
         for sample in style_samples:
@@ -767,34 +778,37 @@ class GallerySiteTests(unittest.TestCase):
         self.assertEqual({row["series"] for row in rows}, {"Retrain", "Finetune"})
 
 
-    def test_grouped_bar_is_real_raster_extraction_with_vector_validation(self):
+    def test_first_bar_card_is_the_vector_pdf_transmission_case(self):
         sample = next(item for item in self.basics["samples"] if item["id"] == "bar")
-        self.assertEqual(sample["status"], "candidate")
+        self.assertEqual(sample["status"], "partial_visible")
         self.assertEqual(
             sample["articleUrl"],
-            "https://www.nature.com/articles/s41467-026-68864-9",
+            "https://www.nature.com/articles/s41467-025-63143-5",
         )
+        self.assertEqual(sample["styleSpec"]["renderer"], "paper-dual-axis-bar-line")
+        self.assertEqual(sample["styleSpec"]["canvas"], {"width": 1756, "height": 828})
         report_path = GALLERY / sample["assets"]["report"]
         report = json.loads(report_path.read_text(encoding="utf-8"))
-        self.assertEqual(report["case_id"], "nature-oatman-grouped-bar")
-        extraction = report["candidate_extraction"]
-        self.assertEqual(extraction["status"], "candidate")
-        self.assertEqual(extraction["summary"]["extracted_mark_count"], 32)
-        self.assertEqual(extraction["summary"]["missing_mark_count"], 0)
-        self.assertEqual(extraction["summary"]["ambiguous_mark_count"], 0)
-        self.assertEqual(extraction["summary"]["excluded_component_count"], 2)
-        validation = report["vector_validation"]
-        self.assertEqual(validation["status"], "validated_real_vector_geometry")
-        self.assertEqual(validation["matched_bars"], 32)
-        self.assertLess(validation["mae"], validation["raster_value_per_pixel"])
+        self.assertEqual(report["case_id"], "nature-63143-fig3")
+        self.assertEqual(report["route"]["route_id"], "pdf_vector_assisted")
+        self.assertEqual(report["visible_mark_counts"]["bars_accepted"], 22)
+        self.assertEqual(report["visible_mark_counts"]["line_markers_accepted"], 22)
+        self.assertFalse(report["public_gallery"]["source_data_used_by_renderer"])
+        self.assertEqual(
+            report["public_gallery"]["original_and_recreation_canvas"],
+            [1756, 828],
+        )
         case_root = report_path.parent
-        for name in ["vector-reference.json", "vector-validation.csv", "vector-validation.png"]:
+        for name in ["original.png", "overlay.png", "recreated.png", "data.csv", "figure-spec.json"]:
             self.assertTrue((case_root / name).is_file(), name)
             self.assertGreater((case_root / name).stat().st_size, 0, name)
         with (GALLERY / sample["assets"]["data"]).open(newline="", encoding="utf-8") as handle:
             rows = list(csv.DictReader(handle))
-        self.assertEqual(len(rows), 32)
-        self.assertEqual({row["series"] for row in rows}, {"CER", "TCX"})
+        self.assertEqual(len(rows), 22)
+        self.assertEqual({row["panel_id"] for row in rows}, {"median_left", "mean_right"})
+        self.assertEqual({row["year"] for row in rows}, {str(year) for year in range(2012, 2023)})
+        self.assertTrue(all(row["bar_status"] == "vector_rectangle_extracted" for row in rows))
+        self.assertTrue(all(row["line_status"] == "vector_marker_extracted" for row in rows))
 
     def test_dose_response_is_pdf_vector_extraction_with_separate_validation(self):
         sample = next(item for item in self.basics["samples"] if item["id"] == "dose-response")
