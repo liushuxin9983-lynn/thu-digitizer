@@ -8,7 +8,7 @@ from pathlib import Path
 
 from PIL import Image
 
-from scripts.build_natcom_transmission_fig3_gallery_case import (
+from build_natcom_transmission_fig3_gallery_case import (
     CANVAS,
     DEFAULT_SOURCE,
     PUBLIC_FIELDS,
