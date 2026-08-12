@@ -1,0 +1,16 @@
+{
+  "name": "candlestick-digitizer-benchmarks",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Deterministic Lightweight Charts fixtures for candlestick digitizer evaluation",
+  "scripts": {
+    "render:lwc": "node render_lwc_case.mjs",
+    "install:chromium": "playwright install chromium"
+  },
+  "dependencies": {
+    "lightweight-charts": "5.2.0"
+  },
+  "devDependencies": {
+    "playwright": "1.62.1"
+  }
+}
