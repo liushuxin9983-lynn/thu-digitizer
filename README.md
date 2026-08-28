@@ -97,6 +97,18 @@ python scripts/thu_digitizer.py validate-spec --spec figure-spec.json
 
 如果图表类型未知，可以省略 `--chart-type`。预检只负责路由和确认，不代表数值已经获得提取授权。不同图表的完整参数与质量门槛见 [`SKILL.md`](SKILL.md)。
 
+### K 线 / 蜡烛图（候选路线）
+
+K 线仅支持单面板的原始栅格图，且只恢复图上清晰可分的 OHLC。先生成配置，再人工核对面板、绘图区、线性价格轴锚点、涨跌样式、蜡烛几何和覆盖图确认项；确认完成后才可提取：
+
+```powershell
+python scripts/thu_digitizer.py inspect --input candlestick.png --chart-type candlestick --output-report preflight-report.json --output-spec candlestick-spec.json
+# 人工完成并验证 candlestick-spec.json 后：
+python scripts/thu_digitizer.py extract --spec candlestick-spec.json --output-dir evidence
+```
+
+只有 `report.json` 的 `numeric_output_authorized` 为 `true` 时，`evidence` 才会包含 `data.csv`、`overlay.png` 和报告；否则只保留拒绝报告。被遮挡、融合或不完整的蜡烛不会估算。日期、成交量、技术指标和未在经验证价格轴上可见编码的数值不属于此路线。PDF 不能直接使用该提取器，必须先经过统一预检并明确转换为满足源合同的栅格图。
+
 运行本地画廊：
 
 ```powershell

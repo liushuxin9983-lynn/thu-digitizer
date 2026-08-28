@@ -421,5 +421,15 @@ class CandlestickUnifiedCliTests(unittest.TestCase):
         )
 
 
+class CandlestickDocumentationTests(unittest.TestCase):
+    def test_root_skill_documents_candlestick_candidate_and_unified_command(self):
+        text = (ROOT / "SKILL.md").read_text(encoding="utf-8")
+        self.assertIn("candlestick", text)
+        self.assertIn("raster_candlestick_candidate", text)
+        self.assertIn("thu_digitizer.py extract", text)
+        self.assertIn("numeric_output_authorized", text)
+        self.assertIn("Dates, volume, indicators", text)
+
+
 if __name__ == "__main__":
     unittest.main()

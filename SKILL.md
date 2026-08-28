@@ -115,6 +115,42 @@ This route remains candidate until additional marker styles, linear/log axis var
 7. Deliver the immutable CSV, JSON report, overlay, and (when requested) a recreation. State whether positions/curves are direct, traced, refitted, low-confidence, or unmeasured.
 8. If official source data, ground truth, or user corrections are available, verify the semantic mapping and run a separate validation report. Never overwrite the original extraction with source-normalized values.
 
+## Raster candlestick extraction (candidate)
+
+For a single-panel raster candlestick chart, use the registered
+`raster_candlestick_candidate` route. It recovers only visibly separable OHLC
+geometry after the exact original raster, panel/plot bounds, linear price-axis
+anchors, candle styles, and candle geometry have all been manually verified.
+Never route a PDF directly to this extractor: inspect/rasterize the target PDF
+page through the unified preflight first, then use this route only when the
+completed FigureSpec records a raster source contract.
+
+```powershell
+python scripts/thu_digitizer.py inspect `
+  --input candlestick.png --chart-type candlestick `
+  --output-report preflight-report.json `
+  --output-spec candlestick-spec.json
+
+# Manually verify and complete candlestick-spec.json, then:
+python scripts/thu_digitizer.py extract `
+  --spec candlestick-spec.json --output-dir evidence
+```
+
+The first command proposes a route only. Before the second command, manually
+verify every required confirmation, including `panel_roi`, `plot_bounds`,
+`price_axis`, `style_semantics`, `candle_geometry`, and `overlay_review`. The
+extract command writes `data.csv`, `report.json`, and `overlay.png` only when
+`numeric_output_authorized` is true; otherwise it writes a refusal report and
+no numeric artifact. Review the overlay at original resolution before treating
+candidate values as accepted.
+
+Visible-OHLC limits are strict: only an unambiguous body and connected wick
+support `open`, `high`, `low`, and `close`; fused, occluded, incomplete, or
+ambiguous candles are refused rather than estimated. Dates, volume, indicators,
+trades, hidden order-book data, and values not visibly encoded by the verified
+price axis are outside this route. Do not infer timestamps from spacing or
+recover indicator/volume values from a price-candle extraction.
+
 ## Calibrated histogram extraction
 
 The stable extractor supports color-distinct histogram bars with calibrated x/y axes. Use `scripts/digitize_histogram.py` through its `extract_histogram` API with explicit `plot_bounds`, two x-axis calibration points, two y-axis calibration points, and the bar color. Its result is calibrated bin edges and heights, not the original raw observations.

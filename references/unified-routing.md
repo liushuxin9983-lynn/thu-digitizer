@@ -75,6 +75,13 @@ The machine-readable registry lives in `scripts/extractor_registry.py`. Registry
 - A generic vector PDF selects inspection-assisted routing first and retains an eligible raster fallback when available.
 - A vector PDF enters generic vector-assisted recovery only when that chart family is declared compatible. Otherwise it either requires an explicit page-to-raster step or returns a chart-specific refusal.
 - A raster dose-response image currently refuses the PDF-only extractor.
+- A candlestick chart selects `raster_candlestick_candidate` only for a
+  single-panel raster source with verified linear price-axis anchors, candle
+  styles, and geometry. A PDF is never sent directly to this route; it must be
+  inspected and explicitly rasterized through preflight before a raster
+  FigureSpec can be completed. The route recovers visible, separable OHLC only;
+  dates, volume, indicators, and ambiguous or occluded candles require refusal
+  or separate reviewed workflows.
 - A verified raster UpSet or aligned lattice composite selects the candidate lattice route. It still requires the exact original-raster identity, verified panel/layer grammar and colours, semantic labels, and optional independent row-value calibration; it never accepts expected detected counts.
 - Unknown or non-Cartesian types never fall through to a generic XY extractor.
 - Case-only or unimplemented coordinate families return `not_automated` or `unsupported`.
@@ -82,3 +89,14 @@ The machine-readable registry lives in `scripts/extractor_registry.py`. Registry
 ## What this improvement does not claim
 
 This layer does not yet classify charts automatically, detect panels reliably, read ticks through OCR, or execute every extractor from one command. It provides a common, testable boundary between proposals and verified numeric work. The lattice-composite adapter has its own source-locked command in `scripts/candidate_digitize_lattice_composite.py`; other extraction adapters may be added route by route without changing the evidence or refusal contract.
+
+## Candlestick candidate workflow
+
+Use two commands for a raster candlestick candidate: inspect with
+`--chart-type candlestick`, manually verify the generated FigureSpec, then run
+`python scripts/thu_digitizer.py extract --spec candlestick-spec.json --output-dir evidence`.
+The extraction adapter refuses numeric output until the completed spec verifies
+the source contract, one panel and plot bounds, a linear price axis, style and
+candle geometry, and overlay review. Its evidence bundle contains `data.csv`,
+`report.json`, and `overlay.png` only when authorization succeeds. It must
+never turn unresolved OHLC geometry into estimates.
