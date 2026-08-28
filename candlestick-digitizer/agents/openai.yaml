@@ -1,0 +1,4 @@
+interface:
+  display_name: "Candlestick Chart Digitizer"
+  short_description: "Extract auditable OHLC data from chart images"
+  default_prompt: "Use $candlestick-digitizer to digitize this candlestick chart into an auditable OHLC evidence bundle."
