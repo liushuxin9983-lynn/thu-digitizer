@@ -1,11 +1,19 @@
 import unittest
 
-from figure_spec import (
-    FigureSpecError,
-    assert_valid_figure_spec,
-    figure_spec_readiness,
-    validate_figure_spec,
-)
+try:
+    from figure_spec import (
+        FigureSpecError,
+        assert_valid_figure_spec,
+        figure_spec_readiness,
+        validate_figure_spec,
+    )
+except ImportError:  # pragma: no cover - package-style unittest invocation
+    from .figure_spec import (
+        FigureSpecError,
+        assert_valid_figure_spec,
+        figure_spec_readiness,
+        validate_figure_spec,
+    )
 
 
 def base_spec():
@@ -58,6 +66,78 @@ def base_spec():
     }
 
 
+def candlestick_ready_spec():
+    spec = base_spec()
+    panel = spec["panels"][0]
+    panel.update(
+        {
+            "chart_type": "candlestick",
+            "coordinate_model": "categorical_value",
+            "axes": [
+                {
+                    "axis_id": "category",
+                    "scale": "categorical",
+                    "verification": "not_applicable",
+                    "anchors": [],
+                },
+                {
+                    "axis_id": "price",
+                    "scale": "linear",
+                    "verification": "verified",
+                    "anchors": [
+                        {"pixel": 440, "value": 0},
+                        {"pixel": 40, "value": 100},
+                    ],
+                },
+            ],
+            "mark_grammars": ["candle_body", "wick", "price_reference_line"],
+            "route": {"route_id": "raster_candlestick_candidate"},
+            "required_confirmations": [
+                "panel_roi",
+                "plot_bounds",
+                "price_axis",
+                "style_semantics",
+                "candle_geometry",
+                "overlay_review",
+            ],
+            "confirmations": {
+                "panel_roi": "verified",
+                "plot_bounds": "verified",
+                "price_axis": "verified",
+                "style_semantics": "verified",
+                "candle_geometry": "verified",
+                "overlay_review": "verified",
+            },
+            "route_config": {
+                "price_axis": {
+                    "scale": "linear",
+                    "verification": "verified",
+                    "anchors": [
+                        {"pixel": 440, "value": 0, "evidence": {"kind": "manual"}},
+                        {"pixel": 40, "value": 100, "evidence": {"kind": "manual"}},
+                    ],
+                },
+                "styles": [
+                    {
+                        "id": "up",
+                        "kind": "filled",
+                        "colors": ["#00aa00"],
+                        "tolerance": 0,
+                        "direction": "close_above_open",
+                    }
+                ],
+                "geometry": {
+                    "min_body_width_px": 8,
+                    "max_body_width_px": 15,
+                    "max_wick_center_offset_px": 1,
+                },
+                "duplicate_distance_px": 1,
+            },
+        }
+    )
+    return spec
+
+
 class FigureSpecTests(unittest.TestCase):
     def test_accepts_verified_linear_axes_and_panel_bounds(self):
         spec = base_spec()
@@ -104,6 +184,31 @@ class FigureSpecTests(unittest.TestCase):
         spec = base_spec()
         spec["source"]["resampling_applied"] = True
         self.assertTrue(any("resampling_applied" in error for error in validate_figure_spec(spec)))
+
+    def test_candlestick_ready_spec_requires_linear_verified_price_axis_and_styles(self):
+        spec = candlestick_ready_spec()
+        spec["panels"][0]["route_config"]["price_axis"]["scale"] = "log10"
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("candlestick price_axis.scale" in error for error in errors))
+
+    def test_candlestick_ready_spec_rejects_incomplete_style_or_geometry(self):
+        spec = candlestick_ready_spec()
+        spec["panels"][0]["route_config"]["styles"][0]["direction"] = "unknown"
+        spec["panels"][0]["route_config"]["geometry"]["min_body_width_px"] = 0
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("candlestick styles[0].direction" in error for error in errors))
+        self.assertTrue(any("candlestick geometry.min_body_width_px" in error for error in errors))
+
+    def test_candlestick_rejects_nonfinite_or_unevidenced_route_values(self):
+        spec = candlestick_ready_spec()
+        config = spec["panels"][0]["route_config"]
+        config["price_axis"]["anchors"][1].pop("evidence")
+        config["styles"][0]["tolerance"] = float("nan")
+        config["geometry"]["max_body_width_px"] = 10**10000
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("anchors[1]" in error for error in errors))
+        self.assertTrue(any("styles[0].tolerance" in error for error in errors))
+        self.assertTrue(any("geometry.max_body_width_px" in error for error in errors))
 
 
 if __name__ == "__main__":

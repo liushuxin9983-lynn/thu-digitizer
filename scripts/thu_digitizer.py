@@ -160,8 +160,8 @@ def _axis_templates(coordinate_model: str) -> list[dict[str, Any]]:
         ]
     if coordinate_model == "categorical_value":
         return [
-            {"axis_id": "category", "orientation": "category", "scale": "categorical", "verification": "missing", "anchors": []},
-            {"axis_id": "value", "orientation": "value", "scale": "linear", "verification": "missing", "anchors": []},
+            {"axis_id": "category", "orientation": "category", "scale": "categorical", "verification": "not_applicable", "anchors": []},
+            {"axis_id": "price", "orientation": "y", "scale": "linear", "verification": "missing", "anchors": []},
         ]
     if coordinate_model == "grid_color":
         return [
@@ -202,6 +202,20 @@ def build_preflight(
     coordinate_model = coordinate_models[0] if len(coordinate_models) == 1 else "unknown"
     bounds = list(panel_bounds) if panel_bounds is not None else [0.0, 0.0, inspection["width"], inspection["height"]]
     bounds_verification = "user_provided" if panel_bounds is not None else "proposed"
+    is_candlestick = route["route_id"] == "raster_candlestick_candidate"
+
+    route_config = (
+        {
+            "price_axis": {"scale": "linear", "verification": "missing", "anchors": []},
+            "styles": [],
+            "geometry": {"verification": "missing"},
+            "duplicate_distance_px": None,
+            "exclusions": {"verification": "missing", "regions": []},
+            "occluders": {"verification": "missing", "regions": []},
+        }
+        if is_candlestick
+        else None
+    )
 
     figure_spec = {
         "schema_version": 1,
@@ -256,6 +270,7 @@ def build_preflight(
                 },
                 "recoverable": route["recoverable"],
                 "non_recoverable": route["non_recoverable"],
+                **({"route_config": route_config} if route_config is not None else {}),
             }
         ],
         "evidence_contract": {

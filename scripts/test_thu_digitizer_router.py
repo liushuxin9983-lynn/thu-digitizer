@@ -16,6 +16,21 @@ GALLERY = ROOT / "gallery"
 
 
 class UnifiedRouterTests(unittest.TestCase):
+    def test_candlestick_preflight_registers_candidate_route(self):
+        image = ROOT / "scripts" / "fixtures" / "candlestick" / "single_filled_candle.png"
+        report, spec = build_preflight(image, chart_type="candlestick")
+
+        panel = spec["panels"][0]
+        self.assertEqual(
+            report["route_selection"]["primary"]["route_id"],
+            "raster_candlestick_candidate",
+        )
+        self.assertEqual(panel["coordinate_model"], "categorical_value")
+        self.assertEqual([axis["axis_id"] for axis in panel["axes"]], ["category", "price"])
+        self.assertIn("price_axis", panel["required_confirmations"])
+        self.assertIn("route_config", panel)
+        self.assertFalse(report["safety"]["numeric_extraction_authorized"])
+
     def test_registry_ids_are_unique_and_every_route_declares_limits(self):
         self.assertEqual(len({route.route_id for route in ROUTES}), len(ROUTES))
         for route in ROUTES:
