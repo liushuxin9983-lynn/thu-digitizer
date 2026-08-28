@@ -11,6 +11,7 @@ import argparse
 import hashlib
 import json
 from pathlib import Path
+import sys
 from typing import Any
 
 import fitz
@@ -18,20 +19,36 @@ import numpy as np
 from PIL import Image
 
 try:
+    from candidate_digitize_candlestick import (
+        CANDLESTICK_ROUTE_ID,
+        ensure_empty_output_dir,
+        run_candlestick_extraction,
+        write_refusal_report,
+    )
     from extractor_registry import registry_document, select_route
     from figure_spec import (
+        FigureSpecError,
         assert_valid_figure_spec,
         figure_spec_readiness,
         read_figure_spec,
+        validate_figure_spec,
         write_figure_spec,
     )
     from inspect_pdf_vectors import inspect_page
 except ImportError:  # pragma: no cover - package-style invocation
+    from .candidate_digitize_candlestick import (
+        CANDLESTICK_ROUTE_ID,
+        ensure_empty_output_dir,
+        run_candlestick_extraction,
+        write_refusal_report,
+    )
     from .extractor_registry import registry_document, select_route
     from .figure_spec import (
+        FigureSpecError,
         assert_valid_figure_spec,
         figure_spec_readiness,
         read_figure_spec,
+        validate_figure_spec,
         write_figure_spec,
     )
     from .inspect_pdf_vectors import inspect_page
@@ -324,10 +341,91 @@ def build_parser() -> argparse.ArgumentParser:
 
     validate = subparsers.add_parser("validate-spec", help="Validate a FigureSpec without running extraction")
     validate.add_argument("--spec", required=True, type=Path)
+
+    extract = subparsers.add_parser("extract", help="Run one verified registered extractor")
+    extract.add_argument("--spec", required=True, type=Path)
+    extract.add_argument("--output-dir", required=True, type=Path)
     return parser
 
 
-def main() -> None:
+def _read_extract_spec(spec_path: Path, output_dir: Path) -> dict[str, Any] | None:
+    try:
+        return read_figure_spec(spec_path)
+    except (FigureSpecError, json.JSONDecodeError, OSError) as exc:
+        raw_spec: dict[str, Any] | None = None
+        validation_errors = [str(exc)]
+        try:
+            loaded = json.loads(spec_path.read_text(encoding="utf-8"))
+        except (json.JSONDecodeError, OSError):
+            pass
+        else:
+            if isinstance(loaded, dict):
+                raw_spec = loaded
+                validation_errors = validate_figure_spec(loaded) or validation_errors
+        write_refusal_report(
+            raw_spec,
+            output_dir,
+            refusal_reasons=["invalid_figure_spec"],
+            validation_errors=validation_errors,
+        )
+        print(
+            json.dumps(
+                {
+                    "status": "configuration_error",
+                    "reason": "invalid_figure_spec",
+                    "report": str(output_dir / "report.json"),
+                },
+                ensure_ascii=False,
+            ),
+            file=sys.stderr,
+        )
+        return None
+
+
+def _run_extract(spec_path: Path, output_dir: Path) -> int:
+    try:
+        ensure_empty_output_dir(output_dir)
+    except FileExistsError as exc:
+        print(str(exc), file=sys.stderr)
+        return 1
+
+    spec = _read_extract_spec(spec_path, output_dir)
+    if spec is None:
+        return 1
+    if len(spec["panels"]) != 1:
+        write_refusal_report(
+            spec,
+            output_dir,
+            refusal_reasons=["multiple_panel_extract_not_implemented"],
+        )
+        print("multiple_panel_extract_not_implemented", file=sys.stderr)
+        return 1
+
+    route_id = spec["panels"][0]["route"]["route_id"]
+    if route_id != CANDLESTICK_ROUTE_ID:
+        write_refusal_report(
+            spec,
+            output_dir,
+            refusal_reasons=["unsupported_extract_route"],
+        )
+        print(f"unsupported_extract_route: {route_id}", file=sys.stderr)
+        return 1
+
+    authorized = run_candlestick_extraction(spec, output_dir)
+    print(
+        json.dumps(
+            {
+                "status": "authorized" if authorized else "refused",
+                "route": route_id,
+                "output_dir": str(output_dir),
+            },
+            ensure_ascii=False,
+        )
+    )
+    return 0 if authorized else 2
+
+
+def main() -> int:
     args = build_parser().parse_args()
     if args.command == "routes":
         document = registry_document()
@@ -335,7 +433,7 @@ def main() -> None:
             _write_json(args.output, document)
         else:
             print(json.dumps(document, ensure_ascii=False, indent=2))
-        return
+        return 0
     if args.command == "validate-spec":
         spec = read_figure_spec(args.spec)
         readiness = figure_spec_readiness(spec)
@@ -345,7 +443,9 @@ def main() -> None:
                 ensure_ascii=False,
             )
         )
-        return
+        return 0
+    if args.command == "extract":
+        return _run_extract(args.spec, args.output_dir)
 
     report, spec = build_preflight(
         args.input,
@@ -366,7 +466,8 @@ def main() -> None:
             ensure_ascii=False,
         )
     )
+    return 0
 
 
 if __name__ == "__main__":
-    main()
+    raise SystemExit(main())
