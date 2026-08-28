@@ -99,6 +99,8 @@ python scripts/thu_digitizer.py validate-spec --spec figure-spec.json
 
 ### K 线 / 蜡烛图（候选路线）
 
+`candlestick-digitizer` 是本仓库新增的功能，由维护者受原始 THU Digitizer 仓库的统一路由、证据链和保守拒绝理念启发后实现，并已整合进主入口；它不是原仓库已有的独立能力。
+
 K 线仅支持单面板的原始栅格图，且只恢复图上清晰可分的 OHLC。先生成配置，再人工核对面板、绘图区、线性价格轴锚点、涨跌样式、蜡烛几何和覆盖图确认项；确认完成后才可提取：
 
 ```powershell
