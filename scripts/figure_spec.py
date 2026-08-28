@@ -141,11 +141,21 @@ def _validate_axis(axis: Any, *, path: str, errors: list[str]) -> None:
         errors.append(f"{path} verified anchor values must be distinct")
 
 
-def _validate_candlestick_route_config(panel: dict[str, Any], errors: list[str], path: str) -> None:
+def _validate_candlestick_route_config(
+    panel: dict[str, Any],
+    confirmations: dict[str, Any],
+    spec_status: Any,
+    errors: list[str],
+    path: str,
+) -> None:
     """Validate the one-panel, evidence-bound candlestick route contract."""
 
     config = panel.get("route_config")
-    ready = panel.get("confirmations", {}).get("price_axis") == "verified"
+    ready = spec_status == "ready_for_assisted_extraction"
+    if ready:
+        for name in ("price_axis", "style_semantics", "candle_geometry"):
+            if confirmations.get(name) != "verified":
+                errors.append(f"{path}.confirmations.{name} must be verified for a ready candlestick panel")
     if not isinstance(config, dict):
         if ready:
             errors.append(f"{path}.route_config is required for a ready candlestick panel")
@@ -177,8 +187,60 @@ def _validate_candlestick_route_config(panel: dict[str, Any], errors: list[str],
                 ):
                     errors.append(f"{anchor_path} must be numeric and evidenced")
 
+        if ready:
+            price_axes = [
+                axis
+                for axis in panel.get("axes", [])
+                if isinstance(axis, dict) and axis.get("axis_id") == "price"
+            ]
+            if len(price_axes) != 1:
+                errors.append(f"{path}.candlestick panel requires exactly one price axis")
+            else:
+                panel_price_axis = price_axes[0]
+                panel_anchors = panel_price_axis.get("anchors")
+                if panel_price_axis.get("scale") != "linear":
+                    errors.append(f"{path}.candlestick panel price axis.scale must equal 'linear'")
+                if panel_price_axis.get("verification") != "verified":
+                    errors.append(f"{path}.candlestick panel price axis.verification must equal 'verified'")
+                if not isinstance(panel_anchors, list) or len(panel_anchors) != 2:
+                    errors.append(f"{path}.candlestick panel price axis requires exactly two anchors")
+                else:
+                    panel_pairs = [
+                        (anchor.get("pixel"), anchor.get("value"))
+                        if isinstance(anchor, dict)
+                        else None
+                        for anchor in panel_anchors
+                    ]
+                    route_pairs = [
+                        (anchor.get("pixel"), anchor.get("value"))
+                        if isinstance(anchor, dict)
+                        else None
+                        for anchor in anchors
+                    ] if isinstance(anchors, list) else []
+                    if (
+                        any(
+                            pair is None
+                            or not _is_finite_number(pair[0])
+                            or not _is_finite_number(pair[1])
+                            for pair in panel_pairs
+                        )
+                        or len({pair[0] for pair in panel_pairs if pair is not None}) != 2
+                        or len({pair[1] for pair in panel_pairs if pair is not None}) != 2
+                    ):
+                        errors.append(
+                            f"{path}.candlestick panel price axis anchors must be finite and distinct"
+                        )
+                    if (
+                        len(route_pairs) != 2
+                        or any(pair is None for pair in route_pairs)
+                        or set(panel_pairs) != set(route_pairs)
+                    ):
+                        errors.append(
+                            f"{path}.candlestick price-axis anchors must match route_config.price_axis"
+                        )
+
     styles = config.get("styles")
-    styles_ready = panel.get("confirmations", {}).get("style_semantics") == "verified"
+    styles_ready = ready
     if styles_ready and (not isinstance(styles, list) or not styles):
         errors.append(f"{path}.route_config.candlestick styles must contain at least one style")
     elif isinstance(styles, list):
@@ -200,7 +262,7 @@ def _validate_candlestick_route_config(panel: dict[str, Any], errors: list[str],
                 errors.append(f"{style_path}.direction must be open_above_close or close_above_open")
 
     geometry = config.get("geometry")
-    geometry_ready = panel.get("confirmations", {}).get("candle_geometry") == "verified"
+    geometry_ready = ready
     if geometry_ready and not isinstance(geometry, dict):
         errors.append(f"{path}.route_config.candlestick geometry must be an object")
     elif isinstance(geometry, dict) and (
@@ -214,6 +276,8 @@ def _validate_candlestick_route_config(panel: dict[str, Any], errors: list[str],
             )
         )
     ):
+        if ready and geometry.get("verification") != "verified":
+            errors.append(f"{path}.route_config.candlestick geometry.verification must equal 'verified'")
         min_width = geometry.get("min_body_width_px")
         max_width = geometry.get("max_body_width_px")
         wick_tolerance = geometry.get("max_wick_center_offset_px")
@@ -225,6 +289,29 @@ def _validate_candlestick_route_config(panel: dict[str, Any], errors: list[str],
             errors.append(f"{path}.route_config.candlestick geometry body-width bounds must be ordered")
         if not _is_finite_number(wick_tolerance) or float(wick_tolerance) < 0:
             errors.append(f"{path}.route_config.candlestick geometry.max_wick_center_offset_px must be finite and non-negative")
+
+    duplicate_distance = config.get("duplicate_distance_px")
+    if ready and (not _is_finite_number(duplicate_distance) or float(duplicate_distance) <= 0):
+        errors.append(f"{path}.route_config.candlestick duplicate_distance_px must be finite and positive")
+    elif duplicate_distance is not None and (
+        not _is_finite_number(duplicate_distance) or float(duplicate_distance) <= 0
+    ):
+        errors.append(f"{path}.route_config.candlestick duplicate_distance_px must be finite and positive")
+
+    for field in ("exclusions", "occluders"):
+        value = config.get(field)
+        field_path = f"{path}.route_config.candlestick {field}"
+        if not isinstance(value, dict):
+            if ready:
+                errors.append(f"{field_path} must be an object")
+            continue
+        verification = value.get("verification")
+        if verification not in VERIFICATION_STATUSES:
+            errors.append(f"{field_path}.verification must be one of {sorted(VERIFICATION_STATUSES)}")
+        elif ready and verification not in {"verified", "not_applicable"}:
+            errors.append(f"{field_path}.verification must be verified or not_applicable")
+        if not isinstance(value.get("regions"), list):
+            errors.append(f"{field_path}.regions must be a list")
 
 
 def validate_figure_spec(spec: Any) -> list[str]:
@@ -332,8 +419,6 @@ def validate_figure_spec(spec: Any) -> list[str]:
         route = panel.get("route")
         if not isinstance(route, dict) or not isinstance(route.get("route_id"), str):
             errors.append(f"{path}.route.route_id must be a string")
-        elif route["route_id"] == "raster_candlestick_candidate":
-            _validate_candlestick_route_config(panel, errors, path)
         required_confirmations = panel.get("required_confirmations", [])
         confirmations = panel.get("confirmations", {})
         if not isinstance(required_confirmations, list):
@@ -353,6 +438,18 @@ def validate_figure_spec(spec: Any) -> list[str]:
                     errors.append(
                         f"{path}.confirmations.{name} must be verified before ready_for_assisted_extraction"
                     )
+        if (
+            isinstance(route, dict)
+            and route.get("route_id") == "raster_candlestick_candidate"
+            and isinstance(confirmations, dict)
+        ):
+            _validate_candlestick_route_config(
+                panel,
+                confirmations,
+                spec.get("status"),
+                errors,
+                path,
+            )
 
     return errors
 

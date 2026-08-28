@@ -127,11 +127,14 @@ def candlestick_ready_spec():
                     }
                 ],
                 "geometry": {
+                    "verification": "verified",
                     "min_body_width_px": 8,
                     "max_body_width_px": 15,
                     "max_wick_center_offset_px": 1,
                 },
                 "duplicate_distance_px": 1,
+                "exclusions": {"verification": "not_applicable", "regions": []},
+                "occluders": {"verification": "not_applicable", "regions": []},
             },
         }
     )
@@ -209,6 +212,36 @@ class FigureSpecTests(unittest.TestCase):
         self.assertTrue(any("anchors[1]" in error for error in errors))
         self.assertTrue(any("styles[0].tolerance" in error for error in errors))
         self.assertTrue(any("geometry.max_body_width_px" in error for error in errors))
+
+    def test_candlestick_ready_spec_requires_consistent_verified_panel_price_axis(self):
+        spec = candlestick_ready_spec()
+        panel = spec["panels"][0]
+        panel["axes"][1]["scale"] = "log10"
+        panel["route_config"]["price_axis"]["anchors"][1]["value"] = 99
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("candlestick panel price axis.scale" in error for error in errors))
+        self.assertTrue(any("candlestick price-axis anchors" in error for error in errors))
+
+    def test_candlestick_malformed_confirmations_return_errors(self):
+        for malformed in (None, []):
+            with self.subTest(confirmations=malformed):
+                spec = candlestick_ready_spec()
+                spec["panels"][0]["confirmations"] = malformed
+                errors = validate_figure_spec(spec)
+                self.assertTrue(any("confirmations must be an object" in error for error in errors))
+
+    def test_candlestick_ready_spec_requires_resolved_geometry_and_optional_regions(self):
+        spec = candlestick_ready_spec()
+        config = spec["panels"][0]["route_config"]
+        config["duplicate_distance_px"] = 0
+        config["geometry"]["verification"] = "missing"
+        config["exclusions"]["verification"] = "missing"
+        config["occluders"]["verification"] = "proposed"
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("duplicate_distance_px" in error for error in errors))
+        self.assertTrue(any("geometry.verification" in error for error in errors))
+        self.assertTrue(any("exclusions.verification" in error for error in errors))
+        self.assertTrue(any("occluders.verification" in error for error in errors))
 
 
 if __name__ == "__main__":
