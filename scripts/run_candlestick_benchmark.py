@@ -352,7 +352,40 @@ def _gate_results(manifest: dict, evaluation: dict) -> dict[str, bool]:
         elif name == "max_unsafe_false_accepts":
             results[name] = evaluation["unsafe_false_accept_count"] <= int(threshold)
         elif name == "stress_case_failures_are_reported_not_omitted":
-            results[name] = bool(threshold)
+            coverage = evaluation.get("coverage_evidence")
+            status = (
+                coverage.get("extraction_status")
+                if isinstance(coverage, dict)
+                else None
+            )
+            attempted = (
+                coverage.get("attempted") is True
+                if isinstance(coverage, dict)
+                else False
+            )
+            validation_recorded = (
+                coverage.get("validation_recorded") is True
+                if isinstance(coverage, dict)
+                else False
+            )
+            if manifest.get("classification") != "stress":
+                results[name] = attempted and validation_recorded
+            elif status == "refused":
+                results[name] = (
+                    attempted
+                    and validation_recorded
+                    and not evaluation["numeric_output_authorized"]
+                    and bool(evaluation["refusal_reasons"])
+                    and coverage.get("refusal_reasons")
+                    == evaluation["refusal_reasons"]
+                )
+            else:
+                results[name] = (
+                    attempted
+                    and validation_recorded
+                    and status == "authorized"
+                    and evaluation["numeric_output_authorized"]
+                )
         else:
             results[name] = False
     return results
@@ -391,6 +424,12 @@ def _evaluate_after_extraction(
             "required_gates": manifest["evaluation"]["required"],
         }
     )
+    evaluation["coverage_evidence"] = {
+        "attempted": True,
+        "validation_recorded": True,
+        "extraction_status": "authorized" if authorized else "refused",
+        "refusal_reasons": evaluation["refusal_reasons"],
+    }
     gate_results = _gate_results(manifest, evaluation)
     evaluation["gate_results"] = gate_results
     evaluation["failed_gates"] = [

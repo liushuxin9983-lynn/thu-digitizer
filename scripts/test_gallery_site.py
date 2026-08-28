@@ -436,7 +436,9 @@ class GallerySiteTests(unittest.TestCase):
                 width = int(row["width"])
                 height = int(row["height"])
                 bounds = (x, y, x + width, y + height)
-                pixels = list(original.crop(bounds).get_flattened_data())
+                cropped = original.crop(bounds)
+                flatten = getattr(cropped, "get_flattened_data", None)
+                pixels = list(flatten() if flatten is not None else cropped.getdata())
                 if row["value_status"].startswith("border_occluded"):
                     self.assertEqual((row["series"], row["category"]), ("Downregulated", "Microglia"))
                 elif row["series"] == "Upregulated":

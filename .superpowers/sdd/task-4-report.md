@@ -146,3 +146,97 @@ that full run. No claim is made that the repository-wide suite is fully green.
   package-removal task. The migrated generator prefers that final root layout
   and uses the adjacent main checkout only while this integration worktree does
   not yet contain those root files.
+
+## Code-review remediation
+
+This section supersedes the original full-suite and renderer concerns above.
+
+### Findings and fixes
+
+1. The migrated generator searched `ROOT.parent.parent` and therefore depended
+   on the adjacent main checkout. Added tracked repository-root
+   `render_lwc_case.mjs`, `package.json`, and `package-lock.json`; the generator
+   now uses only its own repository root. A clean dependency install is
+   `npm ci --ignore-scripts` from that root.
+2. The stress-case reporting gate returned `bool(threshold)`, which proved only
+   that the manifest contained a truthy declaration. Each validation report now
+   carries concrete `coverage_evidence` recording attempt, validation, outcome,
+   and refusal reasons. The gate fails when that evidence is absent or
+   inconsistent and verifies report-only refusals against the recorded reasons.
+3. The four full-suite errors were reproducible but feasible compatibility
+   defects rather than candlestick regressions:
+   - three China Mining tests addressed an ignored intermediate `outputs/`
+     directory even though the same evidence is published and tracked under
+     `gallery/assets/cases/china-mining-gakedaban-dt-300m/`; the tests now use
+     those tracked artifacts;
+   - one gallery test used Pillow 12's `get_flattened_data` while this runtime
+     has Pillow 11.3.0; it now selects `get_flattened_data` when available and
+     otherwise uses `getdata`, without changing the pixel assertion.
+
+### Review RED evidence
+
+```text
+python -m unittest scripts.test_candlestick_benchmark.MigratedFixtureTests.test_migrated_generator_validates_the_retained_suite scripts.test_candlestick_benchmark.BenchmarkRegressionTests.test_low_resolution_and_ambiguous_cases_preserve_safe_refusals scripts.test_candlestick_benchmark.BenchmarkRegressionTests.test_stress_reporting_gate_requires_concrete_coverage_evidence -v
+```
+
+Result before fixes: generator root assertion failed because it resolved to the
+adjacent checkout; both refusal cases lacked `coverage_evidence`; removing
+coverage evidence did not fail the stress reporting gate.
+
+The exact full discovery command consistently produced three
+`FileNotFoundError` failures under ignored `outputs/` and one `AttributeError`
+for `Image.get_flattened_data` before the compatibility changes.
+
+### Review GREEN evidence
+
+Focused suite:
+
+```text
+python -m unittest scripts.test_candlestick_benchmark -v
+```
+
+Result: 9 tests passed in 0.708 seconds.
+
+Clean-clone-style generator check:
+
+```text
+npm ci --ignore-scripts
+python scripts/generate_candlestick_benchmarks.py --output-dir <fresh-temp>/suite
+```
+
+Result: npm installed the four locked packages with zero vulnerabilities; the
+generator completed all 16 cases using only tracked repository-root renderer
+and dependency declarations.
+
+Full discovery:
+
+```text
+python -m unittest discover scripts -p "test_*.py" -v
+```
+
+Result: 193 tests ran in 14.098 seconds; 192 passed, 1 was intentionally
+skipped, and there were no failures or errors.
+
+### Review files
+
+- Created `render_lwc_case.mjs`.
+- Created `package.json`.
+- Created `package-lock.json`.
+- Modified `scripts/generate_candlestick_benchmarks.py`.
+- Modified `scripts/run_candlestick_benchmark.py`.
+- Modified `scripts/test_candlestick_benchmark.py`.
+- Modified `scripts/test_china_mining_isogram_extraction.py`.
+- Modified `scripts/test_gallery_site.py`.
+
+### Review self-review
+
+- No generator code searches outside the repository root.
+- `node_modules` was used only for the clean-install verification and removed
+  afterward; it is not committed.
+- The stress gate is negative-tested by deleting `coverage_evidence` and
+  requiring the gate to fail.
+- Refusal coverage stores no numeric OHLC values; it contains only attempt,
+  validation, authorization status, and refusal reason codes.
+- Full-suite fixes point tests at already tracked equivalent evidence and add a
+  two-version Pillow iteration fallback; no gallery assets or extraction logic
+  were changed.

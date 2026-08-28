@@ -91,15 +91,17 @@ class MigratedFixtureTests(unittest.TestCase):
         generator = importlib.import_module(
             "scripts.generate_candlestick_benchmarks"
         )
+        self.assertEqual(generator.RENDERER_ROOT, ROOT)
         self.assertTrue((generator.RENDERER_ROOT / "render_lwc_case.mjs").is_file())
-        self.assertTrue(
-            (
-                generator.RENDERER_ROOT
-                / "node_modules"
-                / "lightweight-charts"
-                / "dist"
-                / "lightweight-charts.standalone.production.js"
-            ).is_file()
+        package = json.loads((ROOT / "package.json").read_text(encoding="utf-8"))
+        self.assertEqual(package["dependencies"]["lightweight-charts"], "5.2.0")
+        self.assertEqual(package["devDependencies"]["playwright"], "1.62.1")
+        self.assertTrue((ROOT / "package-lock.json").is_file())
+        self.assertNotIn(
+            "ROOT.parent.parent",
+            (ROOT / "scripts" / "generate_candlestick_benchmarks.py").read_text(
+                encoding="utf-8"
+            ),
         )
         generator.validate_suite(
             ROOT / "benchmarks" / "candlestick" / "synthetic_lwc"
@@ -188,6 +190,31 @@ class BenchmarkRegressionTests(unittest.TestCase):
                 self.assertEqual(evaluation["detected_count"], 0)
                 self.assertEqual(evaluation["unsafe_false_accept_count"], 0)
                 self.assertTrue(evaluation["refusal_reasons"])
+                self.assertEqual(
+                    evaluation["coverage_evidence"]["extraction_status"],
+                    "refused",
+                )
+                self.assertTrue(
+                    evaluation["gate_results"][
+                        "stress_case_failures_are_reported_not_omitted"
+                    ]
+                )
+
+    def test_stress_reporting_gate_requires_concrete_coverage_evidence(self):
+        suite = ROOT / "benchmarks" / "candlestick" / "synthetic_lwc"
+        case = suite / "synthetic_lwc_016_lowres_combined"
+        _, evaluation = self.run_case(case)
+        evaluation.pop("coverage_evidence", None)
+
+        try:
+            from run_candlestick_benchmark import _gate_results
+        except ImportError:
+            from .run_candlestick_benchmark import _gate_results
+
+        results = _gate_results(load_manifest(case / "manifest.json"), evaluation)
+        self.assertFalse(
+            results["stress_case_failures_are_reported_not_omitted"]
+        )
 
 
 if __name__ == "__main__":

@@ -36,25 +36,7 @@ except ImportError:  # pragma: no cover - package-style invocation
 
 
 ROOT = Path(__file__).resolve().parent
-
-
-def _renderer_root() -> Path:
-    dependency = (
-        Path("node_modules")
-        / "lightweight-charts"
-        / "dist"
-        / "lightweight-charts.standalone.production.js"
-    )
-    candidates = (ROOT.parent, ROOT.parent.parent)
-    for candidate in candidates:
-        if (candidate / "render_lwc_case.mjs").is_file() and (
-            candidate / dependency
-        ).is_file():
-            return candidate
-    return ROOT.parent
-
-
-RENDERER_ROOT = _renderer_root()
+RENDERER_ROOT = ROOT.parent
 SCHEMA_VERSION = 1
 
 
