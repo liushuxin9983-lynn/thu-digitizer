@@ -1069,7 +1069,7 @@ def color_mask_multi(
     return mask
 
 
-def extract_klines(
+def _extract_candlesticks_impl(
     image_path: Path | str,
     extraction_config: dict,
 ) -> tuple[ExtractionResult, dict]:
@@ -1311,6 +1311,18 @@ def extract_klines(
     if axis.get("require_anchor_evidence") is True:
         metadata["refusal_reasons"] = []
     return result, metadata
+
+
+def extract_candlesticks(
+    image_path: Path | str,
+    extraction_config: dict,
+) -> tuple[ExtractionResult, dict]:
+    """Extract evidence-bound candlestick candidates from a source-locked image."""
+    return _extract_candlesticks_impl(image_path, extraction_config)
+
+
+# Temporary private-API compatibility during downstream test migration.
+extract_klines = extract_candlesticks
 
 
 def _require_empty_output_dir(output_dir: Path) -> None:
