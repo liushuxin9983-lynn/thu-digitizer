@@ -306,6 +306,120 @@ class CandlestickUnifiedCliTests(unittest.TestCase):
         self.assertIn("overlay_review", readiness["missing_required_confirmations"])
         self.assertEqual(readiness["missing_canonical_confirmations"], [])
 
+    def test_malicious_extra_fields_never_reach_detector_or_refusal_report(self):
+        spec = ready_spec()
+        route_config = spec["panels"][0]["route_config"]
+        price_axis = route_config["price_axis"]
+        anchor = price_axis["anchors"][0]
+        evidence = anchor["evidence"]
+        style = route_config["styles"][0]
+        geometry = style["geometry"]
+        malicious_values = (
+            "SECRET_AXIS_TRUTH",
+            "SECRET_EXPECTED_HIGH",
+            "SECRET_EVIDENCE_DATE",
+            "SECRET_STYLE_OPEN",
+            "SECRET_STYLE_DATE",
+            "SECRET_GEOMETRY_CLOSE",
+            "SECRET_METADATA_ECHO",
+        )
+        price_axis["truth"] = malicious_values[0]
+        anchor["expected_high"] = malicious_values[1]
+        evidence["date"] = malicious_values[2]
+        style["open"] = malicious_values[3]
+        style["date"] = malicious_values[4]
+        style["expected_count"] = 999999
+        geometry["close"] = malicious_values[5]
+        captured: dict = {}
+        detector_result = ExtractionResult(
+            (),
+            (),
+            (CoverageRecord(50.0, "ambiguous_wick", "center_wick_not_connected"),),
+            False,
+        )
+
+        def refusing_detector(_image_path: Path, config: dict):
+            captured.update(config)
+            return detector_result, {
+                "refusal_reasons": ["detector_not_authorized"],
+                "styles": config["styles"],
+                "price_axis": config["price_axis"],
+                "untrusted_metadata": malicious_values[6],
+            }
+
+        with patch(
+            "candidate_digitize_candlestick.extract_candlesticks",
+            side_effect=refusing_detector,
+        ):
+            authorized = run_candlestick_extraction(spec, self.output)
+
+        self.assertFalse(authorized)
+        self.assertEqual(
+            set(captured),
+            {
+                "source_contract",
+                "plot_bounds",
+                "price_axis",
+                "styles",
+                "duplicate_distance_px",
+            },
+        )
+        self.assertEqual(
+            set(captured["price_axis"]),
+            {"scale", "verification", "anchors"},
+        )
+        self.assertEqual(
+            set(captured["price_axis"]["anchors"][0]),
+            {"pixel", "value", "evidence"},
+        )
+        self.assertEqual(
+            set(captured["price_axis"]["anchors"][0]["evidence"]),
+            {"kind"},
+        )
+        self.assertEqual(
+            set(captured["styles"][0]),
+            {"id", "kind", "colors", "tolerance", "direction", "geometry"},
+        )
+        self.assertEqual(
+            set(captured["styles"][0]["geometry"]),
+            {
+                "min_body_width_px",
+                "max_body_width_px",
+                "min_body_height_px",
+                "max_wick_center_offset_px",
+                "max_wick_connection_gap_px",
+            },
+        )
+        detector_text = json.dumps(captured, sort_keys=True)
+        report = self.assert_report_only()
+        report_text = json.dumps(report, sort_keys=True)
+        for value in (*malicious_values, 999999):
+            self.assertNotIn(str(value), detector_text)
+            self.assertNotIn(str(value), report_text)
+        self.assertNotIn("styles", report["detector_details"])
+        self.assertNotIn("price_axis", report["detector_details"])
+        self.assertIn("center_wick_not_connected", report_text)
+
+    def test_not_applicable_canonical_confirmation_refuses_before_detector(self):
+        spec = ready_spec()
+        spec["panels"][0]["confirmations"]["overlay_review"] = "not_applicable"
+        detector_result = ExtractionResult((), (), (), False)
+
+        with patch(
+            "candidate_digitize_candlestick.extract_candlesticks",
+            return_value=(detector_result, {"refusal_reasons": ["detector_called"]}),
+        ) as detector:
+            authorized = run_candlestick_extraction(spec, self.output)
+
+        self.assertFalse(authorized)
+        detector.assert_not_called()
+        report = self.assert_report_only()
+        self.assertEqual(report["refusal_reasons"], ["figure_spec_not_ready"])
+        self.assertIn(
+            "overlay_review",
+            report["readiness"]["missing_canonical_confirmations"],
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

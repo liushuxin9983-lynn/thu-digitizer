@@ -26,6 +26,69 @@ except ImportError:  # pragma: no cover - package-style invocation
 
 
 CANDLESTICK_ROUTE_ID = "raster_candlestick_candidate"
+PRICE_AXIS_FIELDS = ("scale", "verification", "require_anchor_evidence")
+PRICE_ANCHOR_FIELDS = ("pixel", "value")
+PRICE_ANCHOR_EVIDENCE_FIELDS = (
+    "kind",
+    "role",
+    "x_range",
+    "color",
+    "tolerance",
+    "min_support_ratio",
+    "max_row_offset_px",
+)
+STYLE_FIELDS = ("id", "kind", "colors", "tolerance", "direction")
+STYLE_GEOMETRY_FIELDS = (
+    "min_body_width_px",
+    "max_body_width_px",
+    "min_vertical_length_px",
+    "min_body_height_px",
+    "verified_occluder_colors",
+    "verified_occluder_tolerance",
+    "bridge_filled_body_fragments",
+    "occluder_role",
+    "min_occluder_color_separation",
+    "max_body_occlusion_gap_px",
+    "max_body_fragment_center_delta_px",
+    "max_body_fragment_edge_delta_px",
+    "max_body_fragment_width_delta_px",
+    "max_body_fragment_union_width_px",
+    "min_body_fragment_horizontal_overlap_px",
+    "body_occluder_vertical_radius_px",
+    "min_body_occluder_row_coverage",
+    "max_wick_center_offset_px",
+    "max_wick_connection_gap_px",
+    "max_occlusion_gap_px",
+)
+
+
+def _allowed_fields(value: dict, fields: tuple[str, ...]) -> dict[str, Any]:
+    return {key: value[key] for key in fields if key in value}
+
+
+def _price_axis_config(value: dict) -> dict[str, Any]:
+    price_axis = _allowed_fields(value, PRICE_AXIS_FIELDS)
+    price_axis["anchors"] = []
+    for anchor in value["anchors"]:
+        safe_anchor = _allowed_fields(anchor, PRICE_ANCHOR_FIELDS)
+        if isinstance(anchor.get("evidence"), dict):
+            safe_anchor["evidence"] = _allowed_fields(
+                anchor["evidence"],
+                PRICE_ANCHOR_EVIDENCE_FIELDS,
+            )
+        price_axis["anchors"].append(safe_anchor)
+    return price_axis
+
+
+def _style_configs(values: list[dict]) -> list[dict[str, Any]]:
+    styles = []
+    for value in values:
+        style = _allowed_fields(value, STYLE_FIELDS)
+        geometry = value.get("geometry")
+        if isinstance(geometry, dict):
+            style["geometry"] = _allowed_fields(geometry, STYLE_GEOMETRY_FIELDS)
+        styles.append(style)
+    return styles
 
 
 def extraction_config_from_spec(spec: dict) -> tuple[Path, dict]:
@@ -39,9 +102,9 @@ def extraction_config_from_spec(spec: dict) -> tuple[Path, dict]:
         "source_contract": {
             key: spec["source"][key] for key in ("sha256", "width", "height")
         },
-        "plot_bounds": panel["plot_bounds"],
-        "price_axis": route_config["price_axis"],
-        "styles": route_config["styles"],
+        "plot_bounds": list(panel["plot_bounds"]),
+        "price_axis": _price_axis_config(route_config["price_axis"]),
+        "styles": _style_configs(route_config["styles"]),
         "duplicate_distance_px": route_config.get("duplicate_distance_px", 15),
     }
 
@@ -111,12 +174,16 @@ def write_refusal_report(
 
 
 def _detector_refusal_details(result: Any, metadata: dict[str, Any]) -> dict[str, Any]:
-    return {
-        **metadata,
+    details = {
         "candle_count": len(result.candles),
+        "candidate_count": len(result.candidates),
         "coverage_ledger": [asdict(record) for record in result.coverage_ledger],
-        "candidates": [asdict(candidate) for candidate in result.candidates],
     }
+    if metadata.get("algorithm_version") in {"candidate-v1", "candidate-v2"}:
+        details["algorithm_version"] = metadata["algorithm_version"]
+    if metadata.get("coordinate_space") == "original_raster_pixels":
+        details["coordinate_space"] = "original_raster_pixels"
+    return details
 
 
 def _detector_refusal_reasons(result: Any, metadata: dict[str, Any]) -> list[str]:
@@ -145,7 +212,7 @@ def _candlestick_readiness(spec: dict) -> dict[str, Any]:
     missing_canonical = [
         name
         for name in canonical
-        if confirmed.get(name) not in {"verified", "not_applicable"}
+        if confirmed.get(name) != "verified"
     ]
 
     readiness_reasons: list[str] = []
@@ -199,7 +266,6 @@ def run_candlestick_extraction(spec: dict, output_dir: Path | str) -> bool:
             output_dir,
             refusal_reasons=[exc.reason_code],
             readiness=readiness,
-            detector_details=exc.details,
         )
         return False
 
