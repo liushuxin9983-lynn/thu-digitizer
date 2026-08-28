@@ -13,6 +13,7 @@ try:
         extract_candlesticks,
         write_extraction_artifacts,
     )
+    from extractor_registry import ROUTE_BY_ID
     from figure_spec import figure_spec_readiness
 except ImportError:  # pragma: no cover - package-style invocation
     from .candlestick_extractor import (
@@ -20,6 +21,7 @@ except ImportError:  # pragma: no cover - package-style invocation
         extract_candlesticks,
         write_extraction_artifacts,
     )
+    from .extractor_registry import ROUTE_BY_ID
     from .figure_spec import figure_spec_readiness
 
 
@@ -112,7 +114,6 @@ def _detector_refusal_details(result: Any, metadata: dict[str, Any]) -> dict[str
     return {
         **metadata,
         "candle_count": len(result.candles),
-        "candles": [asdict(candle) for candle in result.candles],
         "coverage_ledger": [asdict(record) for record in result.coverage_ledger],
         "candidates": [asdict(candidate) for candidate in result.candidates],
     }
@@ -129,11 +130,57 @@ def _detector_refusal_reasons(result: Any, metadata: dict[str, Any]) -> list[str
     return unique_reasons or ["detector_not_authorized"]
 
 
+def _candlestick_readiness(spec: dict) -> dict[str, Any]:
+    """Combine shared validation with registry-owned candlestick authorization."""
+
+    shared = figure_spec_readiness(spec)
+    canonical = list(ROUTE_BY_ID[CANDLESTICK_ROUTE_ID].required_confirmations)
+    panels = spec.get("panels", []) if isinstance(spec, dict) else []
+    panel = panels[0] if panels and isinstance(panels[0], dict) else {}
+    declared = panel.get("required_confirmations", [])
+    declared_names = set(declared) if isinstance(declared, list) else set()
+    confirmations = panel.get("confirmations", {})
+    confirmed = confirmations if isinstance(confirmations, dict) else {}
+    missing_required = [name for name in canonical if name not in declared_names]
+    missing_canonical = [
+        name
+        for name in canonical
+        if confirmed.get(name) not in {"verified", "not_applicable"}
+    ]
+
+    readiness_reasons: list[str] = []
+    if spec.get("status") != "ready_for_assisted_extraction":
+        readiness_reasons.append("spec_status_not_ready")
+    if shared["status"] != "ready_for_assisted_extraction":
+        readiness_reasons.append("shared_figure_spec_not_ready")
+    if missing_required:
+        readiness_reasons.append("canonical_required_confirmations_truncated")
+    if missing_canonical:
+        readiness_reasons.append("canonical_confirmations_not_verified")
+
+    if shared["status"] == "invalid":
+        status = "invalid"
+    elif readiness_reasons:
+        status = "needs_verified_configuration"
+    else:
+        status = "ready_for_assisted_extraction"
+    return {
+        **shared,
+        "status": status,
+        "shared_readiness_status": shared["status"],
+        "spec_status": spec.get("status"),
+        "canonical_required_confirmations": canonical,
+        "missing_required_confirmations": missing_required,
+        "missing_canonical_confirmations": missing_canonical,
+        "readiness_reasons": readiness_reasons,
+    }
+
+
 def run_candlestick_extraction(spec: dict, output_dir: Path | str) -> bool:
     """Run the registered candidate and return whether numeric output was authorized."""
 
     ensure_empty_output_dir(output_dir)
-    readiness = figure_spec_readiness(spec)
+    readiness = _candlestick_readiness(spec)
     if readiness["status"] != "ready_for_assisted_extraction":
         write_refusal_report(
             spec,

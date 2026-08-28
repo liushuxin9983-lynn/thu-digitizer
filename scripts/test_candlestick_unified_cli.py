@@ -8,6 +8,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest.mock import patch
 
 from PIL import Image
 
@@ -15,6 +16,10 @@ from PIL import Image
 ROOT = Path(__file__).resolve().parents[1]
 SCRIPTS = ROOT / "scripts"
 IMAGE = SCRIPTS / "fixtures" / "candlestick" / "single_filled_candle.png"
+sys.path.insert(0, str(SCRIPTS))
+
+from candidate_digitize_candlestick import run_candlestick_extraction
+from candlestick_extractor import CoverageRecord, ExtractedCandle, ExtractionResult
 
 
 def run_extract(spec: Path, output: Path) -> subprocess.CompletedProcess[str]:
@@ -150,6 +155,10 @@ class CandlestickUnifiedCliTests(unittest.TestCase):
         self.spec.write_text(json.dumps(spec, indent=2), encoding="utf-8")
         return self.spec
 
+    def assert_report_only(self) -> dict:
+        self.assertEqual({path.name for path in self.output.iterdir()}, {"report.json"})
+        return json.loads((self.output / "report.json").read_text(encoding="utf-8"))
+
     def test_extract_writes_standard_authorized_evidence_bundle(self):
         completed = run_extract(self.write_spec(ready_spec()), self.output)
 
@@ -218,6 +227,84 @@ class CandlestickUnifiedCliTests(unittest.TestCase):
         self.assertIn("non-empty evidence directory", completed.stderr)
         self.assertEqual(existing.read_text(encoding="utf-8"), "keep")
         self.assertEqual({path.name for path in self.output.iterdir()}, {"report.json"})
+
+    def test_partial_result_refusal_report_contains_no_ohlc_keys_or_values(self):
+        candle = ExtractedCandle(
+            x_center=50.0,
+            style_id="up",
+            direction="close_above_open",
+            open=123456.789,
+            high=234567.891,
+            low=345678.912,
+            close=456789.123,
+            y_body_top=30,
+            y_body_bottom=50,
+            y_wick_top=20,
+            y_wick_bottom=60,
+            body_left=45,
+            body_right=55,
+            confidence="candidate",
+        )
+        result = ExtractionResult(
+            candles=(candle,),
+            candidates=(),
+            coverage_ledger=(
+                CoverageRecord(50.0, "extracted", None),
+                CoverageRecord(75.0, "ambiguous_wick", "center_wick_not_connected"),
+            ),
+            numeric_output_authorized=False,
+        )
+
+        with patch(
+            "candidate_digitize_candlestick.extract_candlesticks",
+            return_value=(result, {"refusal_reasons": ["partial_result_refused"]}),
+        ):
+            authorized = run_candlestick_extraction(ready_spec(), self.output)
+
+        self.assertFalse(authorized)
+        report = self.assert_report_only()
+        report_text = json.dumps(report, sort_keys=True)
+        for key in ("open", "high", "low", "close"):
+            self.assertNotIn(f'"{key}"', report_text)
+        for value in (123456.789, 234567.891, 345678.912, 456789.123):
+            self.assertNotIn(str(value), report_text)
+        self.assertIn("center_wick_not_connected", report_text)
+
+    def test_nonready_top_level_status_refuses_before_detector(self):
+        spec = ready_spec()
+        spec["status"] = "needs_verified_configuration"
+        detector_result = ExtractionResult((), (), (), False)
+
+        with patch(
+            "candidate_digitize_candlestick.extract_candlesticks",
+            return_value=(detector_result, {"refusal_reasons": ["detector_called"]}),
+        ) as detector:
+            authorized = run_candlestick_extraction(spec, self.output)
+
+        self.assertFalse(authorized)
+        detector.assert_not_called()
+        report = self.assert_report_only()
+        self.assertEqual(report["refusal_reasons"], ["figure_spec_not_ready"])
+        self.assertIn("spec_status_not_ready", report["readiness"]["readiness_reasons"])
+
+    def test_truncated_required_confirmations_refuses_before_detector(self):
+        spec = ready_spec()
+        spec["panels"][0]["required_confirmations"].remove("overlay_review")
+        detector_result = ExtractionResult((), (), (), False)
+
+        with patch(
+            "candidate_digitize_candlestick.extract_candlesticks",
+            return_value=(detector_result, {"refusal_reasons": ["detector_called"]}),
+        ) as detector:
+            authorized = run_candlestick_extraction(spec, self.output)
+
+        self.assertFalse(authorized)
+        detector.assert_not_called()
+        report = self.assert_report_only()
+        readiness = report["readiness"]
+        self.assertEqual(report["refusal_reasons"], ["figure_spec_not_ready"])
+        self.assertIn("overlay_review", readiness["missing_required_confirmations"])
+        self.assertEqual(readiness["missing_canonical_confirmations"], [])
 
 
 if __name__ == "__main__":
