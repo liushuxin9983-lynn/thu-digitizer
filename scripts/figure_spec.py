@@ -10,6 +10,7 @@ from __future__ import annotations
 import json
 import math
 from pathlib import Path
+import re
 from typing import Any
 
 
@@ -53,6 +54,55 @@ SPEC_STATUSES = {
     "low_confidence",
 }
 VERIFICATION_STATUSES = {"missing", "proposed", "user_provided", "verified", "not_applicable"}
+CANDLESTICK_STYLE_GEOMETRY_FIELDS = (
+    "min_body_width_px",
+    "max_body_width_px",
+    "min_vertical_length_px",
+    "min_body_height_px",
+    "verified_occluder_colors",
+    "verified_occluder_tolerance",
+    "bridge_filled_body_fragments",
+    "occluder_role",
+    "min_occluder_color_separation",
+    "max_body_occlusion_gap_px",
+    "max_body_fragment_center_delta_px",
+    "max_body_fragment_edge_delta_px",
+    "max_body_fragment_width_delta_px",
+    "max_body_fragment_union_width_px",
+    "min_body_fragment_horizontal_overlap_px",
+    "body_occluder_vertical_radius_px",
+    "min_body_occluder_row_coverage",
+    "max_wick_center_offset_px",
+    "max_wick_connection_gap_px",
+    "max_occlusion_gap_px",
+)
+CANDLESTICK_REQUIRED_STYLE_GEOMETRY_FIELDS = (
+    "min_body_width_px",
+    "max_body_width_px",
+    "max_wick_center_offset_px",
+)
+CANDLESTICK_POSITIVE_INTEGER_GEOMETRY_FIELDS = {
+    "min_body_width_px",
+    "max_body_width_px",
+    "min_vertical_length_px",
+    "min_body_height_px",
+    "max_body_fragment_union_width_px",
+}
+CANDLESTICK_NONNEGATIVE_INTEGER_GEOMETRY_FIELDS = {
+    "max_body_occlusion_gap_px",
+    "max_body_fragment_edge_delta_px",
+    "max_body_fragment_width_delta_px",
+    "min_body_fragment_horizontal_overlap_px",
+    "body_occluder_vertical_radius_px",
+    "max_wick_center_offset_px",
+    "max_wick_connection_gap_px",
+    "max_occlusion_gap_px",
+}
+CANDLESTICK_NONNEGATIVE_NUMBER_GEOMETRY_FIELDS = {
+    "verified_occluder_tolerance",
+    "min_occluder_color_separation",
+    "max_body_fragment_center_delta_px",
+}
 
 
 class FigureSpecError(ValueError):
@@ -70,6 +120,76 @@ def _is_finite_number(value: Any) -> bool:
         return math.isfinite(float(value))
     except (OverflowError, TypeError, ValueError):
         return False
+
+
+def _is_integer(value: Any) -> bool:
+    return isinstance(value, int) and not isinstance(value, bool)
+
+
+def _validate_candlestick_style_geometry(
+    geometry: Any,
+    *,
+    path: str,
+    errors: list[str],
+) -> None:
+    if not isinstance(geometry, dict):
+        errors.append(f"{path} must be an object")
+        return
+    unknown_fields = sorted(set(geometry) - set(CANDLESTICK_STYLE_GEOMETRY_FIELDS))
+    for field in unknown_fields:
+        errors.append(f"{path}.{field} is not a supported candlestick geometry control")
+    for field in CANDLESTICK_REQUIRED_STYLE_GEOMETRY_FIELDS:
+        if field not in geometry:
+            errors.append(f"{path}.{field} is required")
+    for field in CANDLESTICK_POSITIVE_INTEGER_GEOMETRY_FIELDS & geometry.keys():
+        if (
+            not _is_integer(geometry[field])
+            or not _is_finite_number(geometry[field])
+            or geometry[field] <= 0
+        ):
+            errors.append(f"{path}.{field} must be a positive integer")
+    for field in CANDLESTICK_NONNEGATIVE_INTEGER_GEOMETRY_FIELDS & geometry.keys():
+        if (
+            not _is_integer(geometry[field])
+            or not _is_finite_number(geometry[field])
+            or geometry[field] < 0
+        ):
+            errors.append(f"{path}.{field} must be a non-negative integer")
+    for field in CANDLESTICK_NONNEGATIVE_NUMBER_GEOMETRY_FIELDS & geometry.keys():
+        if not _is_finite_number(geometry[field]) or float(geometry[field]) < 0:
+            errors.append(f"{path}.{field} must be a finite non-negative number")
+    if "bridge_filled_body_fragments" in geometry and not isinstance(
+        geometry["bridge_filled_body_fragments"], bool
+    ):
+        errors.append(f"{path}.bridge_filled_body_fragments must be boolean")
+    if "occluder_role" in geometry and geometry["occluder_role"] != "topology_only_not_numeric_fill":
+        errors.append(
+            f"{path}.occluder_role must equal 'topology_only_not_numeric_fill'"
+        )
+    colors = geometry.get("verified_occluder_colors")
+    if colors is not None and (
+        not isinstance(colors, list)
+        or not all(
+            isinstance(color, str) and re.fullmatch(r"#[0-9A-Fa-f]{6}", color)
+            for color in colors
+        )
+    ):
+        errors.append(f"{path}.verified_occluder_colors must be a list of #RRGGBB colors")
+    coverage = geometry.get("min_body_occluder_row_coverage")
+    if coverage is not None and (
+        not _is_finite_number(coverage) or not 0 <= float(coverage) <= 1
+    ):
+        errors.append(
+            f"{path}.min_body_occluder_row_coverage must be between zero and one"
+        )
+    min_width = geometry.get("min_body_width_px")
+    max_width = geometry.get("max_body_width_px")
+    if (
+        _is_integer(min_width)
+        and _is_integer(max_width)
+        and min_width > max_width
+    ):
+        errors.append(f"{path} body-width bounds must be ordered")
 
 
 def _validate_bounds(
@@ -258,6 +378,7 @@ def _validate_candlestick_route_config(
                         )
 
     styles = config.get("styles")
+    style_ids: list[str] = []
     styles_ready = ready
     if styles_ready and (not isinstance(styles, list) or not styles):
         errors.append(f"{path}.route_config.candlestick styles must contain at least one style")
@@ -269,6 +390,8 @@ def _validate_candlestick_route_config(
                 continue
             if not isinstance(style.get("id"), str) or not style["id"]:
                 errors.append(f"{style_path}.id must be a non-empty string")
+            else:
+                style_ids.append(style["id"])
             if style.get("kind") not in {"filled", "outline"}:
                 errors.append(f"{style_path}.kind must be 'filled' or 'outline'")
             colors = style.get("colors")
@@ -278,35 +401,42 @@ def _validate_candlestick_route_config(
                 errors.append(f"{style_path}.tolerance must be a finite non-negative number")
             if style.get("direction") not in {"open_above_close", "close_above_open"}:
                 errors.append(f"{style_path}.direction must be open_above_close or close_above_open")
+            if "geometry" in style:
+                errors.append(
+                    f"{style_path}.geometry is not allowed; use the verified route_config.geometry.styles contract"
+                )
+        if len(style_ids) != len(set(style_ids)):
+            errors.append(
+                f"{path}.route_config.candlestick style ids must be unique"
+            )
 
     geometry = config.get("geometry")
     geometry_ready = ready
     if geometry_ready and not isinstance(geometry, dict):
         errors.append(f"{path}.route_config.candlestick geometry must be an object")
-    elif isinstance(geometry, dict) and (
-        geometry_ready
-        or any(
-            key in geometry
-            for key in (
-                "min_body_width_px",
-                "max_body_width_px",
-                "max_wick_center_offset_px",
+    elif isinstance(geometry, dict):
+        for field in sorted(set(geometry) - {"verification", "styles"}):
+            errors.append(
+                f"{path}.route_config.candlestick geometry.{field} is not supported"
             )
-        )
-    ):
         if ready and geometry.get("verification") != "verified":
             errors.append(f"{path}.route_config.candlestick geometry.verification must equal 'verified'")
-        min_width = geometry.get("min_body_width_px")
-        max_width = geometry.get("max_body_width_px")
-        wick_tolerance = geometry.get("max_wick_center_offset_px")
-        if not _is_finite_number(min_width) or float(min_width) <= 0:
-            errors.append(f"{path}.route_config.candlestick geometry.min_body_width_px must be finite and positive")
-        if not _is_finite_number(max_width) or float(max_width) <= 0:
-            errors.append(f"{path}.route_config.candlestick geometry.max_body_width_px must be finite and positive")
-        if _is_finite_number(min_width) and _is_finite_number(max_width) and float(min_width) > float(max_width):
-            errors.append(f"{path}.route_config.candlestick geometry body-width bounds must be ordered")
-        if not _is_finite_number(wick_tolerance) or float(wick_tolerance) < 0:
-            errors.append(f"{path}.route_config.candlestick geometry.max_wick_center_offset_px must be finite and non-negative")
+        style_geometries = geometry.get("styles")
+        geometry_path = f"{path}.route_config.candlestick geometry.styles"
+        if not isinstance(style_geometries, dict):
+            if ready:
+                errors.append(f"{geometry_path} must be an object")
+        else:
+            if ready and set(style_geometries) != set(style_ids):
+                errors.append(
+                    f"{geometry_path} keys must exactly match the configured style ids"
+                )
+            for style_id, style_geometry in style_geometries.items():
+                _validate_candlestick_style_geometry(
+                    style_geometry,
+                    path=f"{geometry_path}.{style_id}",
+                    errors=errors,
+                )
 
     duplicate_distance = config.get("duplicate_distance_px")
     if ready and (not _is_finite_number(duplicate_distance) or float(duplicate_distance) <= 0):
@@ -323,13 +453,22 @@ def _validate_candlestick_route_config(
             if ready:
                 errors.append(f"{field_path} must be an object")
             continue
+        for unsupported_field in sorted(set(value) - {"verification", "regions"}):
+            errors.append(
+                f"{field_path}.{unsupported_field} is an unsupported candlestick detector control"
+            )
         verification = value.get("verification")
         if verification not in VERIFICATION_STATUSES:
             errors.append(f"{field_path}.verification must be one of {sorted(VERIFICATION_STATUSES)}")
         elif ready and verification not in {"verified", "not_applicable"}:
             errors.append(f"{field_path}.verification must be verified or not_applicable")
-        if not isinstance(value.get("regions"), list):
+        regions = value.get("regions")
+        if not isinstance(regions, list):
             errors.append(f"{field_path}.regions must be a list")
+        elif regions:
+            errors.append(
+                f"{field_path}.regions are unsupported by the candlestick detector and must be empty"
+            )
 
 
 def validate_figure_spec(spec: Any) -> list[str]:
@@ -347,6 +486,9 @@ def validate_figure_spec(spec: Any) -> list[str]:
     if not isinstance(source, dict):
         errors.append("source must be an object")
         return errors
+    input_file = source.get("input_file")
+    if not isinstance(input_file, str) or not input_file.strip():
+        errors.append("source.input_file must be a non-empty string")
     if source.get("media_kind") not in MEDIA_KINDS:
         errors.append(f"source.media_kind must be one of {sorted(MEDIA_KINDS)}")
     if source.get("media_kind") == "raster" and source.get("coordinate_space") != "pixel":
@@ -356,15 +498,17 @@ def validate_figure_spec(spec: Any) -> list[str]:
         errors.append("source.measurement_space must be original_raster_pixels or pdf_page_points")
     if source.get("media_kind") == "raster" and measurement_space not in {None, "original_raster_pixels"}:
         errors.append("raster measurements must stay in original_raster_pixels")
-    if source.get("resampling_applied") is True:
-        errors.append("source.resampling_applied must be false for extraction measurements")
+    if source.get("resampling_applied") is not False:
+        errors.append("source.resampling_applied must be explicitly false for extraction measurements")
     width = source.get("width")
     height = source.get("height")
     if not _is_number(width) or float(width) <= 0:
         errors.append("source.width must be positive")
     if not _is_number(height) or float(height) <= 0:
         errors.append("source.height must be positive")
-    if not isinstance(source.get("sha256"), str) or len(source.get("sha256", "")) != 64:
+    if not isinstance(source.get("sha256"), str) or re.fullmatch(
+        r"[0-9A-Fa-f]{64}", source.get("sha256", "")
+    ) is None:
         errors.append("source.sha256 must be a 64-character hexadecimal digest")
 
     panels = spec.get("panels")

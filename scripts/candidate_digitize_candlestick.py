@@ -7,6 +7,8 @@ import json
 from pathlib import Path
 from typing import Any
 
+from PIL import UnidentifiedImageError
+
 try:
     from candlestick_extractor import (
         ExtractionRefused,
@@ -14,7 +16,7 @@ try:
         write_extraction_artifacts,
     )
     from extractor_registry import ROUTE_BY_ID
-    from figure_spec import figure_spec_readiness
+    from figure_spec import CANDLESTICK_STYLE_GEOMETRY_FIELDS, figure_spec_readiness
 except ImportError:  # pragma: no cover - package-style invocation
     from .candlestick_extractor import (
         ExtractionRefused,
@@ -22,7 +24,7 @@ except ImportError:  # pragma: no cover - package-style invocation
         write_extraction_artifacts,
     )
     from .extractor_registry import ROUTE_BY_ID
-    from .figure_spec import figure_spec_readiness
+    from .figure_spec import CANDLESTICK_STYLE_GEOMETRY_FIELDS, figure_spec_readiness
 
 
 CANDLESTICK_ROUTE_ID = "raster_candlestick_candidate"
@@ -38,28 +40,6 @@ PRICE_ANCHOR_EVIDENCE_FIELDS = (
     "max_row_offset_px",
 )
 STYLE_FIELDS = ("id", "kind", "colors", "tolerance", "direction")
-STYLE_GEOMETRY_FIELDS = (
-    "min_body_width_px",
-    "max_body_width_px",
-    "min_vertical_length_px",
-    "min_body_height_px",
-    "verified_occluder_colors",
-    "verified_occluder_tolerance",
-    "bridge_filled_body_fragments",
-    "occluder_role",
-    "min_occluder_color_separation",
-    "max_body_occlusion_gap_px",
-    "max_body_fragment_center_delta_px",
-    "max_body_fragment_edge_delta_px",
-    "max_body_fragment_width_delta_px",
-    "max_body_fragment_union_width_px",
-    "min_body_fragment_horizontal_overlap_px",
-    "body_occluder_vertical_radius_px",
-    "min_body_occluder_row_coverage",
-    "max_wick_center_offset_px",
-    "max_wick_connection_gap_px",
-    "max_occlusion_gap_px",
-)
 
 
 def _allowed_fields(value: dict, fields: tuple[str, ...]) -> dict[str, Any]:
@@ -80,13 +60,17 @@ def _price_axis_config(value: dict) -> dict[str, Any]:
     return price_axis
 
 
-def _style_configs(values: list[dict]) -> list[dict[str, Any]]:
+def _style_configs(
+    values: list[dict],
+    geometry_by_style: dict[str, dict],
+) -> list[dict[str, Any]]:
     styles = []
     for value in values:
         style = _allowed_fields(value, STYLE_FIELDS)
-        geometry = value.get("geometry")
-        if isinstance(geometry, dict):
-            style["geometry"] = _allowed_fields(geometry, STYLE_GEOMETRY_FIELDS)
+        style["geometry"] = _allowed_fields(
+            geometry_by_style[value["id"]],
+            CANDLESTICK_STYLE_GEOMETRY_FIELDS,
+        )
         styles.append(style)
     return styles
 
@@ -98,13 +82,19 @@ def extraction_config_from_spec(spec: dict) -> tuple[Path, dict]:
     if panel["route"]["route_id"] != CANDLESTICK_ROUTE_ID:
         raise ValueError("unsupported_extract_route")
     route_config = panel["route_config"]
+    for field in ("exclusions", "occluders"):
+        if set(route_config[field]) - {"verification", "regions"}:
+            raise ExtractionRefused(f"unsupported_{field}_controls")
+        if route_config[field]["regions"]:
+            raise ExtractionRefused(f"unsupported_{field}_regions")
+    geometry_by_style = route_config["geometry"]["styles"]
     return Path(spec["source"]["input_file"]), {
         "source_contract": {
             key: spec["source"][key] for key in ("sha256", "width", "height")
         },
         "plot_bounds": list(panel["plot_bounds"]),
         "price_axis": _price_axis_config(route_config["price_axis"]),
-        "styles": _style_configs(route_config["styles"]),
+        "styles": _style_configs(route_config["styles"], geometry_by_style),
         "duplicate_distance_px": route_config.get("duplicate_distance_px", 15),
     }
 
@@ -257,9 +247,33 @@ def run_candlestick_extraction(spec: dict, output_dir: Path | str) -> bool:
         )
         return False
 
-    image_path, extraction_config = extraction_config_from_spec(spec)
     try:
+        image_path, extraction_config = extraction_config_from_spec(spec)
         result, metadata = extract_candlesticks(image_path, extraction_config)
+    except FileNotFoundError:
+        write_refusal_report(
+            spec,
+            output_dir,
+            refusal_reasons=["source_unavailable"],
+            readiness=readiness,
+        )
+        return False
+    except UnidentifiedImageError:
+        write_refusal_report(
+            spec,
+            output_dir,
+            refusal_reasons=["source_not_image"],
+            readiness=readiness,
+        )
+        return False
+    except OSError:
+        write_refusal_report(
+            spec,
+            output_dir,
+            refusal_reasons=["source_unreadable"],
+            readiness=readiness,
+        )
+        return False
     except ExtractionRefused as exc:
         write_refusal_report(
             spec,

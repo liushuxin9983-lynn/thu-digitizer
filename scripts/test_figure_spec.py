@@ -22,6 +22,7 @@ def base_spec():
         "schema_version": 1,
         "status": "ready_for_assisted_extraction",
         "source": {
+            "input_file": "figure.png",
             "media_kind": "raster",
             "coordinate_space": "pixel",
             "measurement_space": "original_raster_pixels",
@@ -132,9 +133,15 @@ def candlestick_ready_spec():
                 ],
                 "geometry": {
                     "verification": "verified",
-                    "min_body_width_px": 8,
-                    "max_body_width_px": 15,
-                    "max_wick_center_offset_px": 1,
+                    "styles": {
+                        "up": {
+                            "min_body_width_px": 8,
+                            "max_body_width_px": 15,
+                            "min_body_height_px": 2,
+                            "max_wick_center_offset_px": 1,
+                            "max_wick_connection_gap_px": 1,
+                        }
+                    },
                 },
                 "duplicate_distance_px": 1,
                 "exclusions": {"verification": "not_applicable", "regions": []},
@@ -195,6 +202,27 @@ class FigureSpecTests(unittest.TestCase):
         spec["source"]["resampling_applied"] = True
         self.assertTrue(any("resampling_applied" in error for error in validate_figure_spec(spec)))
 
+    def test_source_contract_requires_input_file_explicit_false_and_hex_digest(self):
+        for input_file in (None, "", 42):
+            with self.subTest(input_file=input_file):
+                spec = base_spec()
+                spec["source"]["input_file"] = input_file
+                self.assertTrue(
+                    any("source.input_file" in error for error in validate_figure_spec(spec))
+                )
+
+        for resampling_applied in (None, 0, "false"):
+            with self.subTest(resampling_applied=resampling_applied):
+                spec = base_spec()
+                spec["source"]["resampling_applied"] = resampling_applied
+                self.assertTrue(
+                    any("resampling_applied" in error for error in validate_figure_spec(spec))
+                )
+
+        spec = base_spec()
+        spec["source"]["sha256"] = "g" * 64
+        self.assertTrue(any("sha256" in error for error in validate_figure_spec(spec)))
+
     def test_candlestick_ready_spec_requires_linear_verified_price_axis_and_styles(self):
         spec = candlestick_ready_spec()
         spec["panels"][0]["route_config"]["price_axis"]["scale"] = "log10"
@@ -204,21 +232,21 @@ class FigureSpecTests(unittest.TestCase):
     def test_candlestick_ready_spec_rejects_incomplete_style_or_geometry(self):
         spec = candlestick_ready_spec()
         spec["panels"][0]["route_config"]["styles"][0]["direction"] = "unknown"
-        spec["panels"][0]["route_config"]["geometry"]["min_body_width_px"] = 0
+        spec["panels"][0]["route_config"]["geometry"]["styles"]["up"]["min_body_width_px"] = 0
         errors = validate_figure_spec(spec)
         self.assertTrue(any("candlestick styles[0].direction" in error for error in errors))
-        self.assertTrue(any("candlestick geometry.min_body_width_px" in error for error in errors))
+        self.assertTrue(any("geometry.styles.up.min_body_width_px" in error for error in errors))
 
     def test_candlestick_rejects_nonfinite_or_unevidenced_route_values(self):
         spec = candlestick_ready_spec()
         config = spec["panels"][0]["route_config"]
         config["price_axis"]["anchors"][1].pop("evidence")
         config["styles"][0]["tolerance"] = float("nan")
-        config["geometry"]["max_body_width_px"] = 10**10000
+        config["geometry"]["styles"]["up"]["max_body_width_px"] = 10**10000
         errors = validate_figure_spec(spec)
         self.assertTrue(any("anchors[1]" in error for error in errors))
         self.assertTrue(any("styles[0].tolerance" in error for error in errors))
-        self.assertTrue(any("geometry.max_body_width_px" in error for error in errors))
+        self.assertTrue(any("geometry.styles.up.max_body_width_px" in error for error in errors))
 
     def test_candlestick_ready_spec_requires_consistent_verified_panel_price_axis(self):
         spec = candlestick_ready_spec()
@@ -249,6 +277,69 @@ class FigureSpecTests(unittest.TestCase):
         self.assertTrue(any("geometry.verification" in error for error in errors))
         self.assertTrue(any("exclusions.verification" in error for error in errors))
         self.assertTrue(any("occluders.verification" in error for error in errors))
+
+    def test_candlestick_ready_spec_rejects_style_local_geometry_and_unknown_geometry_controls(self):
+        spec = candlestick_ready_spec()
+        spec["panels"][0]["route_config"]["styles"][0]["geometry"] = {
+            "min_body_width_px": 99
+        }
+        spec["panels"][0]["route_config"]["geometry"]["styles"]["up"][
+            "expected_close"
+        ] = 123
+
+        errors = validate_figure_spec(spec)
+
+        self.assertTrue(any("styles[0].geometry" in error for error in errors))
+        self.assertTrue(any("expected_close" in error for error in errors))
+
+    def test_candlestick_ready_spec_requires_geometry_for_exact_style_ids(self):
+        spec = candlestick_ready_spec()
+        spec["panels"][0]["route_config"]["styles"].append(
+            {
+                "id": "down",
+                "kind": "outline",
+                "colors": ["#aa0000"],
+                "tolerance": 0,
+                "direction": "open_above_close",
+            }
+        )
+        spec["panels"][0]["route_config"]["geometry"]["styles"]["orphan"] = {
+            "min_body_width_px": 8,
+            "max_body_width_px": 15,
+            "max_wick_center_offset_px": 1,
+        }
+
+        errors = validate_figure_spec(spec)
+
+        self.assertTrue(any("geometry.styles" in error and "style ids" in error for error in errors))
+
+    def test_candlestick_ready_spec_rejects_duplicate_style_ids(self):
+        spec = candlestick_ready_spec()
+        spec["panels"][0]["route_config"]["styles"].append(
+            copy.deepcopy(spec["panels"][0]["route_config"]["styles"][0])
+        )
+
+        errors = validate_figure_spec(spec)
+
+        self.assertTrue(any("style ids must be unique" in error for error in errors))
+
+    def test_candlestick_ready_spec_rejects_nonempty_unsupported_regions(self):
+        spec = candlestick_ready_spec()
+        config = spec["panels"][0]["route_config"]
+        config["exclusions"] = {
+            "verification": "verified",
+            "regions": [[10, 10, 20, 20]],
+        }
+        config["occluders"] = {
+            "verification": "verified",
+            "regions": [],
+            "colors": ["#ffffff"],
+        }
+
+        errors = validate_figure_spec(spec)
+
+        self.assertTrue(any("exclusions.regions" in error and "unsupported" in error for error in errors))
+        self.assertTrue(any("occluders.colors" in error and "unsupported" in error for error in errors))
 
     def test_candlestick_route_rejects_non_raster_source_contract(self):
         spec = candlestick_ready_spec()

@@ -70,22 +70,12 @@ def _evidenced_anchors(price_axis: dict) -> list[dict[str, Any]]:
 
 
 def _verified_geometry(styles: list[dict]) -> dict[str, Any]:
-    geometries = [
-        style.get("geometry", {})
-        for style in styles
-        if isinstance(style.get("geometry"), dict)
-    ]
     return {
         "verification": "verified",
-        "min_body_width_px": min(
-            float(value["min_body_width_px"]) for value in geometries
-        ),
-        "max_body_width_px": max(
-            float(value["max_body_width_px"]) for value in geometries
-        ),
-        "max_wick_center_offset_px": max(
-            float(value.get("max_wick_center_offset_px", 0)) for value in geometries
-        ),
+        "styles": {
+            style["id"]: json.loads(json.dumps(style["geometry"]))
+            for style in styles
+        },
     }
 
 
@@ -98,7 +88,11 @@ def figure_spec_from_manifest(
     root = _manifest_case_dir(manifest, case_dir)
     image = manifest["image"]
     config = manifest["extraction_config"]
-    styles = json.loads(json.dumps(config["styles"]))
+    detector_styles = json.loads(json.dumps(config["styles"]))
+    styles = [
+        {key: value for key, value in style.items() if key != "geometry"}
+        for style in detector_styles
+    ]
     anchors = _evidenced_anchors(config["price_axis"])
     required = list(ROUTE_BY_ID[CANDLESTICK_ROUTE_ID].required_confirmations)
     width = image["width"]
@@ -159,7 +153,7 @@ def figure_spec_from_manifest(
                         "anchors": anchors,
                     },
                     "styles": styles,
-                    "geometry": _verified_geometry(styles),
+                    "geometry": _verified_geometry(detector_styles),
                     "duplicate_distance_px": config.get("duplicate_distance_px", 15),
                     "exclusions": {
                         "verification": "not_applicable",

@@ -31,6 +31,16 @@ class UnifiedRouterTests(unittest.TestCase):
         self.assertIn("route_config", panel)
         self.assertFalse(report["safety"]["numeric_extraction_authorized"])
 
+    def test_existing_categorical_routes_keep_category_and_value_axes(self):
+        image = ROOT / "scripts" / "fixtures" / "candlestick" / "single_filled_candle.png"
+        for chart_type in ("bar", "box", "paired_outline_box"):
+            with self.subTest(chart_type=chart_type):
+                _report, spec = build_preflight(image, chart_type=chart_type)
+                self.assertEqual(
+                    [axis["axis_id"] for axis in spec["panels"][0]["axes"]],
+                    ["category", "value"],
+                )
+
     def test_registry_ids_are_unique_and_every_route_declares_limits(self):
         self.assertEqual(len({route.route_id for route in ROUTES}), len(ROUTES))
         for route in ROUTES:

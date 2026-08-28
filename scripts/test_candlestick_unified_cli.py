@@ -117,20 +117,19 @@ def ready_spec() -> dict:
                             "direction": "close_above_open",
                             "colors": ["#00aa00"],
                             "tolerance": 0,
-                            "geometry": {
+                        }
+                    ],
+                    "geometry": {
+                        "verification": "verified",
+                        "styles": {
+                            "up": {
                                 "min_body_width_px": 8,
                                 "max_body_width_px": 15,
                                 "min_body_height_px": 2,
                                 "max_wick_center_offset_px": 1,
                                 "max_wick_connection_gap_px": 1,
-                            },
-                        }
-                    ],
-                    "geometry": {
-                        "verification": "verified",
-                        "min_body_width_px": 8,
-                        "max_body_width_px": 15,
-                        "max_wick_center_offset_px": 1,
+                            }
+                        },
                     },
                     "duplicate_distance_px": 1,
                     "exclusions": {"verification": "not_applicable", "regions": []},
@@ -169,6 +168,8 @@ class CandlestickUnifiedCliTests(unittest.TestCase):
         )
         with Image.open(IMAGE) as source, Image.open(self.output / "overlay.png") as overlay:
             self.assertEqual(overlay.size, source.size)
+        report = json.loads((self.output / "report.json").read_text(encoding="utf-8"))
+        self.assertEqual(report["algorithm"]["name"], "raster_candlestick_candidate")
 
     def test_extract_refuses_unverified_spec_without_numeric_artifacts(self):
         spec = ready_spec()
@@ -215,6 +216,41 @@ class CandlestickUnifiedCliTests(unittest.TestCase):
         self.assertFalse(report["numeric_output_authorized"])
         self.assertEqual(report["refusal_reasons"], ["invalid_figure_spec"])
         self.assertTrue(report["validation_errors"])
+
+    def test_missing_source_writes_only_structured_refusal_report(self):
+        spec = ready_spec()
+        spec["source"]["input_file"] = str(self.root / "missing.png")
+
+        completed = run_extract(self.write_spec(spec), self.output)
+
+        self.assertEqual(completed.returncode, 2, completed.stderr)
+        report = self.assert_report_only()
+        self.assertEqual(report["refusal_reasons"], ["source_unavailable"])
+
+    def test_non_image_source_writes_only_structured_refusal_report(self):
+        invalid_image = self.root / "not-an-image.png"
+        invalid_image.write_text("not an image", encoding="utf-8")
+        spec = ready_spec()
+        spec["source"]["input_file"] = str(invalid_image)
+        spec["source"]["sha256"] = hashlib.sha256(invalid_image.read_bytes()).hexdigest()
+
+        completed = run_extract(self.write_spec(spec), self.output)
+
+        self.assertEqual(completed.returncode, 2, completed.stderr)
+        report = self.assert_report_only()
+        self.assertEqual(report["refusal_reasons"], ["source_not_image"])
+
+    def test_unreadable_source_writes_only_structured_refusal_report(self):
+        source_directory = self.root / "source-directory"
+        source_directory.mkdir()
+        spec = ready_spec()
+        spec["source"]["input_file"] = str(source_directory)
+
+        completed = run_extract(self.write_spec(spec), self.output)
+
+        self.assertEqual(completed.returncode, 2, completed.stderr)
+        report = self.assert_report_only()
+        self.assertEqual(report["refusal_reasons"], ["source_unreadable"])
 
     def test_extract_does_not_overwrite_nonempty_evidence_directory(self):
         self.output.mkdir()
@@ -313,14 +349,12 @@ class CandlestickUnifiedCliTests(unittest.TestCase):
         anchor = price_axis["anchors"][0]
         evidence = anchor["evidence"]
         style = route_config["styles"][0]
-        geometry = style["geometry"]
         malicious_values = (
             "SECRET_AXIS_TRUTH",
             "SECRET_EXPECTED_HIGH",
             "SECRET_EVIDENCE_DATE",
             "SECRET_STYLE_OPEN",
             "SECRET_STYLE_DATE",
-            "SECRET_GEOMETRY_CLOSE",
             "SECRET_METADATA_ECHO",
         )
         price_axis["truth"] = malicious_values[0]
@@ -329,7 +363,6 @@ class CandlestickUnifiedCliTests(unittest.TestCase):
         style["open"] = malicious_values[3]
         style["date"] = malicious_values[4]
         style["expected_count"] = 999999
-        geometry["close"] = malicious_values[5]
         captured: dict = {}
         detector_result = ExtractionResult(
             (),
@@ -344,7 +377,7 @@ class CandlestickUnifiedCliTests(unittest.TestCase):
                 "refusal_reasons": ["detector_not_authorized"],
                 "styles": config["styles"],
                 "price_axis": config["price_axis"],
-                "untrusted_metadata": malicious_values[6],
+                "untrusted_metadata": malicious_values[5],
             }
 
         with patch(
@@ -399,6 +432,66 @@ class CandlestickUnifiedCliTests(unittest.TestCase):
         self.assertNotIn("styles", report["detector_details"])
         self.assertNotIn("price_axis", report["detector_details"])
         self.assertIn("center_wick_not_connected", report_text)
+
+    def test_route_geometry_is_the_only_geometry_mapped_to_every_detector_style(self):
+        spec = ready_spec()
+        config = spec["panels"][0]["route_config"]
+        config["styles"].append(
+            {
+                "id": "down",
+                "kind": "outline",
+                "direction": "open_above_close",
+                "colors": ["#aa0000"],
+                "tolerance": 2,
+            }
+        )
+        config["geometry"]["styles"]["down"] = {
+            "min_body_width_px": 6,
+            "max_body_width_px": 14,
+            "min_vertical_length_px": 3,
+            "max_wick_center_offset_px": 2,
+            "max_wick_connection_gap_px": 0,
+        }
+        captured = {}
+
+        def detector(_image_path: Path, detector_config: dict):
+            captured.update(detector_config)
+            return ExtractionResult((), (), (), False), {
+                "refusal_reasons": ["detector_not_authorized"]
+            }
+
+        with patch(
+            "candidate_digitize_candlestick.extract_candlesticks",
+            side_effect=detector,
+        ):
+            authorized = run_candlestick_extraction(spec, self.output)
+
+        self.assertFalse(authorized)
+        self.assertEqual(
+            [style["geometry"] for style in captured["styles"]],
+            [
+                config["geometry"]["styles"]["up"],
+                config["geometry"]["styles"]["down"],
+            ],
+        )
+
+    def test_nonempty_exclusions_refuse_before_detector_invocation(self):
+        spec = ready_spec()
+        spec["panels"][0]["route_config"]["exclusions"] = {
+            "verification": "verified",
+            "regions": [[10, 10, 20, 20]],
+        }
+
+        with patch("candidate_digitize_candlestick.extract_candlesticks") as detector:
+            authorized = run_candlestick_extraction(spec, self.output)
+
+        self.assertFalse(authorized)
+        detector.assert_not_called()
+        report = self.assert_report_only()
+        self.assertEqual(report["refusal_reasons"], ["figure_spec_not_ready"])
+        self.assertTrue(
+            any("exclusions.regions" in error for error in report["readiness"]["errors"])
+        )
 
     def test_not_applicable_canonical_confirmation_refuses_before_detector(self):
         spec = ready_spec()

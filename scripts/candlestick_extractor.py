@@ -1321,10 +1321,6 @@ def extract_candlesticks(
     return _extract_candlesticks_impl(image_path, extraction_config)
 
 
-# Temporary private-API compatibility during downstream test migration.
-extract_klines = extract_candlesticks
-
-
 def _require_empty_output_dir(output_dir: Path) -> None:
     if output_dir.exists() and any(output_dir.iterdir()):
         raise FileExistsError(f"refusing to overwrite non-empty evidence directory: {output_dir}")
@@ -1364,7 +1360,7 @@ def write_extraction_artifacts(
                 writer.writerow({"index": index, **asdict(candle)})
 
     algorithm = {
-        "name": "raster_kline_candidate",
+        "name": "raster_candlestick_candidate",
         "version": metadata.get("algorithm_version", "candidate-v1"),
     }
     run_material = json.dumps(

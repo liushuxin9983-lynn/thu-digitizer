@@ -82,14 +82,10 @@ Expected: FAIL with `ModuleNotFoundError: No module named 'candlestick_extractor
 
 ```python
 # scripts/candlestick_extractor.py
-# Rename the existing extract_klines definition to _extract_candlesticks_impl,
-# then expose a name which does not use the old K-line terminology.
+# Rename the existing implementation to _extract_candlesticks_impl,
+# then expose the candlestick terminology.
 def extract_candlesticks(image_path: Path | str, extraction_config: dict) -> tuple[ExtractionResult, dict]:
     return _extract_candlesticks_impl(image_path, extraction_config)
-
-# Retain this private compatibility alias only while the old test migration is
-# being completed; no public CLI or documentation refers to it.
-extract_klines = extract_candlesticks
 ```
 
 Use `git mv candlestick-digitizer/scripts/kline_extractor.py scripts/candlestick_extractor.py`, then rename the original implementation to `_extract_candlesticks_impl` so the public function calls it exactly once. Preserve `ExtractionRefused`, the source contract, price-anchor evidence verification, coverage ledger, and `write_extraction_artifacts` byte-for-byte apart from import/module names.
