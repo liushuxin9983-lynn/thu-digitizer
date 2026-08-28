@@ -184,6 +184,7 @@ def _validate_candlestick_route_config(
                     _is_finite_number(anchor.get("pixel"))
                     and _is_finite_number(anchor.get("value"))
                     and isinstance(anchor.get("evidence"), dict)
+                    and bool(anchor["evidence"])
                 ):
                     errors.append(f"{anchor_path} must be numeric and evidenced")
 
@@ -357,6 +358,7 @@ def validate_figure_spec(spec: Any) -> list[str]:
         return errors
 
     panel_ids = set()
+    candlestick_panels: list[str] = []
     for panel_index, panel in enumerate(panels):
         path = f"panels[{panel_index}]"
         if not isinstance(panel, dict):
@@ -438,17 +440,33 @@ def validate_figure_spec(spec: Any) -> list[str]:
                     errors.append(
                         f"{path}.confirmations.{name} must be verified before ready_for_assisted_extraction"
                     )
-        if (
+        is_candlestick_route = (
             isinstance(route, dict)
             and route.get("route_id") == "raster_candlestick_candidate"
-            and isinstance(confirmations, dict)
-        ):
+        )
+        if is_candlestick_route:
+            candlestick_panels.append(path)
+            if panel.get("coordinate_model") != "categorical_value":
+                errors.append(f"{path}.candlestick coordinate_model must equal 'categorical_value'")
+            if route.get("maturity") != "candidate":
+                errors.append(f"{path}.candlestick route.maturity must equal 'candidate'")
+        if is_candlestick_route and isinstance(confirmations, dict):
             _validate_candlestick_route_config(
                 panel,
                 confirmations,
                 spec.get("status"),
                 errors,
                 path,
+            )
+
+    if candlestick_panels:
+        if len(panels) != 1:
+            errors.append("candlestick route requires exactly one panel")
+        if source.get("media_kind") != "raster":
+            errors.append("candlestick source.media_kind must equal 'raster'")
+        if source.get("measurement_space") != "original_raster_pixels":
+            errors.append(
+                "candlestick source.measurement_space must equal 'original_raster_pixels'"
             )
 
     return errors

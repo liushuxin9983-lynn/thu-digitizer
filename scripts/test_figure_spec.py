@@ -1,3 +1,4 @@
+import copy
 import unittest
 
 try:
@@ -242,6 +243,45 @@ class FigureSpecTests(unittest.TestCase):
         self.assertTrue(any("geometry.verification" in error for error in errors))
         self.assertTrue(any("exclusions.verification" in error for error in errors))
         self.assertTrue(any("occluders.verification" in error for error in errors))
+
+    def test_candlestick_route_rejects_non_raster_source_contract(self):
+        spec = candlestick_ready_spec()
+        spec["source"].update(
+            {
+                "media_kind": "pdf",
+                "coordinate_space": "pdf_pt",
+                "measurement_space": "pdf_page_points",
+            }
+        )
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("candlestick source.media_kind" in error for error in errors))
+        self.assertTrue(any("candlestick source.measurement_space" in error for error in errors))
+
+    def test_candlestick_route_rejects_multiple_panels(self):
+        spec = candlestick_ready_spec()
+        second_panel = copy.deepcopy(spec["panels"][0])
+        second_panel["panel_id"] = "panel-b"
+        spec["panels"].append(second_panel)
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("candlestick route requires exactly one panel" in error for error in errors))
+
+    def test_candlestick_route_rejects_wrong_coordinate_model(self):
+        spec = candlestick_ready_spec()
+        spec["panels"][0]["coordinate_model"] = "cartesian_linear"
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("candlestick coordinate_model" in error for error in errors))
+
+    def test_candlestick_route_rejects_wrong_maturity(self):
+        spec = candlestick_ready_spec()
+        spec["panels"][0]["route"]["maturity"] = "validated_local_stable"
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("candlestick route.maturity" in error for error in errors))
+
+    def test_candlestick_route_rejects_empty_anchor_evidence(self):
+        spec = candlestick_ready_spec()
+        spec["panels"][0]["route_config"]["price_axis"]["anchors"][0]["evidence"] = {}
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("anchors[0]" in error for error in errors))
 
 
 if __name__ == "__main__":
