@@ -92,7 +92,10 @@ def candlestick_ready_spec():
                 },
             ],
             "mark_grammars": ["candle_body", "wick", "price_reference_line"],
-            "route": {"route_id": "raster_candlestick_candidate"},
+            "route": {
+                "route_id": "raster_candlestick_candidate",
+                "maturity": "candidate",
+            },
             "required_confirmations": [
                 "panel_roi",
                 "plot_bounds",
@@ -143,6 +146,9 @@ def candlestick_ready_spec():
 
 
 class FigureSpecTests(unittest.TestCase):
+    def test_candlestick_ready_spec_is_a_valid_baseline(self):
+        self.assertEqual(validate_figure_spec(candlestick_ready_spec()), [])
+
     def test_accepts_verified_linear_axes_and_panel_bounds(self):
         spec = base_spec()
         self.assertEqual(validate_figure_spec(spec), [])
@@ -282,6 +288,21 @@ class FigureSpecTests(unittest.TestCase):
         spec["panels"][0]["route_config"]["price_axis"]["anchors"][0]["evidence"] = {}
         errors = validate_figure_spec(spec)
         self.assertTrue(any("anchors[0]" in error for error in errors))
+
+    def test_candlestick_ready_spec_rejects_missing_category_axis(self):
+        spec = candlestick_ready_spec()
+        spec["panels"][0]["axes"] = [spec["panels"][0]["axes"][1]]
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("candlestick panel requires exactly one category axis" in error for error in errors))
+
+    def test_candlestick_ready_spec_rejects_wrong_category_axis_contract(self):
+        spec = candlestick_ready_spec()
+        category_axis = spec["panels"][0]["axes"][0]
+        category_axis["scale"] = "linear"
+        category_axis["verification"] = "verified"
+        errors = validate_figure_spec(spec)
+        self.assertTrue(any("candlestick category axis.scale" in error for error in errors))
+        self.assertTrue(any("candlestick category axis.verification" in error for error in errors))
 
 
 if __name__ == "__main__":

@@ -189,9 +189,26 @@ def _validate_candlestick_route_config(
                     errors.append(f"{anchor_path} must be numeric and evidenced")
 
         if ready:
+            axes = panel.get("axes")
+            valid_axes = axes if isinstance(axes, list) else []
+            category_axes = [
+                axis
+                for axis in valid_axes
+                if isinstance(axis, dict) and axis.get("axis_id") == "category"
+            ]
+            if len(category_axes) != 1:
+                errors.append(f"{path}.candlestick panel requires exactly one category axis")
+            else:
+                category_axis = category_axes[0]
+                if category_axis.get("scale") != "categorical":
+                    errors.append(f"{path}.candlestick category axis.scale must equal 'categorical'")
+                if category_axis.get("verification") != "not_applicable":
+                    errors.append(
+                        f"{path}.candlestick category axis.verification must equal 'not_applicable'"
+                    )
             price_axes = [
                 axis
-                for axis in panel.get("axes", [])
+                for axis in valid_axes
                 if isinstance(axis, dict) and axis.get("axis_id") == "price"
             ]
             if len(price_axes) != 1:
