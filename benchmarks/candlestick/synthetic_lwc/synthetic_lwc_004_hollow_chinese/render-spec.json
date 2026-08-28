@@ -1,0 +1,185 @@
+{
+  "body_style": "hollow_rise",
+  "candles": [
+    {
+      "borderColor": "#E64646",
+      "close": 107.1492,
+      "color": "#FFFFFF",
+      "high": 108.2965,
+      "low": 103.5755,
+      "open": 104.8265,
+      "time": "2026-01-05",
+      "wickColor": "#E64646"
+    },
+    {
+      "close": 106.3235,
+      "high": 108.5979,
+      "low": 104.8751,
+      "open": 107.1687,
+      "time": "2026-01-06"
+    },
+    {
+      "borderColor": "#E64646",
+      "close": 106.6207,
+      "color": "#FFFFFF",
+      "high": 107.8812,
+      "low": 104.4051,
+      "open": 105.6847,
+      "time": "2026-01-07",
+      "wickColor": "#E64646"
+    },
+    {
+      "borderColor": "#E64646",
+      "close": 108.9007,
+      "color": "#FFFFFF",
+      "high": 109.7312,
+      "low": 106.2935,
+      "open": 107.3008,
+      "time": "2026-01-08",
+      "wickColor": "#E64646"
+    },
+    {
+      "close": 108.0335,
+      "high": 109.7708,
+      "low": 107.484,
+      "open": 109.3861,
+      "time": "2026-01-09"
+    },
+    {
+      "close": 107.9919,
+      "high": 109.5172,
+      "low": 107.4887,
+      "open": 108.7734,
+      "time": "2026-01-12"
+    },
+    {
+      "borderColor": "#E64646",
+      "close": 108.8065,
+      "color": "#FFFFFF",
+      "high": 109.2221,
+      "low": 105.5292,
+      "open": 107.158,
+      "time": "2026-01-13",
+      "wickColor": "#E64646"
+    },
+    {
+      "close": 107.5739,
+      "high": 109.2922,
+      "low": 106.0778,
+      "open": 108.9215,
+      "time": "2026-01-14"
+    },
+    {
+      "borderColor": "#E64646",
+      "close": 108.7198,
+      "color": "#FFFFFF",
+      "high": 109.1459,
+      "low": 105.9445,
+      "open": 107.3312,
+      "time": "2026-01-15",
+      "wickColor": "#E64646"
+    },
+    {
+      "borderColor": "#E64646",
+      "close": 109.8914,
+      "color": "#FFFFFF",
+      "high": 110.8798,
+      "low": 107.7899,
+      "open": 109.0738,
+      "time": "2026-01-16",
+      "wickColor": "#E64646"
+    },
+    {
+      "close": 108.3261,
+      "high": 110.2809,
+      "low": 107.3621,
+      "open": 109.7596,
+      "time": "2026-01-19"
+    },
+    {
+      "close": 106.6491,
+      "high": 109.3963,
+      "low": 105.1049,
+      "open": 108.8464,
+      "time": "2026-01-20"
+    },
+    {
+      "borderColor": "#E64646",
+      "close": 107.0411,
+      "color": "#FFFFFF",
+      "high": 108.1801,
+      "low": 106.1787,
+      "open": 106.7211,
+      "time": "2026-01-21",
+      "wickColor": "#E64646"
+    },
+    {
+      "close": 106.4736,
+      "high": 108.1974,
+      "low": 105.4867,
+      "open": 106.9101,
+      "time": "2026-01-22"
+    },
+    {
+      "borderColor": "#E64646",
+      "close": 108.6493,
+      "color": "#FFFFFF",
+      "high": 109.6319,
+      "low": 105.4302,
+      "open": 106.8166,
+      "time": "2026-01-23",
+      "wickColor": "#E64646"
+    },
+    {
+      "borderColor": "#E64646",
+      "close": 110.9215,
+      "color": "#FFFFFF",
+      "high": 111.8909,
+      "low": 108.1165,
+      "open": 108.7899,
+      "time": "2026-01-26",
+      "wickColor": "#E64646"
+    },
+    {
+      "borderColor": "#E64646",
+      "close": 113.257,
+      "color": "#FFFFFF",
+      "high": 113.7934,
+      "low": 111.0929,
+      "open": 111.9093,
+      "time": "2026-01-27",
+      "wickColor": "#E64646"
+    },
+    {
+      "close": 111.8768,
+      "high": 113.8761,
+      "low": 111.3833,
+      "open": 113.2425,
+      "time": "2026-01-28"
+    }
+  ],
+  "candlestick": {
+    "borderDownColor": "#00A884",
+    "borderUpColor": "#E64646",
+    "borderVisible": true,
+    "downColor": "#00A884",
+    "lastValueVisible": false,
+    "priceLineVisible": false,
+    "upColor": "#E64646",
+    "wickDownColor": "#00A884",
+    "wickUpColor": "#E64646"
+  },
+  "case_id": "synthetic_lwc_004_hollow_chinese",
+  "geometry": "standard",
+  "height": 700,
+  "indicator_definitions": [],
+  "overlays": [],
+  "schema_version": 1,
+  "seed": 1004,
+  "theme": {
+    "background": "#FFFFFF",
+    "grid": "#E8E8E8",
+    "text": "#262626"
+  },
+  "width": 1200
+}

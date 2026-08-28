@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "case_id": "synthetic_lwc_016_lowres_combined",
+  "coordinate_space": "original_raster_pixels",
+  "width": 640,
+  "height": 360,
+  "plot_bounds": [
+    0,
+    0,
+    581,
+    331
+  ],
+  "candle_x_centers": [
+    11.125,
+    35.375,
+    59.625,
+    83.875,
+    108.125,
+    132.375,
+    156.625,
+    180.875,
+    205.125,
+    229.375,
+    253.625,
+    277.875,
+    302.125,
+    326.375,
+    350.625,
+    374.875,
+    399.125,
+    423.375,
+    447.625,
+    471.875,
+    496.125,
+    520.375,
+    544.625,
+    568.875
+  ],
+  "price_anchors": [
+    {
+      "pixel": 50,
+      "value": 113.32570635
+    },
+    {
+      "pixel": 282,
+      "value": 102.89684165
+    }
+  ],
+  "renderer": {
+    "name": "lightweight-charts",
+    "version": "5.2.0",
+    "playwright_version": "1.62.1",
+    "browser": "151.0.7922.34",
+    "device_scale_factor": 1
+  }
+}

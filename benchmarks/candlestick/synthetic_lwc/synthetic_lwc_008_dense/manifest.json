@@ -1,0 +1,124 @@
+{
+  "calibration_provenance": {
+    "method": "lightweight_charts_coordinate_api",
+    "price_api": "candlestickSeries.coordinateToPrice",
+    "time_api": "chart.timeScale().timeToCoordinate"
+  },
+  "case_id": "synthetic_lwc_008_dense",
+  "classification": "stress",
+  "evaluation": {
+    "required": {
+      "clean_case_f1": 1.0,
+      "clean_case_precision": 1.0,
+      "clean_case_recall": 1.0,
+      "max_field_absolute_error": 0.13068028,
+      "max_field_mae": 0.06534014,
+      "max_unsafe_false_accepts": 0,
+      "stress_case_failures_are_reported_not_omitted": true
+    },
+    "x_match_tolerance_px": 3.925
+  },
+  "extraction_config": {
+    "duplicate_distance_px": 9.158,
+    "plot_bounds": [
+      0,
+      0,
+      941,
+      591
+    ],
+    "price_axis": {
+      "anchors": [
+        {
+          "pixel": 89,
+          "value": 105.99404554
+        },
+        {
+          "pixel": 503,
+          "value": 95.17371841
+        }
+      ],
+      "provenance": "deterministic_renderer_geometry",
+      "scale": "linear"
+    },
+    "styles": [
+      {
+        "colors": [
+          "#26A69A"
+        ],
+        "direction": "close_above_open",
+        "geometry": {
+          "max_body_width_px": 25,
+          "max_wick_center_offset_px": 2,
+          "max_wick_connection_gap_px": 2,
+          "min_body_height_px": 2,
+          "min_body_width_px": 11,
+          "min_vertical_length_px": 2
+        },
+        "id": "rise",
+        "kind": "filled",
+        "tolerance": 16
+      },
+      {
+        "colors": [
+          "#EF5350"
+        ],
+        "direction": "open_above_close",
+        "geometry": {
+          "max_body_width_px": 25,
+          "max_wick_center_offset_px": 2,
+          "max_wick_connection_gap_px": 2,
+          "min_body_height_px": 2,
+          "min_body_width_px": 11,
+          "min_vertical_length_px": 2
+        },
+        "id": "fall",
+        "kind": "filled",
+        "tolerance": 16
+      }
+    ]
+  },
+  "family": "geometry",
+  "held_out": false,
+  "image": {
+    "coordinate_space": "original_raster_pixels",
+    "file": "original.png",
+    "height": 620,
+    "sha256": "D01BC4F751B6631EA778C91F5EA0239B273BC3C43057A95F71926A5D59C60E34",
+    "width": 1000
+  },
+  "kind": "synthetic",
+  "limitations": [
+    "single renderer and template family",
+    "synthetic tuning evidence only",
+    "dates are evaluator identifiers, not OCR targets",
+    "overlay values cannot supply OHLC"
+  ],
+  "overlay_policy": {
+    "colors": [],
+    "occluder_role": "not_applicable",
+    "values_used_for_ohlc": false
+  },
+  "renderer": {
+    "browser": "151.0.7922.34",
+    "device_scale_factor": 1,
+    "name": "lightweight-charts",
+    "playwright_version": "1.62.1",
+    "version": "5.2.0"
+  },
+  "schema_version": 1,
+  "stressors": {
+    "body_style": "filled",
+    "geometry": "standard",
+    "near_color_overlay": false,
+    "overlay_ids": [],
+    "theme": "western_light"
+  },
+  "truth": {
+    "detector_access": false,
+    "file": "truth.csv",
+    "mapping": "date identifies rows; OHLC is source truth; x_center_px comes from renderer timeToCoordinate",
+    "seed": 1008,
+    "source": "deterministic_local_generator"
+  },
+  "tuning_case": true
+}

@@ -1,0 +1,173 @@
+{
+  "calibration_provenance": {
+    "method": "lightweight_charts_coordinate_api",
+    "price_api": "candlestickSeries.coordinateToPrice",
+    "time_api": "chart.timeScale().timeToCoordinate"
+  },
+  "case_id": "synthetic_lwc_016_lowres_combined",
+  "classification": "stress",
+  "evaluation": {
+    "required": {
+      "clean_case_f1": 1.0,
+      "clean_case_precision": 1.0,
+      "clean_case_recall": 1.0,
+      "max_field_absolute_error": 0.22476002,
+      "max_field_mae": 0.11238001,
+      "max_unsafe_false_accepts": 0,
+      "stress_case_failures_are_reported_not_omitted": true
+    },
+    "x_match_tolerance_px": 3.637
+  },
+  "extraction_config": {
+    "duplicate_distance_px": 8.487,
+    "plot_bounds": [
+      0,
+      0,
+      581,
+      331
+    ],
+    "price_axis": {
+      "anchors": [
+        {
+          "pixel": 50,
+          "value": 113.32570635
+        },
+        {
+          "pixel": 282,
+          "value": 102.89684165
+        }
+      ],
+      "provenance": "deterministic_renderer_geometry",
+      "scale": "linear"
+    },
+    "styles": [
+      {
+        "colors": [
+          "#FF5B5B"
+        ],
+        "direction": "close_above_open",
+        "geometry": {
+          "body_occluder_vertical_radius_px": 1,
+          "bridge_filled_body_fragments": true,
+          "max_body_fragment_center_delta_px": 14,
+          "max_body_fragment_edge_delta_px": 14,
+          "max_body_fragment_union_width_px": 24,
+          "max_body_fragment_width_delta_px": 14,
+          "max_body_occlusion_gap_px": 6,
+          "max_body_width_px": 24,
+          "max_occlusion_gap_px": 6,
+          "max_wick_center_offset_px": 2,
+          "max_wick_connection_gap_px": 2,
+          "min_body_fragment_horizontal_overlap_px": 3,
+          "min_body_height_px": 2,
+          "min_body_occluder_row_coverage": 1.0,
+          "min_body_width_px": 10,
+          "min_occluder_color_separation": 1.0,
+          "min_vertical_length_px": 2,
+          "occluder_role": "topology_only_not_numeric_fill",
+          "verified_occluder_colors": [
+            "#40C4FF",
+            "#B388FF",
+            "#FFAB40",
+            "#FFD740"
+          ],
+          "verified_occluder_tolerance": 14
+        },
+        "id": "rise",
+        "kind": "filled",
+        "tolerance": 16
+      },
+      {
+        "colors": [
+          "#20C997"
+        ],
+        "direction": "open_above_close",
+        "geometry": {
+          "body_occluder_vertical_radius_px": 1,
+          "bridge_filled_body_fragments": true,
+          "max_body_fragment_center_delta_px": 14,
+          "max_body_fragment_edge_delta_px": 14,
+          "max_body_fragment_union_width_px": 24,
+          "max_body_fragment_width_delta_px": 14,
+          "max_body_occlusion_gap_px": 6,
+          "max_body_width_px": 24,
+          "max_occlusion_gap_px": 6,
+          "max_wick_center_offset_px": 2,
+          "max_wick_connection_gap_px": 2,
+          "min_body_fragment_horizontal_overlap_px": 3,
+          "min_body_height_px": 2,
+          "min_body_occluder_row_coverage": 1.0,
+          "min_body_width_px": 10,
+          "min_occluder_color_separation": 1.0,
+          "min_vertical_length_px": 2,
+          "occluder_role": "topology_only_not_numeric_fill",
+          "verified_occluder_colors": [
+            "#40C4FF",
+            "#B388FF",
+            "#FFAB40",
+            "#FFD740"
+          ],
+          "verified_occluder_tolerance": 14
+        },
+        "id": "fall",
+        "kind": "filled",
+        "tolerance": 16
+      }
+    ]
+  },
+  "family": "bollinger",
+  "held_out": false,
+  "image": {
+    "coordinate_space": "original_raster_pixels",
+    "file": "original.png",
+    "height": 360,
+    "sha256": "B56E112373E4634742D27B0B475243534BC7BD7AFB11F19EBDDBAC5B6F26580D",
+    "width": 640
+  },
+  "kind": "synthetic",
+  "limitations": [
+    "single renderer and template family",
+    "synthetic tuning evidence only",
+    "dates are evaluator identifiers, not OCR targets",
+    "overlay values cannot supply OHLC"
+  ],
+  "overlay_policy": {
+    "colors": [
+      "#40C4FF",
+      "#B388FF",
+      "#FFAB40",
+      "#FFD740"
+    ],
+    "occluder_role": "topology_only_not_numeric_fill",
+    "values_used_for_ohlc": false
+  },
+  "renderer": {
+    "browser": "151.0.7922.34",
+    "device_scale_factor": 1,
+    "name": "lightweight-charts",
+    "playwright_version": "1.62.1",
+    "version": "5.2.0"
+  },
+  "schema_version": 1,
+  "stressors": {
+    "body_style": "filled",
+    "geometry": "standard",
+    "near_color_overlay": false,
+    "overlay_ids": [
+      "ma3_1",
+      "ma8_2",
+      "bollinger_upper_3",
+      "bollinger_middle_3",
+      "bollinger_lower_3"
+    ],
+    "theme": "chinese_dark"
+  },
+  "truth": {
+    "detector_access": false,
+    "file": "truth.csv",
+    "mapping": "date identifies rows; OHLC is source truth; x_center_px comes from renderer timeToCoordinate",
+    "seed": 1016,
+    "source": "deterministic_local_generator"
+  },
+  "tuning_case": true
+}

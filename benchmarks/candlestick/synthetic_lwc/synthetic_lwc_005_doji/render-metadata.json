@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "case_id": "synthetic_lwc_005_doji",
+  "coordinate_space": "original_raster_pixels",
+  "width": 1200,
+  "height": 700,
+  "plot_bounds": [
+    0,
+    0,
+    1141,
+    671
+  ],
+  "candle_x_centers": [
+    30.722222,
+    94.166667,
+    157.611111,
+    221.055556,
+    284.5,
+    347.944444,
+    411.388889,
+    474.833333,
+    538.277778,
+    601.722222,
+    665.166667,
+    728.611111,
+    792.055556,
+    855.5,
+    918.944444,
+    982.388889,
+    1045.833333,
+    1109.277778
+  ],
+  "price_anchors": [
+    {
+      "pixel": 101,
+      "value": 117.37419631
+    },
+    {
+      "pixel": 571,
+      "value": 105.31544678
+    }
+  ],
+  "renderer": {
+    "name": "lightweight-charts",
+    "version": "5.2.0",
+    "playwright_version": "1.62.1",
+    "browser": "151.0.7922.34",
+    "device_scale_factor": 1
+  }
+}

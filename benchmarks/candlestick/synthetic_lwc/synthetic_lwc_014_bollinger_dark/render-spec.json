@@ -1,0 +1,366 @@
+{
+  "body_style": "filled",
+  "candles": [
+    {
+      "close": 105.4096,
+      "high": 106.4295,
+      "low": 104.5013,
+      "open": 106.0342,
+      "time": "2026-01-05"
+    },
+    {
+      "close": 107.3427,
+      "high": 108.2995,
+      "low": 105.4346,
+      "open": 106.4514,
+      "time": "2026-01-06"
+    },
+    {
+      "close": 107.9307,
+      "high": 109.0441,
+      "low": 106.311,
+      "open": 106.7944,
+      "time": "2026-01-07"
+    },
+    {
+      "close": 109.9524,
+      "high": 111.244,
+      "low": 108.0519,
+      "open": 108.7247,
+      "time": "2026-01-08"
+    },
+    {
+      "close": 110.354,
+      "high": 111.5825,
+      "low": 108.9946,
+      "open": 110.8021,
+      "time": "2026-01-09"
+    },
+    {
+      "close": 111.396,
+      "high": 111.8171,
+      "low": 109.0832,
+      "open": 109.7942,
+      "time": "2026-01-12"
+    },
+    {
+      "close": 110.8962,
+      "high": 112.5952,
+      "low": 110.502,
+      "open": 111.6959,
+      "time": "2026-01-13"
+    },
+    {
+      "close": 112.8074,
+      "high": 114.2859,
+      "low": 111.3608,
+      "open": 111.9398,
+      "time": "2026-01-14"
+    },
+    {
+      "close": 112.4209,
+      "high": 113.4892,
+      "low": 111.8042,
+      "open": 112.9954,
+      "time": "2026-01-15"
+    },
+    {
+      "close": 110.3025,
+      "high": 112.9048,
+      "low": 109.0119,
+      "open": 112.4647,
+      "time": "2026-01-16"
+    },
+    {
+      "close": 111.9339,
+      "high": 113.4318,
+      "low": 110.3367,
+      "open": 110.8463,
+      "time": "2026-01-19"
+    },
+    {
+      "close": 112.7444,
+      "high": 113.8657,
+      "low": 110.3778,
+      "open": 111.3049,
+      "time": "2026-01-20"
+    },
+    {
+      "close": 114.2645,
+      "high": 115.8999,
+      "low": 111.9684,
+      "open": 113.1351,
+      "time": "2026-01-21"
+    },
+    {
+      "close": 112.7223,
+      "high": 115.9234,
+      "low": 111.9971,
+      "open": 114.6296,
+      "time": "2026-01-22"
+    },
+    {
+      "close": 112.3077,
+      "high": 113.1239,
+      "low": 110.5939,
+      "open": 111.7843,
+      "time": "2026-01-23"
+    },
+    {
+      "close": 111.0944,
+      "high": 112.4751,
+      "low": 110.7329,
+      "open": 111.4144,
+      "time": "2026-01-26"
+    },
+    {
+      "close": 111.3475,
+      "high": 111.9232,
+      "low": 109.7107,
+      "open": 110.7458,
+      "time": "2026-01-27"
+    },
+    {
+      "close": 110.3466,
+      "high": 112.2492,
+      "low": 109.2653,
+      "open": 111.681,
+      "time": "2026-01-28"
+    }
+  ],
+  "candlestick": {
+    "borderDownColor": "#F7525F",
+    "borderUpColor": "#22AB94",
+    "borderVisible": true,
+    "downColor": "#F7525F",
+    "lastValueVisible": false,
+    "priceLineVisible": false,
+    "upColor": "#22AB94",
+    "wickDownColor": "#F7525F",
+    "wickUpColor": "#22AB94"
+  },
+  "case_id": "synthetic_lwc_014_bollinger_dark",
+  "geometry": "standard",
+  "height": 700,
+  "indicator_definitions": [
+    {
+      "colors": {
+        "lower": "#FFD54F",
+        "middle": "#FF8A65",
+        "upper": "#FFD54F"
+      },
+      "kind": "bollinger",
+      "multiplier": 2.0,
+      "period": 6,
+      "width": 2
+    }
+  ],
+  "overlays": [
+    {
+      "color": "#FFD54F",
+      "data": [
+        {
+          "time": "2026-01-12",
+          "value": 112.799293
+        },
+        {
+          "time": "2026-01-13",
+          "value": 112.641785
+        },
+        {
+          "time": "2026-01-14",
+          "value": 113.521188
+        },
+        {
+          "time": "2026-01-15",
+          "value": 113.371972
+        },
+        {
+          "time": "2026-01-16",
+          "value": 113.289346
+        },
+        {
+          "time": "2026-01-19",
+          "value": 113.350396
+        },
+        {
+          "time": "2026-01-20",
+          "value": 113.740154
+        },
+        {
+          "time": "2026-01-21",
+          "value": 114.77549
+        },
+        {
+          "time": "2026-01-22",
+          "value": 114.752656
+        },
+        {
+          "time": "2026-01-23",
+          "value": 114.73457
+        },
+        {
+          "time": "2026-01-26",
+          "value": 114.435607
+        },
+        {
+          "time": "2026-01-27",
+          "value": 114.498113
+        },
+        {
+          "time": "2026-01-28",
+          "value": 114.559785
+        }
+      ],
+      "id": "bollinger_upper_1",
+      "kind": "bollinger_upper",
+      "source": {
+        "field": "close",
+        "multiplier": 2.0,
+        "period": 6,
+        "population_standard_deviation": true
+      },
+      "width": 2
+    },
+    {
+      "color": "#FF8A65",
+      "data": [
+        {
+          "time": "2026-01-12",
+          "value": 108.7309
+        },
+        {
+          "time": "2026-01-13",
+          "value": 109.645333
+        },
+        {
+          "time": "2026-01-14",
+          "value": 110.556117
+        },
+        {
+          "time": "2026-01-15",
+          "value": 111.304483
+        },
+        {
+          "time": "2026-01-16",
+          "value": 111.362833
+        },
+        {
+          "time": "2026-01-19",
+          "value": 111.62615
+        },
+        {
+          "time": "2026-01-20",
+          "value": 111.850883
+        },
+        {
+          "time": "2026-01-21",
+          "value": 112.412267
+        },
+        {
+          "time": "2026-01-22",
+          "value": 112.398083
+        },
+        {
+          "time": "2026-01-23",
+          "value": 112.379217
+        },
+        {
+          "time": "2026-01-26",
+          "value": 112.5112
+        },
+        {
+          "time": "2026-01-27",
+          "value": 112.413467
+        },
+        {
+          "time": "2026-01-28",
+          "value": 112.013833
+        }
+      ],
+      "id": "bollinger_middle_1",
+      "kind": "bollinger_middle",
+      "source": {
+        "field": "close",
+        "multiplier": 2.0,
+        "period": 6,
+        "population_standard_deviation": true
+      },
+      "width": 2
+    },
+    {
+      "color": "#FFD54F",
+      "data": [
+        {
+          "time": "2026-01-12",
+          "value": 104.662507
+        },
+        {
+          "time": "2026-01-13",
+          "value": 106.648881
+        },
+        {
+          "time": "2026-01-14",
+          "value": 107.591045
+        },
+        {
+          "time": "2026-01-15",
+          "value": 109.236995
+        },
+        {
+          "time": "2026-01-16",
+          "value": 109.436321
+        },
+        {
+          "time": "2026-01-19",
+          "value": 109.901904
+        },
+        {
+          "time": "2026-01-20",
+          "value": 109.961612
+        },
+        {
+          "time": "2026-01-21",
+          "value": 110.049043
+        },
+        {
+          "time": "2026-01-22",
+          "value": 110.043511
+        },
+        {
+          "time": "2026-01-23",
+          "value": 110.023864
+        },
+        {
+          "time": "2026-01-26",
+          "value": 110.586793
+        },
+        {
+          "time": "2026-01-27",
+          "value": 110.32882
+        },
+        {
+          "time": "2026-01-28",
+          "value": 109.467881
+        }
+      ],
+      "id": "bollinger_lower_1",
+      "kind": "bollinger_lower",
+      "source": {
+        "field": "close",
+        "multiplier": 2.0,
+        "period": 6,
+        "population_standard_deviation": true
+      },
+      "width": 2
+    }
+  ],
+  "schema_version": 1,
+  "seed": 1014,
+  "theme": {
+    "background": "#121722",
+    "grid": "#2A2E39",
+    "text": "#D1D4DC"
+  },
+  "width": 1200
+}

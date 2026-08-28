@@ -1,0 +1,121 @@
+{
+  "cases": [
+    {
+      "case_id": "synthetic_lwc_001_light_western",
+      "classification": "clean",
+      "family": "base",
+      "image_sha256": "190DE126DD0BF0494D408E771D2538C2B83BAD681F2D502B994D1C6DC3FEB271",
+      "path": "synthetic_lwc_001_light_western"
+    },
+    {
+      "case_id": "synthetic_lwc_002_dark_western",
+      "classification": "clean",
+      "family": "base",
+      "image_sha256": "96BF434F21D763574F5511AEEF051D719AFC0F7F4CA7654224423A6466F9CFD6",
+      "path": "synthetic_lwc_002_dark_western"
+    },
+    {
+      "case_id": "synthetic_lwc_003_light_chinese",
+      "classification": "clean",
+      "family": "base",
+      "image_sha256": "00F8BEA7CE0B325E17D4D171CCCB0CE7F07201ED62291340F02B2D3C1655FFCB",
+      "path": "synthetic_lwc_003_light_chinese"
+    },
+    {
+      "case_id": "synthetic_lwc_004_hollow_chinese",
+      "classification": "stress",
+      "family": "base",
+      "image_sha256": "7D186D892867BE70B1AECF7908D9C2830E313DBC5DA2AC267B7E36EF6AF22D8D",
+      "path": "synthetic_lwc_004_hollow_chinese"
+    },
+    {
+      "case_id": "synthetic_lwc_005_doji",
+      "classification": "stress",
+      "family": "geometry",
+      "image_sha256": "1E7D3E3271FB59B0B7924F0D05B2C8FF997352233111A8F155BD0C43430802EA",
+      "path": "synthetic_lwc_005_doji"
+    },
+    {
+      "case_id": "synthetic_lwc_006_no_upper_wick",
+      "classification": "stress",
+      "family": "geometry",
+      "image_sha256": "E4D00C3236B4D160E2EA0C105863024CB2F9A7C95DD27CAAE0064C01D4E38828",
+      "path": "synthetic_lwc_006_no_upper_wick"
+    },
+    {
+      "case_id": "synthetic_lwc_007_no_lower_wick",
+      "classification": "stress",
+      "family": "geometry",
+      "image_sha256": "0575592F6BC06A4F709273FCAA4796897C42E8F4ED7DF10C9C0B45A0FE9B9394",
+      "path": "synthetic_lwc_007_no_lower_wick"
+    },
+    {
+      "case_id": "synthetic_lwc_008_dense",
+      "classification": "stress",
+      "family": "geometry",
+      "image_sha256": "D01BC4F751B6631EA778C91F5EA0239B273BC3C43057A95F71926A5D59C60E34",
+      "path": "synthetic_lwc_008_dense"
+    },
+    {
+      "case_id": "synthetic_lwc_009_single_ma",
+      "classification": "stress",
+      "family": "ma",
+      "image_sha256": "53B42934531678DE4788D5D6C9A344C266FC77B8864509E287BF858346DD5B28",
+      "path": "synthetic_lwc_009_single_ma"
+    },
+    {
+      "case_id": "synthetic_lwc_010_dual_ma",
+      "classification": "stress",
+      "family": "ma",
+      "image_sha256": "7F57D4CC0121F2B6724F5EB6CE49BC1DA9E0F417F7956F6FBA9BAFC27C499484",
+      "path": "synthetic_lwc_010_dual_ma"
+    },
+    {
+      "case_id": "synthetic_lwc_011_dual_ma_cross",
+      "classification": "stress",
+      "family": "ma",
+      "image_sha256": "F666E03064B77FBDFDAB26411AF44D496D3E9E88CC2EBE0DD3B737122A307E6D",
+      "path": "synthetic_lwc_011_dual_ma_cross"
+    },
+    {
+      "case_id": "synthetic_lwc_012_near_color_ma",
+      "classification": "stress",
+      "family": "ma",
+      "image_sha256": "61AB7D715446AA07E57A95FBB20A618E5035F508C26D8153D002984A25C49D2A",
+      "path": "synthetic_lwc_012_near_color_ma"
+    },
+    {
+      "case_id": "synthetic_lwc_013_bollinger_light",
+      "classification": "stress",
+      "family": "bollinger",
+      "image_sha256": "7FC1CD4DDA6B0B1462D0BBD21D41D4DD17240600174BDF7B23B50B661085D5FB",
+      "path": "synthetic_lwc_013_bollinger_light"
+    },
+    {
+      "case_id": "synthetic_lwc_014_bollinger_dark",
+      "classification": "stress",
+      "family": "bollinger",
+      "image_sha256": "F23EBEB5CF8929556EB4B53CFE4854846DB3B041A23848FFABB0FC6A87E7F80D",
+      "path": "synthetic_lwc_014_bollinger_dark"
+    },
+    {
+      "case_id": "synthetic_lwc_015_narrow_bollinger",
+      "classification": "stress",
+      "family": "bollinger",
+      "image_sha256": "67412BA71831205BA9F315C0EC0275B7055F28FFB8922DD316C762B3D14D5E52",
+      "path": "synthetic_lwc_015_narrow_bollinger"
+    },
+    {
+      "case_id": "synthetic_lwc_016_lowres_combined",
+      "classification": "stress",
+      "family": "bollinger",
+      "image_sha256": "B56E112373E4634742D27B0B475243534BC7BD7AFB11F19EBDDBAC5B6F26580D",
+      "path": "synthetic_lwc_016_lowres_combined"
+    }
+  ],
+  "held_out": false,
+  "kind": "synthetic_tuning_regression",
+  "renderer_family": "lightweight-charts@5.2.0",
+  "schema_version": 1,
+  "suite_id": "synthetic_lwc_v1"
+}

@@ -1,0 +1,77 @@
+{
+  "schema_version": 1,
+  "case_id": "kline_sample_001",
+  "kind": "real_raster_regression",
+  "tuning_case": true,
+  "held_out": false,
+  "image": {
+    "file": "original.png",
+    "sha256": "0E5D9824FF9D632A47BBAA6807EA19EAF6162F57D94F85FB83A03C477744F080",
+    "width": 1505,
+    "height": 874,
+    "coordinate_space": "original_raster_pixels"
+  },
+  "truth": {
+    "file": "truth.csv",
+    "source_workbook": "股票数据汇总.xlsx",
+    "source_workbook_sha256": "2F40F76F7583299C313BC65F57C4DC580AB50EA654B6FA7226DD0F9EABD68156",
+    "source_sheet": "股票数据汇总",
+    "source_range": "A1:E12",
+    "mapping": "A=date identifier; numeric prefixes of B:E are OHLC; parenthesized percentages excluded"
+  },
+  "consent": {
+    "retain_normalized_ohlc_fixture": true
+  },
+  "extraction_config": {
+    "plot_bounds": [4, 47, 1438, 830],
+    "price_axis": {
+      "scale": "linear",
+      "anchors": [
+        {"pixel": 47, "value": 27.5},
+        {"pixel": 830, "value": 23.5}
+      ]
+    },
+    "styles": [
+      {
+        "id": "cyan_filled",
+        "kind": "filled",
+        "colors": ["#00EBFF"],
+        "tolerance": 12,
+        "direction": "open_above_close",
+        "geometry": {
+          "min_body_width_px": 80,
+          "max_body_width_px": 110,
+          "max_wick_center_offset_px": 2,
+          "max_wick_connection_gap_px": 2,
+          "verified_occluder_colors": ["#00FF00", "#00DB00"],
+          "verified_occluder_tolerance": 20,
+          "max_occlusion_gap_px": 20,
+          "occluder_role": "topology_only_not_numeric_fill"
+        }
+      },
+      {
+        "id": "red_outline",
+        "kind": "outline",
+        "colors": ["#E64646"],
+        "tolerance": 12,
+        "direction": "close_above_open",
+        "geometry": {
+          "min_body_width_px": 80,
+          "max_body_width_px": 110,
+          "max_wick_center_offset_px": 2
+        }
+      }
+    ]
+  },
+  "evaluation": {
+    "x_match_tolerance_px": 8,
+    "required": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "max_field_mae": 0.01,
+      "max_field_absolute_error": 0.03,
+      "max_unsafe_false_accepts": 0
+    }
+  }
+}

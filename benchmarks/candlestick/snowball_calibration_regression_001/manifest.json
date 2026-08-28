@@ -1,0 +1,143 @@
+{
+  "schema_version": 1,
+  "case_id": "snowball_calibration_regression_001",
+  "kind": "real_raster_regression",
+  "tuning_case": true,
+  "held_out": false,
+  "image": {
+    "file": "original.png",
+    "sha256": "A14527E7E5323DB266084A275CF539B2CF78072A61F82FC4641B29372F0FD25D",
+    "width": 1275,
+    "height": 1167,
+    "coordinate_space": "original_raster_pixels"
+  },
+  "derivation": {
+    "source_case_id": "snowball_held_out_001",
+    "source_case_classification": "dangerous_false_accept",
+    "truth_known_before_configuration": true,
+    "failure_mode_known_before_configuration": true,
+    "failure_mode": "The upper price anchor used the 1443.30 label text-centre row y=27 instead of its visible horizontal gridline at y=12, producing systematic positive OHLC bias.",
+    "purpose": "Post-failure tuning/regression evidence for source-pixel-backed price-axis calibration; this case is not held out.",
+    "changed_extraction_fields": [
+      "price_axis.require_anchor_evidence",
+      "price_axis.anchors[0].pixel",
+      "price_axis.anchors[*].evidence"
+    ],
+    "unchanged_extraction_fields": [
+      "plot_bounds",
+      "price_axis.scale",
+      "price_axis.anchors[*].value",
+      "price_axis.anchors[1].pixel",
+      "styles",
+      "duplicate_distance_px"
+    ],
+    "detection_tuned_from_truth": false,
+    "style_geometry_inventory_changed": false
+  },
+  "provenance": {
+    "instrument": "300308",
+    "renderer_family": "snowball_web",
+    "source_fixture": "snowball_held_out_001",
+    "image_and_truth_copied_byte_for_byte": true
+  },
+  "consent": {
+    "retain_public_screenshot": true,
+    "retain_normalized_ohlc_fixture": true
+  },
+  "truth": {
+    "file": "truth.csv",
+    "source_workbook": "\u4e2d\u9645\u65ed\u521b_300308.xlsx",
+    "source_workbook_sha256": "BA690DC42E53422F65149F0F47054E59FDA42D2F7300A5B7A25034C94CC33628",
+    "source_sheet": "300308\u65e5\u7ebf\u6570\u636e",
+    "source_range": "A210:F233",
+    "ticker_filter": "300308",
+    "visible_interval": {
+      "first_date": "2026-05-29",
+      "last_date": "2026-07-02",
+      "rows": 24
+    },
+    "mapping": "A=date; B=ticker filter; C=open; D=close; E=high; F=low",
+    "x_center_method": "Independent original-raster body-edge midpoints from visible candle geometry; no extracted candidate rows used",
+    "evaluator_only": true
+  },
+  "extraction_config": {
+    "plot_bounds": [20, 12, 1274, 1109],
+    "price_axis": {
+      "scale": "linear",
+      "require_anchor_evidence": true,
+      "anchors": [
+        {
+          "pixel": 12,
+          "value": 1443.30,
+          "evidence": {
+            "kind": "horizontal_reference_line",
+            "role": "gridline",
+            "x_range": [120, 1273],
+            "color": "#F2F2F2",
+            "tolerance": 4,
+            "min_support_ratio": 0.90,
+            "max_row_offset_px": 1
+          }
+        },
+        {
+          "pixel": 1108,
+          "value": 766.61,
+          "evidence": {
+            "kind": "horizontal_reference_line",
+            "role": "gridline",
+            "x_range": [120, 1273],
+            "color": "#F2F2F2",
+            "tolerance": 4,
+            "min_support_ratio": 0.90,
+            "max_row_offset_px": 1
+          }
+        }
+      ]
+    },
+    "styles": [
+      {
+        "id": "filled_green",
+        "kind": "filled",
+        "colors": ["#009933"],
+        "tolerance": 20,
+        "direction": "open_above_close",
+        "geometry": {
+          "min_body_width_px": 25,
+          "max_body_width_px": 60,
+          "min_body_height_px": 2,
+          "max_wick_center_offset_px": 3,
+          "max_wick_connection_gap_px": 2
+        }
+      },
+      {
+        "id": "outline_red",
+        "kind": "outline",
+        "colors": ["#DD2200"],
+        "tolerance": 28,
+        "direction": "close_above_open",
+        "geometry": {
+          "min_body_width_px": 25,
+          "max_body_width_px": 60,
+          "min_vertical_length_px": 2,
+          "max_wick_center_offset_px": 3,
+          "max_wick_connection_gap_px": 2
+        }
+      }
+    ],
+    "duplicate_distance_px": 20
+  },
+  "evaluation": {
+    "x_match_tolerance_px": 12,
+    "max_unsafe_false_accepts": 0,
+    "required_gate_rationale": "Predeclared independently of truth/results: the axis scale is about 0.626 price/px, so MAE 1.0 permits about 1.6 px and max error 2.0 permits about 3.2 px for raster rounding/antialiasing without masking obvious numeric errors.",
+    "required": {
+      "precision": 1.0,
+      "recall": 1.0,
+      "f1": 1.0,
+      "max_field_mae": 1.0,
+      "max_field_absolute_error": 2.0,
+      "max_ohlc_invariant_violations": 0,
+      "max_unsafe_false_accepts": 0
+    }
+  }
+}

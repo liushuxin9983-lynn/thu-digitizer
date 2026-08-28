@@ -1,0 +1,165 @@
+{
+  "calibration_provenance": {
+    "method": "lightweight_charts_coordinate_api",
+    "price_api": "candlestickSeries.coordinateToPrice",
+    "time_api": "chart.timeScale().timeToCoordinate"
+  },
+  "case_id": "synthetic_lwc_015_narrow_bollinger",
+  "classification": "stress",
+  "evaluation": {
+    "required": {
+      "clean_case_f1": 1.0,
+      "clean_case_precision": 1.0,
+      "clean_case_recall": 1.0,
+      "max_field_absolute_error": 0.08277488,
+      "max_field_mae": 0.04138744,
+      "max_unsafe_false_accepts": 0,
+      "stress_case_failures_are_reported_not_omitted": true
+    },
+    "x_match_tolerance_px": 6.118
+  },
+  "extraction_config": {
+    "duplicate_distance_px": 14.275,
+    "plot_bounds": [
+      0,
+      0,
+      1141,
+      671
+    ],
+    "price_axis": {
+      "anchors": [
+        {
+          "pixel": 101,
+          "value": 112.67334182
+        },
+        {
+          "pixel": 571,
+          "value": 104.89250321
+        }
+      ],
+      "provenance": "deterministic_renderer_geometry",
+      "scale": "linear"
+    },
+    "styles": [
+      {
+        "colors": [
+          "#26A69A"
+        ],
+        "direction": "close_above_open",
+        "geometry": {
+          "body_occluder_vertical_radius_px": 1,
+          "bridge_filled_body_fragments": true,
+          "max_body_fragment_center_delta_px": 21,
+          "max_body_fragment_edge_delta_px": 21,
+          "max_body_fragment_union_width_px": 39,
+          "max_body_fragment_width_delta_px": 21,
+          "max_body_occlusion_gap_px": 9,
+          "max_body_width_px": 39,
+          "max_occlusion_gap_px": 9,
+          "max_wick_center_offset_px": 2,
+          "max_wick_connection_gap_px": 2,
+          "min_body_fragment_horizontal_overlap_px": 4,
+          "min_body_height_px": 2,
+          "min_body_occluder_row_coverage": 1.0,
+          "min_body_width_px": 18,
+          "min_occluder_color_separation": 1.0,
+          "min_vertical_length_px": 2,
+          "occluder_role": "topology_only_not_numeric_fill",
+          "verified_occluder_colors": [
+            "#00ACC1",
+            "#8E24AA"
+          ],
+          "verified_occluder_tolerance": 14
+        },
+        "id": "rise",
+        "kind": "filled",
+        "tolerance": 16
+      },
+      {
+        "colors": [
+          "#EF5350"
+        ],
+        "direction": "open_above_close",
+        "geometry": {
+          "body_occluder_vertical_radius_px": 1,
+          "bridge_filled_body_fragments": true,
+          "max_body_fragment_center_delta_px": 21,
+          "max_body_fragment_edge_delta_px": 21,
+          "max_body_fragment_union_width_px": 39,
+          "max_body_fragment_width_delta_px": 21,
+          "max_body_occlusion_gap_px": 9,
+          "max_body_width_px": 39,
+          "max_occlusion_gap_px": 9,
+          "max_wick_center_offset_px": 2,
+          "max_wick_connection_gap_px": 2,
+          "min_body_fragment_horizontal_overlap_px": 4,
+          "min_body_height_px": 2,
+          "min_body_occluder_row_coverage": 1.0,
+          "min_body_width_px": 18,
+          "min_occluder_color_separation": 1.0,
+          "min_vertical_length_px": 2,
+          "occluder_role": "topology_only_not_numeric_fill",
+          "verified_occluder_colors": [
+            "#00ACC1",
+            "#8E24AA"
+          ],
+          "verified_occluder_tolerance": 14
+        },
+        "id": "fall",
+        "kind": "filled",
+        "tolerance": 16
+      }
+    ]
+  },
+  "family": "bollinger",
+  "held_out": false,
+  "image": {
+    "coordinate_space": "original_raster_pixels",
+    "file": "original.png",
+    "height": 700,
+    "sha256": "67412BA71831205BA9F315C0EC0275B7055F28FFB8922DD316C762B3D14D5E52",
+    "width": 1200
+  },
+  "kind": "synthetic",
+  "limitations": [
+    "single renderer and template family",
+    "synthetic tuning evidence only",
+    "dates are evaluator identifiers, not OCR targets",
+    "overlay values cannot supply OHLC"
+  ],
+  "overlay_policy": {
+    "colors": [
+      "#00ACC1",
+      "#8E24AA"
+    ],
+    "occluder_role": "topology_only_not_numeric_fill",
+    "values_used_for_ohlc": false
+  },
+  "renderer": {
+    "browser": "151.0.7922.34",
+    "device_scale_factor": 1,
+    "name": "lightweight-charts",
+    "playwright_version": "1.62.1",
+    "version": "5.2.0"
+  },
+  "schema_version": 1,
+  "stressors": {
+    "body_style": "filled",
+    "geometry": "standard",
+    "near_color_overlay": false,
+    "overlay_ids": [
+      "bollinger_upper_1",
+      "bollinger_middle_1",
+      "bollinger_lower_1"
+    ],
+    "theme": "western_light"
+  },
+  "truth": {
+    "detector_access": false,
+    "file": "truth.csv",
+    "mapping": "date identifies rows; OHLC is source truth; x_center_px comes from renderer timeToCoordinate",
+    "seed": 1015,
+    "source": "deterministic_local_generator"
+  },
+  "tuning_case": true
+}
