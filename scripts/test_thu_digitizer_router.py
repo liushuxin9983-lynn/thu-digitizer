@@ -26,7 +26,25 @@ class UnifiedRouterTests(unittest.TestCase):
             "raster_candlestick_candidate",
         )
         self.assertEqual(panel["coordinate_model"], "categorical_value")
-        self.assertEqual([axis["axis_id"] for axis in panel["axes"]], ["category", "price"])
+        self.assertEqual(
+            panel["axes"],
+            [
+                {
+                    "axis_id": "category",
+                    "orientation": "category",
+                    "scale": "categorical",
+                    "verification": "not_applicable",
+                    "anchors": [],
+                },
+                {
+                    "axis_id": "price",
+                    "orientation": "y",
+                    "scale": "linear",
+                    "verification": "missing",
+                    "anchors": [],
+                },
+            ],
+        )
         self.assertIn("price_axis", panel["required_confirmations"])
         self.assertIn("route_config", panel)
         self.assertFalse(report["safety"]["numeric_extraction_authorized"])
@@ -37,8 +55,23 @@ class UnifiedRouterTests(unittest.TestCase):
             with self.subTest(chart_type=chart_type):
                 _report, spec = build_preflight(image, chart_type=chart_type)
                 self.assertEqual(
-                    [axis["axis_id"] for axis in spec["panels"][0]["axes"]],
-                    ["category", "value"],
+                    spec["panels"][0]["axes"],
+                    [
+                        {
+                            "axis_id": "category",
+                            "orientation": "category",
+                            "scale": "categorical",
+                            "verification": "missing",
+                            "anchors": [],
+                        },
+                        {
+                            "axis_id": "value",
+                            "orientation": "value",
+                            "scale": "linear",
+                            "verification": "missing",
+                            "anchors": [],
+                        },
+                    ],
                 )
 
     def test_registry_ids_are_unique_and_every_route_declares_limits(self):

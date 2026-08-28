@@ -155,11 +155,7 @@ def inspect_input(path: Path, *, page_number: int | None = None) -> dict[str, An
         }
 
 
-def _axis_templates(
-    coordinate_model: str,
-    *,
-    categorical_value_axis_id: str = "value",
-) -> list[dict[str, Any]]:
+def _axis_templates(coordinate_model: str) -> list[dict[str, Any]]:
     if coordinate_model in {
         "cartesian_linear",
         "cartesian_log_x",
@@ -181,8 +177,8 @@ def _axis_templates(
         ]
     if coordinate_model == "categorical_value":
         return [
-            {"axis_id": "category", "orientation": "category", "scale": "categorical", "verification": "not_applicable", "anchors": []},
-            {"axis_id": categorical_value_axis_id, "orientation": "y", "scale": "linear", "verification": "missing", "anchors": []},
+            {"axis_id": "category", "orientation": "category", "scale": "categorical", "verification": "missing", "anchors": []},
+            {"axis_id": "value", "orientation": "value", "scale": "linear", "verification": "missing", "anchors": []},
         ]
     if coordinate_model == "grid_color":
         return [
@@ -203,6 +199,13 @@ def _axis_templates(
             {"axis_id": "value", "orientation": "value", "scale": "linear", "verification": "missing", "anchors": []},
         ]
     return []
+
+
+def _candlestick_axis_templates() -> list[dict[str, Any]]:
+    return [
+        {"axis_id": "category", "orientation": "category", "scale": "categorical", "verification": "not_applicable", "anchors": []},
+        {"axis_id": "price", "orientation": "y", "scale": "linear", "verification": "missing", "anchors": []},
+    ]
 
 
 def build_preflight(
@@ -267,9 +270,10 @@ def build_preflight(
                 "chart_type_verification": "user_provided" if chart_type else "missing",
                 "coordinate_model": coordinate_model,
                 "coordinate_model_verification": "proposed" if coordinate_model != "unknown" else "missing",
-                "axes": _axis_templates(
-                    coordinate_model,
-                    categorical_value_axis_id="price" if is_candlestick else "value",
+                "axes": (
+                    _candlestick_axis_templates()
+                    if is_candlestick
+                    else _axis_templates(coordinate_model)
                 ),
                 "series": [],
                 "mark_grammars": route["mark_grammars"],

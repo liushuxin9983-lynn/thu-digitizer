@@ -65,3 +65,7 @@ No matches
 ```
 
 The full suite's normal non-suppressed run also exited zero; its only diagnostics were pre-existing Pillow deprecation warnings for the `mode` parameter in unrelated bar, boxplot, and histogram image helpers.
+
+## Axis template restoration verification
+
+The final review fix was verified with the route regression tests covering generic bar, box, paired outline box, and candlestick templates, followed by the complete scripts test suite. The focused run passed 12 tests, and the full suite passed without failures.
